@@ -40,13 +40,29 @@ clinic monorepo at `~/Desktop/temetro-mono` (see that repo's root `CLAUDE.md`).
   subpaths (e.g. `@noble/curves/ed25519.js`). `react-native-get-random-values` is imported at the
   top of `crypto.ts` to polyfill `crypto.getRandomValues`.
 - **State.** `src/lib/wallet-context.tsx` is a React context that loads the identity + record,
-  connects the relay, and exposes `approve`/`deny`/`updateRecord`/`reset`. The two tabs
-  (`src/app/index.tsx` = Wallet, `src/app/explore.tsx` = Identity) consume it.
+  connects the relay, and exposes `approve`/`deny`/`respondToPairing`/`updateRecord`/`setRelayUrl`/
+  `reset`. The route files `src/app/{index,explore}.tsx` are thin and render the screen components.
 
-## Config
+## UI — platform-specific `@expo/ui` (hard requirement)
 
-- The backend relay URL comes from `EXPO_PUBLIC_API_URL` (`src/lib/config.ts`, default
-  `http://localhost:4000`). On a physical device set it to your machine's LAN IP.
+The screens are **MetaMask-style native trees**, split by platform so Metro picks the right one:
+`src/components/{wallet-screen,identity-screen}.ios.tsx` use **`@expo/ui/swift-ui`** (SwiftUI;
+SF Symbols via `Image systemName`, modifiers from `@expo/ui/swift-ui/modifiers`),
+`.android.tsx` use **`@expo/ui/jetpack-compose`** (Material 3 `Card`/`Icon`/`Box`, modifiers from
+`@expo/ui/jetpack-compose/modifiers`), and `.tsx` is a universal web fallback. Shared bits:
+`src/lib/{theme,identicon,format}.ts`. Read the installed component `.d.ts` before editing — the API
+is versioned with the SDK. The camera scanner (`src/components/scan-modal.tsx`) and the relay
+"Network" editor (`src/components/network-modal.tsx`) are plain React Native, rendered **outside** any
+`@expo/ui` `Host`.
+
+## Config & relay discovery
+
+- **Zero-config for users.** The relay URL is baked into `app.json` `expo.extra.relayUrl` (read via
+  `expo-constants`). `src/lib/config.ts` resolves: in-app override (secure-store) → `EXPO_PUBLIC_API_URL`
+  (**dev only**) → `extra.relayUrl` → `http://localhost:4000`. Users can change it on **Identity →
+  Network**, or just **scan a clinic's QR** (the pairing URI carries that clinic's URL).
+- **QR pairing.** `src/lib/relay.ts` `parsePairingUri` + `respondToPairing` connect to the scanned
+  clinic's relay, authenticate, and submit the sealed bundle — no wallet number typed.
 
 ## Commands
 

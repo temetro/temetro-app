@@ -60,6 +60,83 @@ export function connectRelay(
   return socket;
 }
 
+// Parsed contents of a scanned `temetro-pair:` QR (a clinic's relay URL + the
+// pending request + the ephemeral key to seal to).
+export type Pairing = {
+  relay: string;
+  rid: string;
+  epk: string;
+  mode?: string;
+  dur?: string;
+};
+
+export function parsePairingUri(uri: string): Pairing | null {
+  try {
+    const q = uri.includes('?') ? uri.slice(uri.indexOf('?') + 1) : '';
+    const params = new URLSearchParams(q);
+    const relay = params.get('relay');
+    const rid = params.get('rid');
+    const epk = params.get('epk');
+    if (!relay || !rid || !epk) return null;
+    return {
+      relay,
+      rid,
+      epk,
+      mode: params.get('mode') ?? undefined,
+      dur: params.get('dur') ?? undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// QR flow: connect to the clinic's relay (from the scanned QR — may differ from
+// our default), authenticate, and submit the sealed + signed bundle for that
+// request, then disconnect. Resolves true on success.
+export function respondToPairing(
+  identity: WalletIdentity,
+  patient: Patient,
+  pairing: Pairing,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = io(`${pairing.relay}/wallet`, {
+      transports: ['websocket'],
+      forceNew: true,
+    });
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      socket.disconnect();
+      resolve(ok);
+    };
+    socket.on('wallet:challenge', ({ challenge }: { challenge: string }) => {
+      const signature = signMessage(identity.privateKeyHex, utf8ToBytes(challenge));
+      socket.emit(
+        'wallet:auth',
+        { walletNumber: identity.walletNumber, signature },
+        (ack: { ok: boolean }) => {
+          if (!ack?.ok) return finish(false);
+          const bytes = utf8ToBytes(JSON.stringify({ patient }));
+          socket.emit(
+            'wallet:share-response',
+            {
+              requestId: pairing.rid,
+              walletNumber: identity.walletNumber,
+              decision: 'approved',
+              sealed: seal(pairing.epk, bytes),
+              signature: signMessage(identity.privateKeyHex, bytes),
+            },
+            (ack2: { ok: boolean }) => finish(!!ack2?.ok),
+          );
+        },
+      );
+    });
+    socket.on('connect_error', () => finish(false));
+    setTimeout(() => finish(false), 12000);
+  });
+}
+
 // Reply to a share request. On approval, the record bundle is signed with the
 // wallet key (provenance) and sealed to the clinic's ephemeral key (privacy).
 export function respondToShare(
