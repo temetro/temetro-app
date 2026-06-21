@@ -1,98 +1,163 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Button, Column, Host, List, ListItem, Row, Spacer, Text } from '@expo/ui';
+import * as Clipboard from 'expo-clipboard';
+import { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useWallet } from '@/lib/wallet-context';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
+const STATUS_LABEL: Record<string, string> = {
+  connecting: 'Connecting…',
+  connected: 'Connecting…',
+  authenticated: 'Online',
+  'auth-failed': 'Auth failed',
+  disconnected: 'Offline',
+};
+
+export default function WalletScreen() {
+  const { identity, record, status, pendingRequest, approve, deny } = useWallet();
+  const [copied, setCopied] = useState(false);
+
+  const copyWallet = async () => {
+    if (!identity) return;
+    await Clipboard.setStringAsync(identity.walletNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  if (!identity || !record) {
     return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
+      <SafeAreaView style={styles.center}>
+        <Host matchContents>
+          <Text textStyle={{ fontSize: 16 }}>Setting up your wallet…</Text>
+        </Host>
+      </SafeAreaView>
     );
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Host matchContents>
+          <Column spacing={16}>
+            <Column spacing={4}>
+              <Text textStyle={{ fontSize: 28, fontWeight: '700' }}>
+                My wallet
+              </Text>
+              <Text textStyle={{ fontSize: 14, color: '#8a8a8e' }}>
+                {`Relay: ${STATUS_LABEL[status] ?? status}`}
+              </Text>
+            </Column>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+            {/* Wallet number card */}
+            <Column
+              spacing={8}
+              style={{ backgroundColor: '#1c1c1e', borderRadius: 16, padding: 16 }}
+            >
+              <Text textStyle={{ fontSize: 13, color: '#8a8a8e' }}>
+                Wallet number
+              </Text>
+              <Text textStyle={{ fontSize: 15, fontWeight: '600' }}>
+                {identity.walletNumber}
+              </Text>
+              <Button
+                variant="outlined"
+                label={copied ? 'Copied' : 'Copy wallet number'}
+                onPress={copyWallet}
+              />
+            </Column>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+            {/* Incoming share request */}
+            {pendingRequest ? (
+              <Column
+                spacing={10}
+                style={{ backgroundColor: '#0a2540', borderRadius: 16, padding: 16 }}
+              >
+                <Text textStyle={{ fontSize: 17, fontWeight: '700' }}>
+                  Share request
+                </Text>
+                <Text textStyle={{ fontSize: 14 }}>
+                  {`${pendingRequest.clinicName} wants to import your record.`}
+                </Text>
+                <Text textStyle={{ fontSize: 13, color: '#9bb8d3' }}>
+                  {pendingRequest.mode === 'temporary'
+                    ? `Temporary — auto-deleted after ${
+                        pendingRequest.durationHours ?? 0
+                      }h`
+                    : 'Permanent share'}
+                </Text>
+                <Row spacing={10}>
+                  <Button
+                    variant="filled"
+                    label="Approve"
+                    onPress={() => approve(pendingRequest)}
+                  />
+                  <Button
+                    variant="outlined"
+                    label="Deny"
+                    onPress={() => deny(pendingRequest)}
+                  />
+                </Row>
+              </Column>
+            ) : null}
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+            {/* Record summary */}
+            <Text textStyle={{ fontSize: 20, fontWeight: '700' }}>
+              {record.name}
+            </Text>
+            <List>
+              <ListItem supportingText={`${record.age} · ${record.sex}`}>
+                Age · Sex
+              </ListItem>
+              <ListItem supportingText={record.status}>Status</ListItem>
+              <ListItem
+                supportingText={
+                  record.allergies.map((a) => a.substance).join(', ') || 'None'
+                }
+              >
+                Allergies
+              </ListItem>
+              <ListItem
+                supportingText={
+                  record.medications.map((m) => m.name).join(', ') || 'None'
+                }
+              >
+                Medications
+              </ListItem>
+              <ListItem
+                supportingText={
+                  record.problems.map((p) => p.label).join(', ') || 'None'
+                }
+              >
+                Problems
+              </ListItem>
+              <ListItem supportingText={record.encounters[0]?.summary ?? '—'}>
+                Last visit
+              </ListItem>
+            </List>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+            <Spacer />
+            <Button
+              variant="text"
+              label="How sharing works"
+              onPress={() =>
+                Alert.alert(
+                  'Your data stays on this device',
+                  'Your record is encrypted on your phone. It is only ever shared when you approve a request, and a temporary share is deleted from the clinic automatically.',
+                )
+              }
+            />
+          </Column>
+        </Host>
+        <View style={styles.footer} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  safe: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  content: { padding: 16 },
+  footer: { height: 80 },
 });
