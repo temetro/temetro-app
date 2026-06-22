@@ -34,7 +34,7 @@ export function connectRelay(
   },
 ): Socket {
   const socket = io(`${apiUrl}/wallet`, {
-    transports: ['websocket'],
+    transports: ['websocket', 'polling'],
     forceNew: true,
   });
 
@@ -100,7 +100,7 @@ export function respondToPairing(
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const socket = io(`${pairing.relay}/wallet`, {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       forceNew: true,
     });
     let settled = false;
@@ -132,10 +132,9 @@ export function respondToPairing(
         },
       );
     });
-    socket.on('connect_error', () => finish(false));
-    // Fail fast if the relay URL in the QR isn't reachable from this device,
-    // rather than leaving the user staring at a frozen screen.
-    setTimeout(() => finish(false), 8000);
+    // Give up if we can't reach the relay — long enough to tolerate a first
+    // cold connection over cellular / a public tunnel, short enough not to hang.
+    setTimeout(() => finish(false), 15000);
   });
 }
 
