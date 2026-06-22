@@ -133,7 +133,9 @@ export function respondToPairing(
       );
     });
     socket.on('connect_error', () => finish(false));
-    setTimeout(() => finish(false), 12000);
+    // Fail fast if the relay URL in the QR isn't reachable from this device,
+    // rather than leaving the user staring at a frozen screen.
+    setTimeout(() => finish(false), 8000);
   });
 }
 

@@ -7,13 +7,13 @@ import {
   Spacer,
   Text,
   VStack,
-  ZStack,
 } from '@expo/ui/swift-ui';
 import {
   background,
   cornerRadius,
   font,
   foregroundColor,
+  frame,
   padding,
 } from '@expo/ui/swift-ui/modifiers';
 import * as Clipboard from 'expo-clipboard';
@@ -24,31 +24,42 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NetworkModal } from '@/components/network-modal';
 import { shortWallet } from '@/lib/format';
 import { identiconColors } from '@/lib/identicon';
-import { palette } from '@/lib/theme';
+import { type Palette, useTheme } from '@/lib/theme';
 import { useWallet } from '@/lib/wallet-context';
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function Section({ title, palette, children }: { title: string; palette: Palette; children: React.ReactNode }) {
   return (
-    <VStack
-      alignment="leading"
-      spacing={3}
-      modifiers={[padding({ all: 14 }), background(palette.card), cornerRadius(14)]}
-    >
-      <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>{label}</Text>
-      <Text modifiers={[font({ size: 14, design: 'monospaced' }), foregroundColor(palette.text)]}>
+    <VStack alignment="leading" spacing={8}>
+      <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundColor(palette.textDim), padding({ leading: 4 })]}>
+        {title}
+      </Text>
+      <VStack spacing={1} modifiers={[background(palette.separator), cornerRadius(16)]}>
+        {children}
+      </VStack>
+    </VStack>
+  );
+}
+
+function Row({ label, value, palette }: { label: string; value: string; palette: Palette }) {
+  return (
+    <HStack spacing={12} modifiers={[padding({ all: 14 }), background(palette.card), frame({ maxWidth: Infinity })]}>
+      <Text modifiers={[font({ size: 15 }), foregroundColor(palette.text)]}>{label}</Text>
+      <Spacer />
+      <Text modifiers={[font({ size: 14, design: 'monospaced' }), foregroundColor(palette.textDim)]}>
         {value}
       </Text>
-    </VStack>
+    </HStack>
   );
 }
 
 export default function IdentityScreenIOS() {
   const { identity, record, relayUrl, setRelayUrl, reset } = useWallet();
+  const { palette } = useTheme();
   const [netOpen, setNetOpen] = useState(false);
 
   if (!identity) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: palette.bg }]}>
         <Host style={styles.fill}>
           <VStack modifiers={[padding({ all: 24 })]}>
             <Text modifiers={[foregroundColor(palette.textDim)]}>Loading…</Text>
@@ -58,7 +69,7 @@ export default function IdentityScreenIOS() {
     );
   }
 
-  const colors = identiconColors(identity.publicKeyHex);
+  const idColor = identiconColors(identity.publicKeyHex).from;
 
   const confirmReset = () =>
     Alert.alert(
@@ -71,57 +82,66 @@ export default function IdentityScreenIOS() {
     );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: palette.bg }]} edges={['top', 'left', 'right']}>
       <Host style={styles.fill}>
         <ScrollView>
-          <VStack spacing={14} modifiers={[padding({ all: 16 })]}>
-            <HStack spacing={14}>
-              <ZStack>
-                <Image systemName="circle.fill" size={52} color={colors.from} />
-                <Text modifiers={[font({ size: 17, weight: 'bold' }), foregroundColor('#ffffff')]}>
+          <VStack spacing={20} modifiers={[padding({ horizontal: 16, top: 4, bottom: 28 })]}>
+            <Text modifiers={[font({ size: 30, weight: 'bold' }), foregroundColor(palette.text), padding({ leading: 4 })]}>
+              Identity
+            </Text>
+
+            {/* Identity header card */}
+            <HStack spacing={14} modifiers={[padding({ all: 16 }), background(palette.card), cornerRadius(20)]}>
+              <VStack modifiers={[frame({ width: 52, height: 52 }), background(idColor), cornerRadius(26)]}>
+                <Text modifiers={[font({ size: 18, weight: 'bold' }), foregroundColor('#ffffff')]}>
                   {record?.initials ?? 'TM'}
                 </Text>
-              </ZStack>
-              <VStack alignment="leading" spacing={2}>
-                <Text modifiers={[font({ size: 20, weight: 'bold' }), foregroundColor(palette.text)]}>
+              </VStack>
+              <VStack alignment="leading" spacing={3}>
+                <Text modifiers={[font({ size: 19, weight: 'semibold' }), foregroundColor(palette.text)]}>
                   {record?.name ?? 'My identity'}
                 </Text>
-                <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>
-                  Stored only on this device
-                </Text>
+                <HStack spacing={5}>
+                  <Image systemName="lock.fill" size={11} color={palette.success} />
+                  <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>
+                    Stored only on this device
+                  </Text>
+                </HStack>
               </VStack>
               <Spacer />
             </HStack>
 
-            <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundColor(palette.textDim), padding({ top: 6, leading: 4 })]}>
-              ACCOUNT DETAILS
-            </Text>
-            <DetailRow label="Wallet number" value={shortWallet(identity.walletNumber)} />
-            <DetailRow label="Public key fingerprint" value={identity.fingerprint} />
-            <DetailRow label="Algorithm" value="Ed25519" />
+            <Section title="WALLET" palette={palette}>
+              <Row label="Wallet number" value={shortWallet(identity.walletNumber)} palette={palette} />
+              <Row label="Fingerprint" value={identity.fingerprint} palette={palette} />
+              <Row label="Algorithm" value="Ed25519" palette={palette} />
+            </Section>
 
-            <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundColor(palette.textDim), padding({ top: 6, leading: 4 })]}>
-              NETWORK
-            </Text>
-            <VStack
-              alignment="leading"
-              spacing={8}
-              modifiers={[padding({ all: 14 }), background(palette.card), cornerRadius(14)]}
-            >
-              <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>Relay server</Text>
-              <Text modifiers={[font({ size: 14 }), foregroundColor(palette.text)]}>{relayUrl}</Text>
-              <Button label="Change network" systemImage="network" onPress={() => setNetOpen(true)} />
+            <Section title="NETWORK" palette={palette}>
+              <Row label="Relay server" value={relayUrl} palette={palette} />
+              <HStack spacing={12} modifiers={[padding({ all: 14 }), background(palette.card), frame({ maxWidth: Infinity })]}>
+                <Button label="Change network" systemImage="network" onPress={() => setNetOpen(true)} />
+                <Spacer />
+              </HStack>
+            </Section>
+
+            <VStack spacing={1} modifiers={[background(palette.separator), cornerRadius(16)]}>
+              <HStack spacing={12} modifiers={[padding({ all: 14 }), background(palette.card), frame({ maxWidth: Infinity })]}>
+                <Button
+                  label="Copy fingerprint"
+                  systemImage="doc.on.doc"
+                  onPress={() => {
+                    void Clipboard.setStringAsync(identity.fingerprint);
+                    Alert.alert('Copied', 'Fingerprint copied.');
+                  }}
+                />
+                <Spacer />
+              </HStack>
+              <HStack spacing={12} modifiers={[padding({ all: 14 }), background(palette.card), frame({ maxWidth: Infinity })]}>
+                <Button label="Reset wallet" systemImage="trash" role="destructive" onPress={confirmReset} />
+                <Spacer />
+              </HStack>
             </VStack>
-
-            <Button
-              label="Copy fingerprint"
-              systemImage="doc.on.doc"
-              onPress={() => {
-                void Clipboard.setStringAsync(identity.fingerprint);
-                Alert.alert('Copied', 'Fingerprint copied.');
-              }}
-            />
-            <Button label="Reset wallet" role="destructive" onPress={confirmReset} />
           </VStack>
         </ScrollView>
       </Host>
@@ -140,6 +160,6 @@ export default function IdentityScreenIOS() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.bg },
+  safe: { flex: 1 },
   fill: { flex: 1 },
 });

@@ -1,9 +1,32 @@
-import { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Button,
+  Host,
+  HStack,
+  Spacer,
+  Text,
+  TextField,
+  useNativeState,
+  VStack,
+} from '@expo/ui/swift-ui';
+import {
+  background,
+  cornerRadius,
+  font,
+  foregroundColor,
+  frame,
+  padding,
+} from '@expo/ui/swift-ui/modifiers';
+import { useEffect } from 'react';
+import { Dimensions, Modal, Pressable, StyleSheet, View } from 'react-native';
 
-import { palette } from '@/lib/theme';
+import { useTheme } from '@/lib/theme';
 
-// Small RN sheet to view/change the relay server URL (MetaMask-style "network").
+// Bound the SwiftUI content width so Text wraps (Host matchContents otherwise
+// sizes to intrinsic width and the hint overflows the sheet). Sheet padding 20×2.
+const CONTENT_WIDTH = Dimensions.get('window').width - 40;
+
+// Bottom-sheet to view/change the relay server URL. The sheet content is native
+// @expo/ui (SwiftUI) — including the TextField — presented inside an RN Modal.
 export function NetworkModal({
   visible,
   current,
@@ -15,54 +38,65 @@ export function NetworkModal({
   onClose: () => void;
   onSave: (url: string) => void;
 }) {
-  const [url, setUrl] = useState(current);
+  const { palette } = useTheme();
+  const text = useNativeState(current);
+
   useEffect(() => {
-    if (visible) setUrl(current);
-  }, [visible, current]);
+    if (visible) text.set(current);
+  }, [visible, current, text]);
 
   return (
     <Modal animationType="slide" onRequestClose={onClose} transparent visible={visible}>
-      <View style={styles.backdrop}>
-        <View style={styles.sheet}>
-          <Text style={styles.title}>Relay server</Text>
-          <Text style={styles.hint}>
-            The clinic server your wallet connects to. Keep the default unless a clinic gives you a
-            different address.
-          </Text>
-          <TextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            onChangeText={setUrl}
-            placeholder="http://…"
-            placeholderTextColor={palette.textDim}
-            style={styles.input}
-            value={url}
-          />
-          <View style={styles.row}>
-            <Pressable onPress={onClose} style={[styles.btn, styles.cancel]}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </Pressable>
-            <Pressable onPress={() => onSave(url)} style={[styles.btn, styles.save]}>
-              <Text style={styles.saveText}>Save</Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
+      <Pressable onPress={onClose} style={styles.backdrop}>
+        {/* Stop taps inside the sheet from dismissing it. */}
+        <Pressable onPress={() => {}} style={[styles.sheet, { backgroundColor: palette.card }]}>
+          <View style={styles.grabber} />
+          <Host matchContents>
+            <VStack alignment="leading" spacing={14} modifiers={[frame({ width: CONTENT_WIDTH })]}>
+              <Text modifiers={[font({ size: 20, weight: 'bold' }), foregroundColor(palette.text)]}>
+                Relay server
+              </Text>
+              <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>
+                The clinic server your wallet connects to. Keep the default unless a clinic gives you a different address.
+              </Text>
+              <TextField
+                autoFocus
+                placeholder="http://…"
+                text={text}
+                modifiers={[
+                  padding({ all: 13 }),
+                  background(palette.cardAlt),
+                  cornerRadius(12),
+                  frame({ maxWidth: Infinity }),
+                ]}
+              />
+              <HStack spacing={12} modifiers={[padding({ top: 2 }), frame({ maxWidth: Infinity })]}>
+                <Button label="Cancel" role="cancel" onPress={onClose} />
+                <Spacer />
+                <Button label="Save" systemImage="checkmark" onPress={() => onSave(text.get())} />
+              </HStack>
+            </VStack>
+          </Host>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
-  sheet: { backgroundColor: palette.card, padding: 20, paddingBottom: 36, borderTopLeftRadius: 24, borderTopRightRadius: 24, gap: 12 },
-  title: { color: palette.text, fontSize: 18, fontWeight: '700' },
-  hint: { color: palette.textDim, fontSize: 13 },
-  input: { backgroundColor: palette.cardAlt, color: palette.text, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
-  row: { flexDirection: 'row', gap: 12, marginTop: 4 },
-  btn: { flex: 1, borderRadius: 14, paddingVertical: 13, alignItems: 'center' },
-  cancel: { backgroundColor: palette.cardAlt },
-  cancelText: { color: palette.text, fontWeight: '600' },
-  save: { backgroundColor: palette.accent },
-  saveText: { color: '#fff', fontWeight: '700' },
+  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
+  sheet: {
+    padding: 20,
+    paddingBottom: 40,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  grabber: {
+    alignSelf: 'center',
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(127,127,127,0.4)',
+    marginBottom: 14,
+  },
 });
