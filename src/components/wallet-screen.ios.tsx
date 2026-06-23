@@ -1,5 +1,6 @@
 import {
   Button,
+  Grid,
   Host,
   HStack,
   Image,
@@ -48,12 +49,15 @@ function CategoryCard({
   return (
     <VStack
       alignment="leading"
-      spacing={10}
-      modifiers={[frame({ height: 126, maxWidth: Infinity, alignment: 'topLeading' }), padding({ all: 16 }), ...cardSurface(palette, 18)]}
+      spacing={12}
+      modifiers={[
+        padding({ all: 14 }),
+        frame({ maxWidth: Infinity, minHeight: 104, alignment: 'topLeading' }),
+        ...cardSurface(palette, 18),
+      ]}
     >
-      <Chip color={c.color} soft={c.soft} icon={CATEGORY_ICON[ck]} />
-      <Spacer />
-      <VStack alignment="leading" spacing={2}>
+      <Chip color={c.color} soft={c.soft} icon={CATEGORY_ICON[ck]} size={36} />
+      <VStack alignment="leading" spacing={3}>
         <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>{label}</Text>
         <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundColor(palette.text), lineLimit(1)]}>
           {value}
@@ -276,18 +280,18 @@ export default function WalletScreenIOS() {
               </VStack>
             ) : null}
 
-            {/* Health record — category grid */}
+            {/* Health record — even 2×2 grid (native SwiftUI Grid keeps columns equal) */}
             <SectionLabel text="HEALTH RECORD" palette={palette} />
-            <VStack spacing={12}>
-              <HStack spacing={12}>
+            <Grid horizontalSpacing={12} verticalSpacing={12} modifiers={[frame({ maxWidth: Infinity })]}>
+              <Grid.Row>
                 <CategoryCard {...cats[0]} palette={palette} />
                 <CategoryCard {...cats[1]} palette={palette} />
-              </HStack>
-              <HStack spacing={12}>
+              </Grid.Row>
+              <Grid.Row>
                 <CategoryCard {...cats[2]} palette={palette} />
                 <CategoryCard {...cats[3]} palette={palette} />
-              </HStack>
-            </VStack>
+              </Grid.Row>
+            </Grid>
 
             {/* History timeline */}
             {history.length ? (
