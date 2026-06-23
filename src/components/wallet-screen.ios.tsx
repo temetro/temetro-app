@@ -10,11 +10,15 @@ import {
 } from '@expo/ui/swift-ui';
 import {
   background,
-  cornerRadius,
+  buttonStyle,
+  controlSize,
   font,
   foregroundColor,
   frame,
+  lineLimit,
   padding,
+  shapes,
+  tint,
 } from '@expo/ui/swift-ui/modifiers';
 import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
@@ -22,13 +26,42 @@ import { Alert, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScanModal } from '@/components/scan-modal';
-import { shareModeLabel, shortWallet } from '@/lib/format';
+import { cardSurface, Chip, SectionLabel } from '@/components/swift-card';
+import { formatDate, shareModeLabel, shortWallet } from '@/lib/format';
 import { identiconColors } from '@/lib/identicon';
 import { parsePairingUri } from '@/lib/relay';
-import { useTheme } from '@/lib/theme';
+import { CATEGORY_ICON, type CategoryKey, type Palette, useTheme } from '@/lib/theme';
 import { useWallet } from '@/lib/wallet-context';
 
-type Row = { icon: string; label: string; value: string };
+function CategoryCard({
+  ck,
+  label,
+  value,
+  palette,
+}: {
+  ck: CategoryKey;
+  label: string;
+  value: string;
+  palette: Palette;
+}) {
+  const c = palette.category[ck];
+  return (
+    <VStack
+      alignment="leading"
+      spacing={10}
+      modifiers={[frame({ height: 126, maxWidth: Infinity, alignment: 'topLeading' }), padding({ all: 16 }), ...cardSurface(palette, 18)]}
+    >
+      <Chip color={c.color} soft={c.soft} icon={CATEGORY_ICON[ck]} />
+      <Spacer />
+      <VStack alignment="leading" spacing={2}>
+        <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>{label}</Text>
+        <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundColor(palette.text), lineLimit(1)]}>
+          {value}
+        </Text>
+      </VStack>
+    </VStack>
+  );
+}
 
 export default function WalletScreenIOS() {
   const { identity, record, status, pendingRequest, approve, deny, respondToPairing } =
@@ -43,9 +76,7 @@ export default function WalletScreenIOS() {
       <SafeAreaView style={[styles.safe, { backgroundColor: palette.bg }]}>
         <Host style={styles.fill}>
           <VStack modifiers={[padding({ all: 24 })]}>
-            <Text modifiers={[foregroundColor(palette.textDim)]}>
-              Setting up your wallet…
-            </Text>
+            <Text modifiers={[foregroundColor(palette.textDim)]}>Setting up your wallet…</Text>
           </VStack>
         </Host>
       </SafeAreaView>
@@ -87,42 +118,42 @@ export default function WalletScreenIOS() {
     );
   };
 
-  const rows: Row[] = [
+  const cats: { ck: CategoryKey; label: string; value: string }[] = [
     {
-      icon: 'exclamationmark.triangle.fill',
+      ck: 'allergy',
       label: 'Allergies',
       value: record.allergies.map((a) => a.substance).join(', ') || 'None recorded',
     },
     {
-      icon: 'pills.fill',
+      ck: 'medication',
       label: 'Medications',
       value: record.medications.map((m) => m.name).join(', ') || 'None recorded',
     },
     {
-      icon: 'heart.text.square.fill',
+      ck: 'problem',
       label: 'Problems',
       value: record.problems.map((p) => p.label).join(', ') || 'None recorded',
     },
     {
-      icon: 'testtube.2',
+      ck: 'lab',
       label: 'Labs',
       value: record.labs.map((l) => l.name).join(', ') || 'None recorded',
     },
-    {
-      icon: 'calendar',
-      label: 'Last visit',
-      value: record.encounters[0]?.summary ?? '—',
-    },
   ];
 
+  const history = [...record.encounters].sort((a, b) => (a.date < b.date ? 1 : -1));
+
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: palette.bg }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: palette.bg }]}
+      edges={['top', 'left', 'right']}
+    >
       <Host style={styles.fill}>
         <ScrollView>
-          <VStack spacing={20} modifiers={[padding({ horizontal: 16, top: 4, bottom: 28 })]}>
+          <VStack spacing={18} modifiers={[padding({ horizontal: 16, top: 4, bottom: 32 })]}>
             {/* Large title */}
             <VStack alignment="leading" spacing={2} modifiers={[padding({ leading: 4 })]}>
-              <Text modifiers={[font({ size: 30, weight: 'bold' }), foregroundColor(palette.text)]}>
+              <Text modifiers={[font({ size: 32, weight: 'bold' }), foregroundColor(palette.text)]}>
                 Wallet
               </Text>
               <Text modifiers={[font({ size: 14 }), foregroundColor(palette.textDim)]}>
@@ -130,99 +161,172 @@ export default function WalletScreenIOS() {
               </Text>
             </VStack>
 
-            {/* Identity card */}
+            {/* Hero identity card */}
             <VStack
               alignment="leading"
-              spacing={14}
-              modifiers={[padding({ all: 18 }), background(palette.card), cornerRadius(20)]}
+              spacing={16}
+              modifiers={[padding({ all: 20 }), ...cardSurface(palette)]}
             >
               <HStack spacing={13}>
                 <VStack
-                  modifiers={[frame({ width: 46, height: 46 }), background(idColor), cornerRadius(23)]}
+                  modifiers={[
+                    frame({ width: 52, height: 52 }),
+                    background(idColor, shapes.roundedRectangle({ cornerRadius: 26 })),
+                  ]}
                 >
-                  <Text modifiers={[font({ size: 16, weight: 'bold' }), foregroundColor('#ffffff')]}>
+                  <Text modifiers={[font({ size: 19, weight: 'bold' }), foregroundColor('#ffffff')]}>
                     {record.initials}
                   </Text>
                 </VStack>
-                <VStack alignment="leading" spacing={3}>
-                  <Text modifiers={[font({ size: 18, weight: 'semibold' }), foregroundColor(palette.text)]}>
+                <VStack alignment="leading" spacing={4}>
+                  <Text modifiers={[font({ size: 19, weight: 'semibold' }), foregroundColor(palette.text)]}>
                     {record.name}
                   </Text>
-                  <Text modifiers={[font({ size: 13, design: 'monospaced' }), foregroundColor(palette.textDim)]}>
-                    {shortWallet(identity.walletNumber)}
-                  </Text>
+                  <HStack spacing={6}>
+                    <Image systemName="circle.fill" size={8} color={stat.color} />
+                    <Text modifiers={[font({ size: 13, weight: 'medium' }), foregroundColor(palette.textDim)]}>
+                      {stat.label}
+                    </Text>
+                  </HStack>
                 </VStack>
                 <Spacer />
               </HStack>
 
-              {/* Status pill */}
-              <HStack spacing={6} modifiers={[padding({ horizontal: 11, vertical: 6 }), background(palette.cardAlt), cornerRadius(20)]}>
-                <Image systemName="circle.fill" size={8} color={stat.color} />
-                <Text modifiers={[font({ size: 12, weight: 'medium' }), foregroundColor(palette.textDim)]}>
-                  {stat.label}
+              {/* Wallet number — the app's hero detail */}
+              <VStack
+                alignment="leading"
+                spacing={7}
+                modifiers={[
+                  padding({ all: 14 }),
+                  background(palette.cardAlt, shapes.roundedRectangle({ cornerRadius: 14 })),
+                  frame({ maxWidth: Infinity, alignment: 'leading' }),
+                ]}
+              >
+                <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundColor(palette.textFaint)]}>
+                  WALLET NUMBER
                 </Text>
-              </HStack>
+                <HStack>
+                  <Text modifiers={[font({ size: 15, design: 'monospaced', weight: 'medium' }), foregroundColor(palette.text)]}>
+                    {shortWallet(identity.walletNumber)}
+                  </Text>
+                  <Spacer />
+                  <Button
+                    label={copied ? 'Copied' : 'Copy'}
+                    systemImage={copied ? 'checkmark' : 'doc.on.doc'}
+                    onPress={copy}
+                    modifiers={[buttonStyle('borderless'), controlSize('small'), tint(palette.accent)]}
+                  />
+                </HStack>
+              </VStack>
 
-              <HStack spacing={18}>
-                <Button label="Scan to connect" systemImage="qrcode.viewfinder" onPress={() => setScanOpen(true)} />
-                <Button label={copied ? 'Copied' : 'Copy number'} systemImage="doc.on.doc" onPress={copy} />
-                <Spacer />
-              </HStack>
+              {/* Primary action */}
+              <Button
+                label="Scan to connect"
+                systemImage="qrcode.viewfinder"
+                onPress={() => setScanOpen(true)}
+                modifiers={[
+                  buttonStyle('borderedProminent'),
+                  controlSize('large'),
+                  tint(palette.accent),
+                  frame({ maxWidth: Infinity }),
+                ]}
+              />
             </VStack>
 
             {/* Incoming share request */}
             {pendingRequest ? (
               <VStack
                 alignment="leading"
-                spacing={10}
-                modifiers={[padding({ all: 16 }), background(palette.accentSoft), cornerRadius(18)]}
+                spacing={12}
+                modifiers={[
+                  padding({ all: 18 }),
+                  background(palette.accentSoft, shapes.roundedRectangle({ cornerRadius: 20 })),
+                ]}
               >
-                <HStack spacing={8}>
-                  <Image systemName="bell.badge.fill" size={16} color={palette.accent} />
-                  <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundColor(palette.text)]}>
-                    Share request
-                  </Text>
+                <HStack spacing={9}>
+                  <Chip color={palette.accent} soft={palette.card} icon="bell.badge.fill" size={34} />
+                  <VStack alignment="leading" spacing={2}>
+                    <Text modifiers={[font({ size: 16, weight: 'semibold' }), foregroundColor(palette.text)]}>
+                      Share request
+                    </Text>
+                    <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>
+                      {shareModeLabel(pendingRequest.mode, pendingRequest.durationHours)}
+                    </Text>
+                  </VStack>
+                  <Spacer />
                 </HStack>
                 <Text modifiers={[font({ size: 14 }), foregroundColor(palette.text)]}>
                   {`${pendingRequest.clinicName} wants to import your record.`}
                 </Text>
-                <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>
-                  {shareModeLabel(pendingRequest.mode, pendingRequest.durationHours)}
-                </Text>
-                <HStack spacing={18}>
-                  <Button label="Approve" systemImage="checkmark" onPress={() => approve(pendingRequest)} />
-                  <Button label="Deny" role="destructive" onPress={() => deny(pendingRequest)} />
+                <HStack spacing={10}>
+                  <Button
+                    label="Approve"
+                    systemImage="checkmark"
+                    onPress={() => approve(pendingRequest)}
+                    modifiers={[buttonStyle('borderedProminent'), controlSize('regular'), tint(palette.accent)]}
+                  />
+                  <Button
+                    label="Deny"
+                    role="destructive"
+                    onPress={() => deny(pendingRequest)}
+                    modifiers={[buttonStyle('bordered'), controlSize('regular')]}
+                  />
                   <Spacer />
                 </HStack>
               </VStack>
             ) : null}
 
-            {/* Health record */}
-            <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundColor(palette.textDim), padding({ leading: 4, top: 2 })]}>
-              HEALTH RECORD
-            </Text>
-            <VStack spacing={1} modifiers={[background(palette.separator), cornerRadius(18)]}>
-              {rows.map((row) => (
-                <HStack
-                  key={row.label}
-                  spacing={13}
-                  modifiers={[padding({ all: 14 }), background(palette.card), frame({ maxWidth: Infinity })]}
-                >
-                  <VStack modifiers={[frame({ width: 30, height: 30 }), background(palette.accentSoft), cornerRadius(8)]}>
-                    <Image systemName={row.icon as never} size={15} color={palette.accent} modifiers={[padding({ all: 7 })]} />
-                  </VStack>
-                  <VStack alignment="leading" spacing={2}>
-                    <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>
-                      {row.label}
-                    </Text>
-                    <Text modifiers={[font({ size: 15 }), foregroundColor(palette.text)]}>
-                      {row.value}
-                    </Text>
-                  </VStack>
-                  <Spacer />
-                </HStack>
-              ))}
+            {/* Health record — category grid */}
+            <SectionLabel text="HEALTH RECORD" palette={palette} />
+            <VStack spacing={12}>
+              <HStack spacing={12}>
+                <CategoryCard {...cats[0]} palette={palette} />
+                <CategoryCard {...cats[1]} palette={palette} />
+              </HStack>
+              <HStack spacing={12}>
+                <CategoryCard {...cats[2]} palette={palette} />
+                <CategoryCard {...cats[3]} palette={palette} />
+              </HStack>
             </VStack>
+
+            {/* History timeline */}
+            {history.length ? (
+              <>
+                <SectionLabel text="HISTORY" palette={palette} />
+                <VStack spacing={0} modifiers={[padding({ horizontal: 18, vertical: 6 }), ...cardSurface(palette, 20)]}>
+                  {history.map((e, i) => (
+                    <HStack key={`${e.date}-${i}`} alignment="top" spacing={13} modifiers={[padding({ vertical: 12 })]}>
+                      <VStack spacing={0} modifiers={[frame({ width: 12, alignment: 'top' })]}>
+                        <Image systemName="circle.fill" size={11} color={palette.accent} />
+                        {i < history.length - 1 ? (
+                          <VStack
+                            modifiers={[
+                              frame({ width: 2, maxHeight: Infinity }),
+                              background(palette.separator),
+                              padding({ top: 4 }),
+                            ]}
+                          >
+                            <Spacer />
+                          </VStack>
+                        ) : null}
+                      </VStack>
+                      <VStack alignment="leading" spacing={3}>
+                        <Text modifiers={[font({ size: 12, weight: 'semibold' }), foregroundColor(palette.accent)]}>
+                          {formatDate(e.date)}
+                        </Text>
+                        <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundColor(palette.text)]}>
+                          {`${e.type} · ${e.provider}`}
+                        </Text>
+                        <Text modifiers={[font({ size: 14 }), foregroundColor(palette.textDim)]}>
+                          {e.summary}
+                        </Text>
+                      </VStack>
+                      <Spacer />
+                    </HStack>
+                  ))}
+                </VStack>
+              </>
+            ) : null}
           </VStack>
         </ScrollView>
       </Host>

@@ -47,13 +47,20 @@ export function ScanModal({
 
             {/* Reticle + chrome over the live camera */}
             <SafeAreaView style={styles.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
-              <RNText style={styles.title}>Scan clinic QR</RNText>
-              <RNText style={styles.subtitle}>
-                Point your camera at the QR shown on the clinic screen.
-              </RNText>
+              <View style={styles.headerScrim}>
+                <RNText style={styles.title}>Scan clinic QR</RNText>
+                <RNText style={styles.subtitle}>
+                  Point your camera at the QR shown on the clinic screen.
+                </RNText>
+              </View>
 
               <View style={styles.reticleWrap} pointerEvents="none">
-                <View style={styles.reticle} />
+                <View style={styles.reticle}>
+                  <View style={[styles.corner, styles.cornerTL, { borderColor: palette.accent }]} />
+                  <View style={[styles.corner, styles.cornerTR, { borderColor: palette.accent }]} />
+                  <View style={[styles.corner, styles.cornerBL, { borderColor: palette.accent }]} />
+                  <View style={[styles.corner, styles.cornerBR, { borderColor: palette.accent }]} />
+                </View>
               </View>
 
               <Pressable onPress={onClose} style={styles.cancelBtn}>
@@ -83,15 +90,19 @@ export function ScanModal({
   );
 }
 
-const RETICLE = 232;
+const RETICLE = 248;
+const CORNER = 40;
+const CORNER_W = 5;
+const CORNER_R = 18;
 
 const styles = StyleSheet.create({
   fill: { flex: 1, backgroundColor: '#000' },
   permFill: { alignItems: 'stretch', justifyContent: 'center' },
-  overlay: { ...StyleSheet.absoluteFill, alignItems: 'center', paddingTop: 24, paddingBottom: 24 },
-  title: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  overlay: { ...StyleSheet.absoluteFill, alignItems: 'center', paddingTop: 12, paddingBottom: 28 },
+  headerScrim: { alignItems: 'center', paddingTop: 12 },
+  title: { color: '#fff', fontSize: 22, fontWeight: '700' },
   subtitle: {
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.82)',
     fontSize: 14,
     textAlign: 'center',
     paddingHorizontal: 40,
@@ -102,15 +113,22 @@ const styles = StyleSheet.create({
     width: RETICLE,
     height: RETICLE,
     borderRadius: 28,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.95)',
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
+  corner: {
+    position: 'absolute',
+    width: CORNER,
+    height: CORNER,
+  },
+  cornerTL: { top: 0, left: 0, borderTopWidth: CORNER_W, borderLeftWidth: CORNER_W, borderTopLeftRadius: CORNER_R },
+  cornerTR: { top: 0, right: 0, borderTopWidth: CORNER_W, borderRightWidth: CORNER_W, borderTopRightRadius: CORNER_R },
+  cornerBL: { bottom: 0, left: 0, borderBottomWidth: CORNER_W, borderLeftWidth: CORNER_W, borderBottomLeftRadius: CORNER_R },
+  cornerBR: { bottom: 0, right: 0, borderBottomWidth: CORNER_W, borderRightWidth: CORNER_W, borderBottomRightRadius: CORNER_R },
   cancelBtn: {
-    paddingHorizontal: 32,
-    paddingVertical: 13,
-    borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    paddingHorizontal: 36,
+    paddingVertical: 14,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   cancelText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

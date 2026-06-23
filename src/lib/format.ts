@@ -4,6 +4,14 @@ export function shortWallet(walletNumber: string): string {
   return `${walletNumber.slice(0, 12)}…${walletNumber.slice(-6)}`;
 }
 
+// Format an ISO date (YYYY-MM-DD) as a short, human label, e.g. "May 20, 2026".
+// Falls back to the raw string if it can't be parsed.
+export function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 // Human label for a share mode + duration.
 export function shareModeLabel(
   mode: 'permanent' | 'temporary',
