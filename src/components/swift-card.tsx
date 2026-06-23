@@ -47,6 +47,22 @@ export function Chip({
   );
 }
 
+// A small colored capsule — used for severity / lab-flag status chips.
+export function Pill({ text, color, soft }: { text: string; color: string; soft: string }) {
+  return (
+    <Text
+      modifiers={[
+        font({ size: 11, weight: 'semibold' }),
+        foregroundColor(color),
+        padding({ horizontal: 9, vertical: 4 }),
+        background(soft, shapes.capsule()),
+      ]}
+    >
+      {text}
+    </Text>
+  );
+}
+
 export function SectionLabel({ text, palette }: { text: string; palette: Palette }) {
   return (
     <Text

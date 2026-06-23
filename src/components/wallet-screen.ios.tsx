@@ -1,5 +1,6 @@
 import {
   Button,
+  Chart,
   Grid,
   Host,
   HStack,
@@ -17,7 +18,9 @@ import {
   foregroundColor,
   frame,
   lineLimit,
+  monospacedDigit,
   padding,
+  shadow,
   shapes,
   tint,
 } from '@expo/ui/swift-ui/modifiers';
@@ -27,42 +30,95 @@ import { Alert, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScanModal } from '@/components/scan-modal';
-import { cardSurface, Chip, SectionLabel } from '@/components/swift-card';
+import { cardSurface, Chip, Pill, SectionLabel } from '@/components/swift-card';
 import { formatDate, shareModeLabel, shortWallet } from '@/lib/format';
-import { identiconColors } from '@/lib/identicon';
 import { parsePairingUri } from '@/lib/relay';
 import { CATEGORY_ICON, type CategoryKey, type Palette, useTheme } from '@/lib/theme';
+import type { AllergySeverity, LabFlag } from '@/lib/types';
 import { useWallet } from '@/lib/wallet-context';
 
-function CategoryCard({
-  ck,
-  label,
-  value,
-  palette,
-}: {
+// White tints used on the teal "wallet pass" surface.
+const W = { full: '#ffffff', t85: 'rgba(255,255,255,0.85)', t70: 'rgba(255,255,255,0.70)', t18: 'rgba(255,255,255,0.18)', t12: 'rgba(255,255,255,0.12)' };
+
+type Status = { text: string; color: string; soft: string };
+
+function severityStyle(p: Palette, s: AllergySeverity): Status {
+  if (s === 'severe') return { text: 'severe', color: p.danger, soft: p.dangerSoft };
+  if (s === 'moderate') return { text: 'moderate', color: p.warning, soft: p.warningSoft };
+  return { text: 'mild', color: p.success, soft: p.successSoft };
+}
+
+function flagStyle(p: Palette, f: LabFlag): Status {
+  if (f === 'critical') return { text: 'critical', color: p.danger, soft: p.dangerSoft };
+  if (f === 'high' || f === 'low') return { text: f, color: p.warning, soft: p.warningSoft };
+  return { text: 'normal', color: p.success, soft: p.successSoft };
+}
+
+type Cat = {
   ck: CategoryKey;
   label: string;
   value: string;
-  palette: Palette;
-}) {
-  const c = palette.category[ck];
+  detail?: string;
+  pill?: Status;
+};
+
+function CategoryCard({ cat, palette }: { cat: Cat; palette: Palette }) {
+  const c = palette.category[cat.ck];
   return (
     <VStack
       alignment="leading"
-      spacing={12}
+      spacing={10}
       modifiers={[
         padding({ all: 14 }),
-        frame({ maxWidth: Infinity, minHeight: 104, alignment: 'topLeading' }),
+        frame({ maxWidth: Infinity, minHeight: 128, alignment: 'topLeading' }),
         ...cardSurface(palette, 18),
       ]}
     >
-      <Chip color={c.color} soft={c.soft} icon={CATEGORY_ICON[ck]} size={36} />
-      <VStack alignment="leading" spacing={3}>
-        <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>{label}</Text>
+      <Chip color={c.color} soft={c.soft} icon={CATEGORY_ICON[cat.ck]} size={36} />
+      <VStack alignment="leading" spacing={4}>
+        <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim)]}>{cat.label}</Text>
         <Text modifiers={[font({ size: 15, weight: 'semibold' }), foregroundColor(palette.text), lineLimit(1)]}>
-          {value}
+          {cat.value}
         </Text>
+        {cat.detail ? (
+          <Text modifiers={[font({ size: 12 }), foregroundColor(palette.textDim), lineLimit(1)]}>
+            {cat.detail}
+          </Text>
+        ) : null}
+        {cat.pill ? <Pill text={cat.pill.text} color={cat.pill.color} soft={cat.pill.soft} /> : null}
       </VStack>
+    </VStack>
+  );
+}
+
+function VitalTile({
+  icon,
+  color,
+  value,
+  unit,
+  palette,
+}: {
+  icon: string;
+  color: string;
+  value: string;
+  unit: string;
+  palette: Palette;
+}) {
+  return (
+    <VStack spacing={5} modifiers={[frame({ maxWidth: Infinity })]}>
+      <Image systemName={icon as never} size={16} color={color} />
+      <Text modifiers={[font({ size: 21, weight: 'bold' }), monospacedDigit(), foregroundColor(palette.text)]}>
+        {value}
+      </Text>
+      <Text modifiers={[font({ size: 11 }), foregroundColor(palette.textDim)]}>{unit}</Text>
+    </VStack>
+  );
+}
+
+function VDivider({ palette }: { palette: Palette }) {
+  return (
+    <VStack modifiers={[frame({ width: 1, height: 30 }), background(palette.separator)]}>
+      <Spacer />
     </VStack>
   );
 }
@@ -87,7 +143,6 @@ export default function WalletScreenIOS() {
     );
   }
 
-  const idColor = identiconColors(identity.publicKeyHex).from;
   const stat = connecting
     ? { label: 'Connecting to clinic…', color: palette.warning }
     : status === 'authenticated'
@@ -122,28 +177,41 @@ export default function WalletScreenIOS() {
     );
   };
 
-  const cats: { ck: CategoryKey; label: string; value: string }[] = [
+  const allergy = record.allergies[0];
+  const med = record.medications[0];
+  const problem = record.problems[0];
+  const lab = record.labs[0];
+
+  const cats: Cat[] = [
     {
       ck: 'allergy',
       label: 'Allergies',
-      value: record.allergies.map((a) => a.substance).join(', ') || 'None recorded',
+      value: allergy?.substance ?? 'None recorded',
+      pill: allergy ? severityStyle(palette, allergy.severity) : undefined,
     },
     {
       ck: 'medication',
       label: 'Medications',
-      value: record.medications.map((m) => m.name).join(', ') || 'None recorded',
+      value: med?.name ?? 'None recorded',
+      detail: med ? `${med.dose} · ${med.frequency}` : undefined,
     },
     {
       ck: 'problem',
       label: 'Problems',
-      value: record.problems.map((p) => p.label).join(', ') || 'None recorded',
+      value: problem?.label ?? 'None recorded',
+      detail: problem ? `since ${problem.since}` : undefined,
     },
     {
       ck: 'lab',
       label: 'Labs',
-      value: record.labs.map((l) => l.name).join(', ') || 'None recorded',
+      value: lab ? `${lab.name} ${lab.value}` : 'None recorded',
+      pill: lab ? flagStyle(palette, lab.flag) : undefined,
     },
   ];
+
+  const trend = record.vitalsTrend;
+  const trendData = trend.points.map((y, i) => ({ x: i, y }));
+  const trendLatest = trend.points.length ? String(trend.points[trend.points.length - 1]) : '—';
 
   const history = [...record.encounters].sort((a, b) => (a.date < b.date ? 1 : -1));
 
@@ -165,30 +233,44 @@ export default function WalletScreenIOS() {
               </Text>
             </VStack>
 
-            {/* Hero identity card */}
+            {/* Wallet pass — branded teal hero */}
             <VStack
               alignment="leading"
               spacing={16}
-              modifiers={[padding({ all: 20 }), ...cardSurface(palette)]}
+              modifiers={[
+                padding({ all: 20 }),
+                background(palette.heroFrom, shapes.roundedRectangle({ cornerRadius: 24 })),
+                shadow({ radius: 18, y: 10, color: palette.shadow }),
+              ]}
             >
+              <HStack spacing={7}>
+                <Image systemName="shield.lefthalf.filled" size={15} color={W.full} />
+                <Text modifiers={[font({ size: 14, weight: 'semibold' }), foregroundColor(W.full)]}>
+                  temetro
+                </Text>
+                <Spacer />
+                <Image systemName="checkmark.seal.fill" size={12} color={W.t85} />
+                <Text modifiers={[font({ size: 12 }), foregroundColor(W.t85)]}>Verified</Text>
+              </HStack>
+
               <HStack spacing={13}>
                 <VStack
                   modifiers={[
-                    frame({ width: 52, height: 52 }),
-                    background(idColor, shapes.roundedRectangle({ cornerRadius: 26 })),
+                    frame({ width: 48, height: 48 }),
+                    background(W.t18, shapes.roundedRectangle({ cornerRadius: 24 })),
                   ]}
                 >
-                  <Text modifiers={[font({ size: 19, weight: 'bold' }), foregroundColor('#ffffff')]}>
+                  <Text modifiers={[font({ size: 18, weight: 'bold' }), foregroundColor(W.full)]}>
                     {record.initials}
                   </Text>
                 </VStack>
-                <VStack alignment="leading" spacing={4}>
-                  <Text modifiers={[font({ size: 19, weight: 'semibold' }), foregroundColor(palette.text)]}>
+                <VStack alignment="leading" spacing={3}>
+                  <Text modifiers={[font({ size: 19, weight: 'semibold' }), foregroundColor(W.full)]}>
                     {record.name}
                   </Text>
                   <HStack spacing={6}>
                     <Image systemName="circle.fill" size={8} color={stat.color} />
-                    <Text modifiers={[font({ size: 13, weight: 'medium' }), foregroundColor(palette.textDim)]}>
+                    <Text modifiers={[font({ size: 13, weight: 'medium' }), foregroundColor(W.t85)]}>
                       {stat.label}
                     </Text>
                   </HStack>
@@ -196,21 +278,22 @@ export default function WalletScreenIOS() {
                 <Spacer />
               </HStack>
 
-              {/* Wallet number — the app's hero detail */}
               <VStack
                 alignment="leading"
-                spacing={7}
+                spacing={6}
                 modifiers={[
                   padding({ all: 14 }),
-                  background(palette.cardAlt, shapes.roundedRectangle({ cornerRadius: 14 })),
+                  background(W.t12, shapes.roundedRectangle({ cornerRadius: 14 })),
                   frame({ maxWidth: Infinity, alignment: 'leading' }),
                 ]}
               >
-                <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundColor(palette.textFaint)]}>
+                <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundColor(W.t70)]}>
                   WALLET NUMBER
                 </Text>
                 <HStack>
-                  <Text modifiers={[font({ size: 15, design: 'monospaced', weight: 'medium' }), foregroundColor(palette.text)]}>
+                  <Text
+                    modifiers={[font({ size: 15, design: 'monospaced', weight: 'medium' }), monospacedDigit(), foregroundColor(W.full)]}
+                  >
                     {shortWallet(identity.walletNumber)}
                   </Text>
                   <Spacer />
@@ -218,24 +301,24 @@ export default function WalletScreenIOS() {
                     label={copied ? 'Copied' : 'Copy'}
                     systemImage={copied ? 'checkmark' : 'doc.on.doc'}
                     onPress={copy}
-                    modifiers={[buttonStyle('borderless'), controlSize('small'), tint(palette.accent)]}
+                    modifiers={[buttonStyle('borderless'), controlSize('small'), tint(W.full)]}
                   />
                 </HStack>
               </VStack>
-
-              {/* Primary action */}
-              <Button
-                label="Scan to connect"
-                systemImage="qrcode.viewfinder"
-                onPress={() => setScanOpen(true)}
-                modifiers={[
-                  buttonStyle('borderedProminent'),
-                  controlSize('large'),
-                  tint(palette.accent),
-                  frame({ maxWidth: Infinity }),
-                ]}
-              />
             </VStack>
+
+            {/* Primary action */}
+            <Button
+              label="Scan to connect"
+              systemImage="qrcode.viewfinder"
+              onPress={() => setScanOpen(true)}
+              modifiers={[
+                buttonStyle('borderedProminent'),
+                controlSize('large'),
+                tint(palette.accent),
+                frame({ maxWidth: Infinity }),
+              ]}
+            />
 
             {/* Incoming share request */}
             {pendingRequest ? (
@@ -280,16 +363,55 @@ export default function WalletScreenIOS() {
               </VStack>
             ) : null}
 
+            {/* Vitals at-a-glance */}
+            <SectionLabel text="VITALS" palette={palette} />
+            <HStack spacing={0} modifiers={[padding({ vertical: 16, horizontal: 6 }), ...cardSurface(palette, 18)]}>
+              <VitalTile icon="heart.fill" color={palette.category.allergy.color} value={record.vitals.hr} unit="bpm" palette={palette} />
+              <VDivider palette={palette} />
+              <VitalTile icon="waveform.path.ecg" color={palette.category.medication.color} value={record.vitals.bp} unit="mmHg" palette={palette} />
+              <VDivider palette={palette} />
+              <VitalTile icon="lungs.fill" color={palette.category.lab.color} value={record.vitals.spo2} unit="SpO₂ %" palette={palette} />
+              <VDivider palette={palette} />
+              <VitalTile icon="thermometer.medium" color={palette.warning} value={record.vitals.temp} unit="°C" palette={palette} />
+            </HStack>
+
+            {/* Trend */}
+            <SectionLabel text="TRENDS" palette={palette} />
+            <VStack alignment="leading" spacing={12} modifiers={[padding({ all: 16 }), ...cardSurface(palette, 18)]}>
+              <HStack>
+                <VStack alignment="leading" spacing={2}>
+                  <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundColor(palette.textDim)]}>
+                    {trend.label}
+                  </Text>
+                  <HStack spacing={4}>
+                    <Text modifiers={[font({ size: 24, weight: 'bold' }), monospacedDigit(), foregroundColor(palette.text)]}>
+                      {trendLatest}
+                    </Text>
+                    <Text modifiers={[font({ size: 13 }), foregroundColor(palette.textDim)]}>{trend.unit}</Text>
+                  </HStack>
+                </VStack>
+                <Spacer />
+              </HStack>
+              <Chart
+                type="line"
+                data={trendData}
+                lineStyle={{ color: palette.accent, width: 3, pointStyle: 'circle', pointSize: 7 }}
+                showGrid={false}
+                animate
+                modifiers={[frame({ height: 92, maxWidth: Infinity })]}
+              />
+            </VStack>
+
             {/* Health record — even 2×2 grid (native SwiftUI Grid keeps columns equal) */}
             <SectionLabel text="HEALTH RECORD" palette={palette} />
             <Grid horizontalSpacing={12} verticalSpacing={12} modifiers={[frame({ maxWidth: Infinity })]}>
               <Grid.Row>
-                <CategoryCard {...cats[0]} palette={palette} />
-                <CategoryCard {...cats[1]} palette={palette} />
+                <CategoryCard cat={cats[0]} palette={palette} />
+                <CategoryCard cat={cats[1]} palette={palette} />
               </Grid.Row>
               <Grid.Row>
-                <CategoryCard {...cats[2]} palette={palette} />
-                <CategoryCard {...cats[3]} palette={palette} />
+                <CategoryCard cat={cats[2]} palette={palette} />
+                <CategoryCard cat={cats[3]} palette={palette} />
               </Grid.Row>
             </Grid>
 

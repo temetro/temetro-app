@@ -25,7 +25,9 @@ export type Palette = {
   onAccent: string; // text/icon on a solid accent
   // Semantic
   success: string;
+  successSoft: string;
   warning: string;
+  warningSoft: string;
   danger: string;
   dangerSoft: string;
   // Depth — light leans on shadows, dark leans on frosted glass + glow
@@ -60,7 +62,9 @@ export const lightPalette: Palette = {
   accentSoft: '#DCF1EE',
   onAccent: '#FFFFFF',
   success: '#1FA45A',
-  warning: '#E08600',
+  successSoft: '#E1F3E8',
+  warning: '#C77700',
+  warningSoft: '#FBEED6',
   danger: '#E0352B',
   dangerSoft: '#FBE6E4',
   glass: false,
@@ -89,7 +93,9 @@ export const darkPalette: Palette = {
   accentSoft: '#143230',
   onAccent: '#04231F',
   success: '#30D158',
+  successSoft: '#0E2A18',
   warning: '#FF9F0A',
+  warningSoft: '#33260C',
   danger: '#FF453A',
   dangerSoft: '#3A1715',
   glass: true,
