@@ -29,3 +29,10 @@ export function saveRecord(localKey: string, patient: Patient): void {
   if (!file.exists) file.create();
   file.write(encryptLocal(localKey, JSON.stringify(patient)));
 }
+
+// Remove the on-disk record entirely (used when resetting the wallet so a fresh
+// registration starts from a clean slate rather than a stale ciphertext).
+export function deleteRecord(): void {
+  const file = recordFile();
+  if (file.exists) file.delete();
+}

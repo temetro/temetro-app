@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/lib/theme';
 
-// Universal fallback (web / unsupported platforms). iOS and Android use the
-// platform-specific SwiftUI / Jetpack Compose trees (onboarding-screen.ios/android).
+// First-run intro slides. Plain React Native (cross-platform) so it renders the
+// same on iOS, Android, and web.
 const SLIDES = [
   {
     title: 'Your record, your device',

@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Uniwind generated className types
+uniwind-types.d.ts

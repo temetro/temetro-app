@@ -9,12 +9,21 @@ clinic monorepo at `~/Desktop/temetro-mono` (see that repo's root `CLAUDE.md`).
 
 ## Hard requirements (do not deviate)
 
-- **Build the UI with `@expo/ui`** (the universal native components — `Host`, `Column`, `Row`,
-  `Text`, `Button`, `List`/`ListItem`, `Switch`, `Picker`, `Spacer`, `ScrollView`), so the app renders
-  **real native UI** (SwiftUI on iOS, Jetpack Compose on Android) rather than styled `View`s. Every
-  `@expo/ui` tree must be wrapped in `<Host>`. Use the `expo:expo-ui` skill before writing UI, and
-  read the installed component `.d.ts` in `node_modules/@expo/ui/build/universal/*` — the API is
-  versioned with the SDK and is the source of truth.
+- **Build the UI with HeroUI Native** (`heroui-native`) — the React Native component library built
+  on **Uniwind (Tailwind for React Native)**. Use its components (`Card`, `Button`, `BottomSheet`,
+  `ListGroup`, `Surface`, `Switch`, `TextField`/`Input`, `RadioGroup`, `Separator`, …) styled with
+  `className`, **not** `@expo/ui`. Use the **`heroui-native` skill** before writing UI (run its
+  `scripts/get_component_docs.mjs <Name>` to fetch the exact anatomy/props) and follow the compound
+  pattern (`Card.Body`, `ListGroup.Item`, …). Setup that must stay intact: `src/global.css`
+  (`@import 'tailwindcss'/'uniwind'/'heroui-native/styles'` + the teal `--accent` override),
+  `metro.config.js` (`withUniwindConfig`, the **outermost** wrapper), and the root providers in
+  `src/app/_layout.tsx` (`GestureHandlerRootView` → `HeroUINativeProvider`). Color icons
+  (`lucide-react-native`) via the `color` prop using `useThemeColor(...)`, not `className`.
+- **The native tab bar is the one exception**: it uses expo-router's `NativeTabs`
+  (`expo-router/unstable-native-tabs`) in `src/app/(tabs)/_layout.tsx` for a real UITabBar /
+  Material BottomNavigation, with **SF Symbols** (`sf=`) on iOS and `drawable=` fallbacks on Android.
+- **Icons are `lucide-react-native`** in-screen (clean SVG set) + SF Symbols on the tab bar. Do not
+  reintroduce the old PNG tab icons.
 - **Target Expo SDK 56.** All `expo-*` packages are pinned to `~56.x`. Before writing any Expo code,
   read the versioned docs at https://docs.expo.dev/versions/v56.0.0/ (see `AGENTS.md`).
 
@@ -40,20 +49,31 @@ clinic monorepo at `~/Desktop/temetro-mono` (see that repo's root `CLAUDE.md`).
   subpaths (e.g. `@noble/curves/ed25519.js`). `react-native-get-random-values` is imported at the
   top of `crypto.ts` to polyfill `crypto.getRandomValues`.
 - **State.** `src/lib/wallet-context.tsx` is a React context that loads the identity + record,
-  connects the relay, and exposes `approve`/`deny`/`respondToPairing`/`updateRecord`/`setRelayUrl`/
-  `reset`. The route files `src/app/{index,explore}.tsx` are thin and render the screen components.
+  connects the relay, and exposes `ready`/`registered`/`register`/`approve`/`deny`/
+  `respondToPairing`/`updateRecord`/`setRelayUrl`/`reset`.
+- **Registration.** First launch runs onboarding (`src/lib/onboarding.ts`) then a **registration**
+  screen (`src/app/register.tsx`) that captures name/DOB/sex and mints the first record via
+  `register()` (seeded with `SAMPLE_PATIENT` demo data, see `src/lib/sample.ts`
+  `buildPatientFromProfile`). The `temetro.registered` flag lives in `src/lib/registration.ts`;
+  `reset()` wipes keys + record + flag so the user re-registers.
 
-## UI — platform-specific `@expo/ui` (hard requirement)
+## UI — HeroUI Native (hard requirement)
 
-The screens are **MetaMask-style native trees**, split by platform so Metro picks the right one:
-`src/components/{wallet-screen,identity-screen}.ios.tsx` use **`@expo/ui/swift-ui`** (SwiftUI;
-SF Symbols via `Image systemName`, modifiers from `@expo/ui/swift-ui/modifiers`),
-`.android.tsx` use **`@expo/ui/jetpack-compose`** (Material 3 `Card`/`Icon`/`Box`, modifiers from
-`@expo/ui/jetpack-compose/modifiers`), and `.tsx` is a universal web fallback. Shared bits:
-`src/lib/{theme,identicon,format}.ts`. Read the installed component `.d.ts` before editing — the API
-is versioned with the SDK. The camera scanner (`src/components/scan-modal.tsx`) and the relay
-"Network" editor (`src/components/network-modal.tsx`) are plain React Native, rendered **outside** any
-`@expo/ui` `Host`.
+Routing is a root **Stack** in `src/app/_layout.tsx` (with an auth-style `GateRedirector`:
+onboarding → register → tabs) wrapping a `(tabs)` group:
+
+- `src/app/(tabs)/index.tsx` — **Home**: settings button (top-left), copyable wallet-number chip
+  (top-right), and a 2×2 grid of HeroUI `Card`s (Visits, Prescriptions, Appointments, Documents)
+  that push detail routes.
+- `src/app/(tabs)/camera.tsx` — **Scan**: `expo-camera` `CameraView` + a HeroUI `BottomSheet` that
+  reviews exactly what will be shared before approving (reuses `parsePairingUri`/`respondToPairing`).
+- `src/app/(tabs)/settings.tsx` — **Settings**: HeroUI `ListGroup` rows (wallet number/fingerprint
+  copy, relay editor in a `BottomSheet`, dark-mode `Switch` via `Uniwind.setTheme`, reset wallet).
+- Detail routes `src/app/{visits,prescriptions,appointments,documents}.tsx` share
+  `src/components/detail-list.tsx` and read from the record / local demo data.
+
+Screens are **single cross-platform files** (no `.ios`/`.android` splits). Shared bits:
+`src/lib/{theme,identicon,format}.ts`.
 
 ## Config & relay discovery
 
@@ -67,12 +87,16 @@ is versioned with the SDK. The camera scanner (`src/components/scan-modal.tsx`) 
 ## Commands
 
 ```bash
-npm run ios      # build + run on iOS (SDK 56 @expo/ui works in Expo Go too: npm start)
+npm run ios      # build + run on iOS (needs a dev build — HeroUI Native pulls in svg/gesture-handler)
 npm run android
-npx tsc --noEmit # typecheck (the two pre-existing *.css side-effect-import errors are from the starter)
 ```
+
+> HeroUI Native + Uniwind compute styles at build time via Metro; the `uniwind-types.d.ts` that
+> makes `className` typecheck is **generated when Metro runs**. Run the app once before relying on
+> `npx tsc --noEmit`.
 
 ## Not built yet
 
-Manual record editing in-app, QR pairing, and a clinic→wallet push of signed updates. The current
-flow seeds a sample record and focuses on the share-approval path.
+In-app record editing and a clinic→wallet push of signed updates. Appointments + documents are
+local demo data (`src/lib/sample.ts`), not yet part of the shared record. The current flow seeds a
+sample record at registration and focuses on the share-approval path.
