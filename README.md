@@ -1,56 +1,50 @@
-# Welcome to your Expo app 👋
+# temetro wallet
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The **patient companion app** for [temetro](https://github.com/temetro/temetro) —
+the open-source AI middleman between clinicians and patient data. This app makes
+the **patient-owned data model** real: a patient's record lives **encrypted on
+their own device**, and clinics can only read or change it with the patient's
+explicit, on-device approval.
 
-## Get started
+This is its **own repository**, separate from the product monorepo.
 
-1. Install dependencies
+## How it works
 
-   ```bash
-   npm install
-   ```
+- 🔑 **Your identity is a keypair.** The patient holds an **Ed25519** keypair;
+  the public key (base58check, `tmw_…`) is their **wallet number**.
+- 🔒 **Records are encrypted on-device.** The record never leaves the phone in
+  the clear. Sharing seals it to a clinic's ephemeral key over the temetro
+  relay, which only ever forwards **ciphertext**.
+- ✅ **Patient approves every share.** A clinic requests a record; the patient
+  approves on their phone; the sealed record is delivered. Temporary shares can
+  auto-delete — possible precisely because records are **off-chain**.
 
-2. Start the app
+> "Decentralization" here means keys and data live on the patient's device and
+> the relay forwards only ciphertext — it is **not** a literal blockchain. The
+> wire format mirrors the backend's `wallet-crypto` exactly.
 
-   ```bash
-   npx expo start
-   ```
+## Stack
 
-In the output, you'll find options to open the app in a
+An **Expo (SDK 56)** app. The UI **must be built with [HeroUI
+Native](https://www.heroui.com/)** (`heroui-native` + Uniwind/Tailwind) — a hard
+requirement; the only exception is the native tab bar (expo-router
+`NativeTabs`). See [`CLAUDE.md`](./CLAUDE.md) for details.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Develop
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+From the Expo output, open the app in a development build, an iOS simulator, an
+Android emulator, or Expo Go. Development is file-based routing under `app/`.
 
-### Other setup steps
+## Related repositories
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- **Product (monorepo):** <https://github.com/temetro/temetro>
+- **Documentation:** <https://docs.temetro.com>
 
-## Learn more
+## License
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT](./LICENSE).
