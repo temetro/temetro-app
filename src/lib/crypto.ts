@@ -3,7 +3,7 @@ import 'react-native-get-random-values';
 
 import { xchacha20poly1305 } from '@noble/ciphers/chacha.js';
 import { ed25519, x25519 } from '@noble/curves/ed25519.js';
-import { sha256 } from '@noble/hashes/sha2.js';
+import { sha256, sha512 } from '@noble/hashes/sha2.js';
 import {
   bytesToHex,
   concatBytes,
@@ -126,6 +126,20 @@ export function signMessage(privateKeyHex: string, message: Uint8Array): string 
   return bytesToHex(ed25519.sign(message, hexToBytes(privateKeyHex)));
 }
 
+// Verify an Ed25519 signature (hex) over `message` against a 32-byte public key.
+// Used to check a clinic's signature on a pushed record update (provenance).
+export function verifySignature(
+  publicKey: Uint8Array,
+  signatureHex: string,
+  message: Uint8Array,
+): boolean {
+  try {
+    return ed25519.verify(hexToBytes(signatureHex), message, publicKey);
+  } catch {
+    return false;
+  }
+}
+
 export function fingerprint(publicKeyHex: string): string {
   const hex = bytesToHex(sha256(hexToBytes(publicKeyHex))).slice(0, 32);
   return `ed25519:${(hex.match(/.{1,4}/g) ?? []).join(' ')}`;
@@ -168,6 +182,33 @@ export function seal(recipientPublicKeyHex: string, plaintext: Uint8Array): stri
   return toBase64(concatBytes(ephemeralPub, nonce, ciphertext));
 }
 
+// Open a sealed box addressed to this wallet's X25519 key (the inverse of the
+// backend `seal`). `recipientPrivateKeyHex` is the wallet's X25519 private key
+// derived from its Ed25519 seed via x25519PrivFromSeed. Throws on tamper.
+export function open(recipientPrivateKeyHex: string, sealedBase64: string): Uint8Array {
+  const recipientPriv = hexToBytes(recipientPrivateKeyHex);
+  const recipientPub = x25519.getPublicKey(recipientPriv);
+  const blob = fromBase64(sealedBase64);
+  const ephemeralPub = blob.slice(0, 32);
+  const nonce = blob.slice(32, 56);
+  const ciphertext = blob.slice(56);
+  const shared = x25519.getSharedSecret(recipientPriv, ephemeralPub);
+  const key = deriveKey(shared, ephemeralPub, recipientPub);
+  return xchacha20poly1305(key, nonce).decrypt(ciphertext);
+}
+
+// Derive the wallet's X25519 private key from its Ed25519 seed (SHA-512 of the
+// seed, first 32 bytes, clamped) so a clinic can seal an update to the X25519
+// key it derives from the wallet's Ed25519 public key. MUST match the backend's
+// src/lib/wallet-x25519.ts derivation (verified: getPublicKey of this === that).
+export function x25519PrivFromSeed(seedHex: string): string {
+  const h = sha512(hexToBytes(seedHex)).slice(0, 32);
+  h[0] &= 248;
+  h[31] &= 127;
+  h[31] |= 64;
+  return bytesToHex(h);
+}
+
 // --- Local symmetric encryption for the on-device record store -------------
 
 export function newLocalKey(): string {
@@ -190,4 +231,4 @@ export function decryptLocal(keyHex: string, payloadBase64: string): string {
   return new TextDecoder().decode(plaintext);
 }
 
-export { utf8ToBytes };
+export { hexToBytes, utf8ToBytes };

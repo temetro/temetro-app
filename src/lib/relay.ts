@@ -25,12 +25,27 @@ export type ShareRequest = {
   durationHours: number | null;
 };
 
+// A clinic→wallet record update pushed over the relay. `sealed` is the encrypted
+// patient snapshot (opened with the wallet's derived X25519 key);
+// `signature`/`clinicPublicKey` prove the clinic authored it.
+export type RecordUpdateEvent = {
+  requestId: string;
+  clinicName: string;
+  sealed: string;
+  signature: string;
+  clinicPublicKey: string;
+  fingerprint: string;
+  changes: string[];
+  createdAt: string;
+};
+
 export function connectRelay(
   apiUrl: string,
   identity: WalletIdentity,
   handlers: {
     onStatus: (status: RelayStatus) => void;
     onShareRequest: (request: ShareRequest) => void;
+    onUpdateRequest?: (update: RecordUpdateEvent) => void;
   },
 ): Socket {
   const socket = io(`${apiUrl}/wallet`, {
@@ -57,7 +72,32 @@ export function connectRelay(
     handlers.onShareRequest(request),
   );
 
+  socket.on('wallet:update-request', (update: RecordUpdateEvent) =>
+    handlers.onUpdateRequest?.(update),
+  );
+
   return socket;
+}
+
+// Tell the clinic the patient's decision on a pushed record update. The decision
+// is signed (`${decision}:${requestId}`) so the backend can verify it came from
+// this wallet before resolving the update.
+export function respondToUpdate(
+  socket: Socket,
+  identity: WalletIdentity,
+  requestId: string,
+  decision: 'approved' | 'denied',
+): void {
+  const signature = signMessage(
+    identity.privateKeyHex,
+    utf8ToBytes(`${decision}:${requestId}`),
+  );
+  socket.emit('wallet:update-response', {
+    requestId,
+    walletNumber: identity.walletNumber,
+    decision,
+    signature,
+  });
 }
 
 // Parsed contents of a scanned `temetro-pair:` QR (a clinic's relay URL + the

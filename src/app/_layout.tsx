@@ -8,6 +8,7 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { UpdatesInbox } from '@/components/updates-inbox';
 import { useOnboarding } from '@/lib/onboarding';
 import { useWallet, WalletProvider } from '@/lib/wallet-context';
 
@@ -68,6 +69,7 @@ export default function RootLayout() {
               />
             </Stack>
             <AnimatedSplashOverlay />
+            <UpdatesInbox />
             <GateRedirector />
           </WalletProvider>
         </HeroUINativeProvider>

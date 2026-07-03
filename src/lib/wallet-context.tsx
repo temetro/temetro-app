@@ -9,13 +9,22 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import { loadRelayOverride, relayUrl as resolveRelayUrl, setRelayOverride } from './config';
+import { hexToBytes, open, verifySignature, x25519PrivFromSeed } from './crypto';
+import {
+  checkAndPinClinicKey,
+  loadUpdates,
+  type PendingUpdate,
+  saveUpdates,
+} from './pending-updates';
 import { deleteRecord, loadRecord, saveRecord } from './records';
 import { clearRegistered, isRegistered, setRegistered } from './registration';
 import {
   connectRelay,
   type Pairing,
+  type RecordUpdateEvent,
   respondToPairing,
   respondToShare,
+  respondToUpdate,
   type RelayStatus,
   type ShareRequest,
 } from './relay';
@@ -31,9 +40,12 @@ type WalletContextValue = {
   status: RelayStatus;
   relayUrl: string;
   pendingRequest: ShareRequest | null;
+  pendingUpdates: PendingUpdate[];
   register: (profile: RegistrationProfile) => Promise<void>;
   approve: (request: ShareRequest) => void;
   deny: (request: ShareRequest) => void;
+  approveUpdate: (update: PendingUpdate) => void;
+  denyUpdate: (update: PendingUpdate) => void;
   respondToPairing: (pairing: Pairing) => Promise<boolean>;
   updateRecord: (patient: Patient) => void;
   setRelayUrl: (url: string) => Promise<void>;
@@ -50,9 +62,62 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<RelayStatus>('connecting');
   const [relayUrl, setRelayUrlState] = useState<string>(resolveRelayUrl());
   const [pendingRequest, setPendingRequest] = useState<ShareRequest | null>(null);
+  const [pendingUpdates, setPendingUpdates] = useState<PendingUpdate[]>([]);
   const socketRef = useRef<Socket | null>(null);
   const identityRef = useRef<WalletIdentity | null>(null);
   const recordRef = useRef<Patient | null>(null);
+  const updatesRef = useRef<PendingUpdate[]>([]);
+
+  const persistUpdates = (next: PendingUpdate[]) => {
+    updatesRef.current = next;
+    setPendingUpdates(next);
+    const id = identityRef.current;
+    if (id) saveUpdates(id.localKey, next);
+  };
+
+  // A clinic pushed a record update: open it with our derived X25519 key, verify
+  // the clinic's signature over the plaintext, TOFU-pin the clinic key, and queue
+  // it for the patient to review. Ignored silently if it can't be trusted.
+  const handleUpdateRequest = (event: RecordUpdateEvent) => {
+    const id = identityRef.current;
+    if (!id) return;
+    // Skip anything we already hold (the relay re-sends on reconnect).
+    if (updatesRef.current.some((u) => u.requestId === event.requestId)) return;
+    try {
+      const priv = x25519PrivFromSeed(id.privateKeyHex);
+      const plaintext = open(priv, event.sealed);
+      const ok = verifySignature(
+        hexToBytes(event.clinicPublicKey),
+        event.signature,
+        plaintext,
+      );
+      if (!ok) return;
+      const bundle = JSON.parse(new TextDecoder().decode(plaintext)) as {
+        patient: Patient;
+        changes: string[];
+      };
+      void checkAndPinClinicKey(event.clinicName, event.clinicPublicKey).then(
+        (keyOk) => {
+          const update: PendingUpdate = {
+            requestId: event.requestId,
+            clinicName: event.clinicName,
+            clinicPublicKey: event.clinicPublicKey,
+            fingerprint: event.fingerprint,
+            changes: bundle.changes ?? event.changes ?? [],
+            patient: bundle.patient,
+            createdAt: event.createdAt,
+            keyChanged: !keyOk,
+          };
+          if (updatesRef.current.some((u) => u.requestId === update.requestId)) {
+            return;
+          }
+          persistUpdates([...updatesRef.current, update]);
+        },
+      );
+    } catch {
+      /* undecryptable / malformed — drop it */
+    }
+  };
 
   // (Re)connect the relay socket to the given URL.
   const connect = (id: WalletIdentity, url: string) => {
@@ -61,6 +126,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     socketRef.current = connectRelay(url, id, {
       onStatus: setStatus,
       onShareRequest: (request) => setPendingRequest(request),
+      onUpdateRequest: handleUpdateRequest,
     });
   };
 
@@ -75,6 +141,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const rec = await loadRecord(id.localKey);
       recordRef.current = rec;
       setRecord(rec);
+      const saved = await loadUpdates(id.localKey);
+      updatesRef.current = saved;
+      setPendingUpdates(saved);
       setRegisteredState(await isRegistered());
       const url = resolveRelayUrl();
       setRelayUrlState(url);
@@ -116,6 +185,35 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setPendingRequest(null);
   };
 
+  // The patient approved a pushed update: replace the on-device record with the
+  // clinic's snapshot, tell the clinic, and clear it from the inbox.
+  const approveUpdate = (update: PendingUpdate) => {
+    const id = identityRef.current;
+    if (id) {
+      saveRecord(id.localKey, update.patient);
+      recordRef.current = update.patient;
+      setRecord(update.patient);
+    }
+    const socket = socketRef.current;
+    if (socket && id) {
+      respondToUpdate(socket, id, update.requestId, 'approved');
+    }
+    persistUpdates(
+      updatesRef.current.filter((u) => u.requestId !== update.requestId),
+    );
+  };
+
+  const denyUpdate = (update: PendingUpdate) => {
+    const socket = socketRef.current;
+    const id = identityRef.current;
+    if (socket && id) {
+      respondToUpdate(socket, id, update.requestId, 'denied');
+    }
+    persistUpdates(
+      updatesRef.current.filter((u) => u.requestId !== update.requestId),
+    );
+  };
+
   const respondToPairingShare = async (pairing: Pairing): Promise<boolean> => {
     const id = identityRef.current;
     if (!id || !recordRef.current) return false;
@@ -147,6 +245,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     await clearRegistered();
     recordRef.current = null;
     setRecord(null);
+    updatesRef.current = [];
+    setPendingUpdates([]);
     setRegisteredState(false);
     const id = await getWallet();
     identityRef.current = id;
@@ -164,9 +264,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         status,
         relayUrl,
         pendingRequest,
+        pendingUpdates,
         register,
         approve,
         deny,
+        approveUpdate,
+        denyUpdate,
         respondToPairing: respondToPairingShare,
         updateRecord,
         setRelayUrl,
