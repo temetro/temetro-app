@@ -1,44 +1,38 @@
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
-// The clinic relay URL the wallet connects to. End users never type this:
-// production builds bake a default into app.json `extra.relayUrl`. Resolution
-// precedence: a user-set in-app override → EXPO_PUBLIC_API_URL (dev only) →
-// app.json extra.relayUrl → localhost. A clinic-specific URL can also arrive
-// via a scanned QR (see relay/pairing), which takes effect for that share.
+// The relay URL the wallet connects to. This is FIXED — end users can't change
+// it in-app (a mistyped URL used to break the connection). Production builds bake
+// it into app.json `extra.relayUrl`; a build-time EXPO_PUBLIC_API_URL still wins
+// for local dev / self-hosting. A clinic-specific relay can also arrive via a
+// scanned QR (see relay/pairing), which takes effect just for that share.
 
+// Legacy key for the removed in-app override — cleared on startup so any bad
+// value a user previously saved is discarded.
 const OVERRIDE_KEY = 'temetro.relayUrl';
 
-const BAKED_DEFAULT =
+const BAKED_DEFAULT = (
   (Constants.expoConfig?.extra as { relayUrl?: string } | undefined)?.relayUrl ??
   process.env.EXPO_PUBLIC_API_URL ??
-  'http://localhost:4000';
+  'https://network.temetro.com'
+).replace(/\/+$/, ''); // no trailing slash → clean `${url}/wallet`
 
-let overrideCache: string | null | undefined;
-
-// The relay URL to use right now (honours an in-app override once loaded).
+// The relay URL to use right now (fixed).
 export function relayUrl(): string {
-  return overrideCache || BAKED_DEFAULT;
+  return BAKED_DEFAULT;
 }
 
 export function defaultRelayUrl(): string {
   return BAKED_DEFAULT;
 }
 
-// Load the persisted override into the cache (call once at startup).
+// Called once at startup: wipe any override a previous build may have persisted,
+// so the wallet always uses the fixed relay URL.
 export async function loadRelayOverride(): Promise<string> {
-  overrideCache = await SecureStore.getItemAsync(OVERRIDE_KEY);
-  return relayUrl();
-}
-
-// Persist (or clear) the in-app relay override.
-export async function setRelayOverride(url: string | null): Promise<void> {
-  const trimmed = url?.trim();
-  if (trimmed) {
-    overrideCache = trimmed;
-    await SecureStore.setItemAsync(OVERRIDE_KEY, trimmed);
-  } else {
-    overrideCache = null;
+  try {
     await SecureStore.deleteItemAsync(OVERRIDE_KEY);
+  } catch {
+    /* nothing stored — fine */
   }
+  return relayUrl();
 }

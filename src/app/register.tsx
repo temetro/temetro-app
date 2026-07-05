@@ -11,7 +11,7 @@ import {
 } from 'heroui-native';
 import { ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shortWallet } from '@/lib/format';
@@ -43,13 +43,12 @@ export default function RegisterScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <KeyboardAvoidingView
+      <ScrollView
         className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: 32 }}
-          contentContainerClassName="px-6 gap-7"
-          keyboardShouldPersistTaps="handled">
+        contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: 32 }}
+        contentContainerClassName="px-6 gap-7"
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets>
           <View className="gap-4">
             <View className="size-16 items-center justify-center rounded-3xl bg-accent/15">
               <ShieldCheck size={30} color={accent} />
@@ -114,7 +113,6 @@ export default function RegisterScreen() {
             <Button.Label>{submitting ? 'Creating…' : 'Create wallet'}</Button.Label>
           </Button>
         </ScrollView>
-      </KeyboardAvoidingView>
     </View>
   );
 }

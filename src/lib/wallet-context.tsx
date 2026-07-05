@@ -8,7 +8,7 @@ import {
 } from 'react';
 import type { Socket } from 'socket.io-client';
 
-import { loadRelayOverride, relayUrl as resolveRelayUrl, setRelayOverride } from './config';
+import { loadRelayOverride, relayUrl as resolveRelayUrl } from './config';
 import { hexToBytes, open, verifySignature, x25519PrivFromSeed } from './crypto';
 import {
   checkAndPinClinicKey,
@@ -48,7 +48,6 @@ type WalletContextValue = {
   denyUpdate: (update: PendingUpdate) => void;
   respondToPairing: (pairing: Pairing) => Promise<boolean>;
   updateRecord: (patient: Patient) => void;
-  setRelayUrl: (url: string) => Promise<void>;
   reset: () => Promise<void>;
 };
 
@@ -228,13 +227,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setRecord(patient);
   };
 
-  const setRelayUrl = async (url: string) => {
-    await setRelayOverride(url);
-    const next = resolveRelayUrl();
-    setRelayUrlState(next);
-    if (identityRef.current) connect(identityRef.current, next);
-  };
-
   const reset = async () => {
     socketRef.current?.disconnect();
     socketRef.current = null;
@@ -272,7 +264,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         denyUpdate,
         respondToPairing: respondToPairingShare,
         updateRecord,
-        setRelayUrl,
         reset,
       }}
     >

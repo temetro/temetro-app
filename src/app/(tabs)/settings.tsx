@@ -1,8 +1,6 @@
 import * as Clipboard from 'expo-clipboard';
 import {
-  BottomSheet,
   Button,
-  Input,
   ListGroup,
   Separator,
   Surface,
@@ -18,7 +16,6 @@ import {
   Trash2,
   Wallet,
 } from 'lucide-react-native';
-import { useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
@@ -37,11 +34,8 @@ const STATUS_LABEL: Record<string, string> = {
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useUniwind();
-  const { identity, record, status, relayUrl, setRelayUrl, reset } = useWallet();
+  const { identity, record, status, reset } = useWallet();
   const [muted, accent] = useThemeColor(['muted', 'accent']);
-
-  const [editingRelay, setEditingRelay] = useState(false);
-  const [relayDraft, setRelayDraft] = useState(relayUrl);
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
@@ -57,11 +51,6 @@ export default function SettingsScreen() {
         { text: 'Reset', style: 'destructive', onPress: () => void reset() },
       ],
     );
-  };
-
-  const saveRelay = async () => {
-    await setRelayUrl(relayDraft.trim());
-    setEditingRelay(false);
   };
 
   return (
@@ -142,21 +131,19 @@ export default function SettingsScreen() {
             Network
           </Text>
           <ListGroup>
-            <ListGroup.Item
-              onPress={() => {
-                setRelayDraft(relayUrl);
-                setEditingRelay(true);
-              }}>
+            <ListGroup.Item>
               <ListGroup.ItemPrefix>
                 <Server size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Relay server</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>Temetro Network</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>
-                  {STATUS_LABEL[status] ?? status} · {relayUrl}
+                  {STATUS_LABEL[status] ?? status}
                 </ListGroup.ItemDescription>
               </ListGroup.ItemContent>
-              <ListGroup.ItemSuffix />
+              <ListGroup.ItemSuffix>
+                <View />
+              </ListGroup.ItemSuffix>
             </ListGroup.Item>
           </ListGroup>
         </View>
@@ -190,40 +177,6 @@ export default function SettingsScreen() {
           <Button.Label>Reset wallet</Button.Label>
         </Button>
       </ScrollView>
-
-      {/* Relay editor */}
-      <BottomSheet isOpen={editingRelay} onOpenChange={setEditingRelay}>
-        <BottomSheet.Portal>
-          <BottomSheet.Overlay />
-          <BottomSheet.Content>
-            <View className="gap-5">
-              <View className="gap-2">
-                <BottomSheet.Title>Relay server</BottomSheet.Title>
-                <BottomSheet.Description>
-                  The Temetro Network relay that forwards your encrypted share
-                  requests. Leave the default unless a clinic gives you another.
-                </BottomSheet.Description>
-              </View>
-              <Input
-                value={relayDraft}
-                onChangeText={setRelayDraft}
-                placeholder="https://network.temetro.com"
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="url"
-              />
-              <View className="gap-3">
-                <Button variant="primary" onPress={saveRelay}>
-                  <Button.Label>Save</Button.Label>
-                </Button>
-                <Button variant="tertiary" onPress={() => setEditingRelay(false)}>
-                  <Button.Label>Cancel</Button.Label>
-                </Button>
-              </View>
-            </View>
-          </BottomSheet.Content>
-        </BottomSheet.Portal>
-      </BottomSheet>
     </View>
   );
 }
