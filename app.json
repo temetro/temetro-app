@@ -53,7 +53,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "relayUrl": "http://localhost:8080"
+      "relayUrl": "https://network.temetro.com"
     }
   }
 }

@@ -200,13 +200,14 @@ export default function SettingsScreen() {
               <View className="gap-2">
                 <BottomSheet.Title>Relay server</BottomSheet.Title>
                 <BottomSheet.Description>
-                  The clinic backend that forwards your encrypted share requests.
+                  The Temetro Network relay that forwards your encrypted share
+                  requests. Leave the default unless a clinic gives you another.
                 </BottomSheet.Description>
               </View>
               <Input
                 value={relayDraft}
                 onChangeText={setRelayDraft}
-                placeholder="http://localhost:4000"
+                placeholder="https://network.temetro.com"
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="url"
