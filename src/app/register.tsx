@@ -7,13 +7,12 @@ import {
   RadioGroup,
   Surface,
   TextField,
-  useThemeColor,
 } from 'heroui-native';
-import { ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Logo } from '@/components/logo';
 import { shortWallet } from '@/lib/format';
 import type { Sex } from '@/lib/types';
 import { useWallet } from '@/lib/wallet-context';
@@ -24,7 +23,6 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { identity, register } = useWallet();
-  const accent = useThemeColor('accent');
 
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
@@ -50,9 +48,7 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets>
           <View className="gap-4">
-            <View className="size-16 items-center justify-center rounded-3xl bg-accent/15">
-              <ShieldCheck size={30} color={accent} />
-            </View>
+            <Logo size={60} />
             <View className="gap-1.5">
               <Text className="text-3xl font-bold text-foreground">Create your wallet</Text>
               <Text className="text-base leading-6 text-muted">

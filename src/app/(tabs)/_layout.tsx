@@ -3,8 +3,10 @@ import { useColorScheme } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
-// medical teal accent (mirrors src/lib/theme.ts) used for the selected tab.
-const TINT = { light: '#0E8E82', dark: '#34C7B5' } as const;
+// Blue accent (mirrors src/lib/theme.ts) used for the selected tab — applied to
+// both the label and the icon so they stay consistent (the SF Symbol otherwise
+// falls back to the iOS system tint).
+const TINT = { light: '#2C6FE6', dark: '#5B93FF' } as const;
 
 // Native bottom tab bar (real UITabBar / Material BottomNavigation) via
 // expo-router's NativeTabs. Screen content is built with HeroUI Native; only the
@@ -17,6 +19,7 @@ export default function TabsLayout() {
   return (
     <NativeTabs
       backgroundColor={colors.background}
+      tintColor={TINT[scheme]}
       labelStyle={{ selected: { color: TINT[scheme] } }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>

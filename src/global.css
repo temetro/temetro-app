@@ -15,22 +15,8 @@
 }
 
 /*
- * temetro brand: medical teal accent (mirrors src/lib/theme.ts).
- * Light accent #0E8E82  ->  hsl(174, 82%, 31%)
- * Dark  accent #34C7B5  ->  hsl(173, 59%, 49%)
+ * temetro accent: HeroUI Native's default blue. We intentionally do NOT
+ * override --accent here so heroui-native components use their built-in blue
+ * (oklch(0.6204 0.195 253.83)). The plain-RN screens mirror this blue via the
+ * JS palette in src/lib/theme.ts.
  */
-@layer theme {
-  @variant light {
-    --accent: hsl(174, 82%, 31%);
-    --accent-foreground: hsl(0, 0%, 100%);
-    --link: hsl(174, 82%, 31%);
-    --focus: hsl(174, 82%, 31%);
-  }
-
-  @variant dark {
-    --accent: hsl(173, 59%, 49%);
-    --accent-foreground: hsl(180, 25%, 10%);
-    --link: hsl(173, 59%, 49%);
-    --focus: hsl(173, 59%, 49%);
-  }
-}

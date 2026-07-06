@@ -10,6 +10,11 @@ export default function VisitsScreen() {
     meta: formatDate(e.date),
     subtitle: e.provider,
     body: e.summary,
+    rows: [
+      { label: 'Date', value: formatDate(e.date) },
+      { label: 'Type', value: e.type },
+      { label: 'Provider', value: e.provider },
+    ],
   }));
   return <DetailList items={items} empty="No visits recorded yet." />;
 }

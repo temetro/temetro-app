@@ -7,7 +7,11 @@ export default function PrescriptionsScreen() {
     id: `${m.name}-${i}`,
     title: m.name,
     meta: m.dose,
-    body: m.frequency,
+    subtitle: m.frequency,
+    rows: [
+      { label: 'Dose', value: m.dose },
+      { label: 'Frequency', value: m.frequency },
+    ],
   }));
   return <DetailList items={items} empty="No active prescriptions." />;
 }

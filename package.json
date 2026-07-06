@@ -1,13 +1,14 @@
 {
   "name": "temetro-app",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",
     "@noble/ciphers": "^2.2.0",
     "@noble/curves": "^2.2.0",
     "@noble/hashes": "^2.2.0",
     "expo": "~56.0.12",
+    "expo-blur": "~56.0.3",
     "expo-camera": "~56.0.8",
     "expo-clipboard": "~56.0.4",
     "expo-constants": "~56.0.18",

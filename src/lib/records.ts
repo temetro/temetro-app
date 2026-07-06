@@ -1,7 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 
 import { decryptLocal, encryptLocal } from './crypto';
-import { SAMPLE_PATIENT } from './sample';
+import { emptyPatient } from './sample';
 import type { Patient } from './types';
 
 // The patient's record is stored as a single encrypted blob in the app's
@@ -16,11 +16,11 @@ function recordFile(): File {
 
 export async function loadRecord(localKey: string): Promise<Patient> {
   const file = recordFile();
-  if (!file.exists) return SAMPLE_PATIENT;
+  if (!file.exists) return emptyPatient();
   try {
     return JSON.parse(decryptLocal(localKey, await file.text())) as Patient;
   } catch {
-    return SAMPLE_PATIENT;
+    return emptyPatient();
   }
 }
 

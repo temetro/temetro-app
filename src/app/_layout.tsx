@@ -67,6 +67,10 @@ export default function RootLayout() {
                 name="documents"
                 options={{ headerShown: true, title: 'Documents', headerBackTitle: 'Home' }}
               />
+              <Stack.Screen
+                name="notifications"
+                options={{ headerShown: true, title: 'Notifications', headerBackTitle: 'Home' }}
+              />
             </Stack>
             <AnimatedSplashOverlay />
             <UpdatesInbox />

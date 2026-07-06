@@ -1,24 +1,20 @@
-import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
-import { Card, Surface, useThemeColor } from 'heroui-native';
+import { Card, useThemeColor } from 'heroui-native';
 import {
+  Bell,
   CalendarDays,
-  Check,
   ChevronRight,
-  Copy,
   FileText,
   type LucideIcon,
   Pill,
   Settings,
   Stethoscope,
-  TriangleAlert,
 } from 'lucide-react-native';
-import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { shortWallet } from '@/lib/format';
-import { SAMPLE_APPOINTMENTS, SAMPLE_DOCUMENTS } from '@/lib/sample';
+import { HeaderIconButton } from '@/components/header-icon-button';
+import { Logo } from '@/components/logo';
 import { useWallet } from '@/lib/wallet-context';
 
 type Tile = {
@@ -42,16 +38,8 @@ function greeting(): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { record, identity } = useWallet();
-  const [fg, muted, accent] = useThemeColor(['foreground', 'muted', 'accent']);
-  const [copied, setCopied] = useState(false);
-
-  const copyWallet = async () => {
-    if (!identity) return;
-    await Clipboard.setStringAsync(identity.walletNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
+  const { record } = useWallet();
+  const [fg, muted] = useThemeColor(['foreground', 'muted']);
 
   const tiles: Tile[] = [
     {
@@ -78,17 +66,17 @@ export default function HomeScreen() {
       key: 'appointments',
       title: 'Appointments',
       caption: 'upcoming',
-      count: SAMPLE_APPOINTMENTS.length,
+      count: 0,
       icon: CalendarDays,
-      color: '#0E8E82',
-      tintClass: 'bg-teal-500/10',
+      color: '#0EA5E9',
+      tintClass: 'bg-sky-500/10',
       route: '/appointments',
     },
     {
       key: 'documents',
       title: 'Documents',
       caption: 'records & notes',
-      count: SAMPLE_DOCUMENTS.length,
+      count: 0,
       icon: FileText,
       color: '#8B5CF6',
       tintClass: 'bg-violet-500/10',
@@ -96,31 +84,27 @@ export default function HomeScreen() {
     },
   ];
 
-  const alert = record?.alerts?.[0];
-
   return (
     <View className="flex-1 bg-background">
       <ScrollView
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
         contentContainerClassName="px-5 gap-6"
         showsVerticalScrollIndicator={false}>
-        {/* Top bar */}
+        {/* Top bar — Liquid Glass icon buttons flanking the app mark */}
         <View className="flex-row items-center justify-between">
-          <Pressable
+          <HeaderIconButton
+            icon={Settings}
+            color={fg}
+            accessibilityLabel="Settings"
             onPress={() => router.navigate('/settings')}
-            hitSlop={8}
-            className="size-11 items-center justify-center rounded-full bg-surface active:opacity-70">
-            <Settings size={20} color={fg} />
-          </Pressable>
-
-          <Pressable
-            onPress={copyWallet}
-            className="flex-row items-center gap-2 rounded-full bg-surface px-3.5 py-2 active:opacity-70">
-            {copied ? <Check size={14} color={accent} /> : <Copy size={14} color={muted} />}
-            <Text className="font-mono text-xs text-foreground">
-              {identity ? shortWallet(identity.walletNumber) : 'tmw_…'}
-            </Text>
-          </Pressable>
+          />
+          <Logo size={32} />
+          <HeaderIconButton
+            icon={Bell}
+            color={fg}
+            accessibilityLabel="Notifications"
+            onPress={() => router.push('/notifications')}
+          />
         </View>
 
         {/* Greeting */}
@@ -129,14 +113,6 @@ export default function HomeScreen() {
           <Text className="text-3xl font-bold text-foreground">{record?.name ?? 'Patient'}</Text>
           <Text className="text-sm text-muted">Your record, stored on this device.</Text>
         </View>
-
-        {/* Allergy / alert banner */}
-        {alert ? (
-          <Surface variant="secondary" className="flex-row items-center gap-3 rounded-2xl">
-            <TriangleAlert size={18} color="#E0352B" />
-            <Text className="flex-1 text-sm font-medium text-foreground">{alert}</Text>
-          </Surface>
-        ) : null}
 
         {/* Grid */}
         <View className="flex-row flex-wrap justify-between gap-y-4">

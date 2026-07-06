@@ -15,13 +15,20 @@ clinic monorepo at `~/Desktop/temetro-mono` (see that repo's root `CLAUDE.md`).
   `className`, **not** `@expo/ui`. Use the **`heroui-native` skill** before writing UI (run its
   `scripts/get_component_docs.mjs <Name>` to fetch the exact anatomy/props) and follow the compound
   pattern (`Card.Body`, `ListGroup.Item`, …). Setup that must stay intact: `src/global.css`
-  (`@import 'tailwindcss'/'uniwind'/'heroui-native/styles'` + the teal `--accent` override),
+  (`@import 'tailwindcss'/'uniwind'/'heroui-native/styles'`; the accent is HeroUI Native's
+  **default blue** — we do NOT override `--accent`, and `src/lib/theme.ts` mirrors that blue),
   `metro.config.js` (`withUniwindConfig`, the **outermost** wrapper), and the root providers in
   `src/app/_layout.tsx` (`GestureHandlerRootView` → `HeroUINativeProvider`). Color icons
   (`lucide-react-native`) via the `color` prop using `useThemeColor(...)`, not `className`.
-- **The native tab bar is the one exception**: it uses expo-router's `NativeTabs`
+- **The native tab bar is one exception**: it uses expo-router's `NativeTabs`
   (`expo-router/unstable-native-tabs`) in `src/app/(tabs)/_layout.tsx` for a real UITabBar /
   Material BottomNavigation, with **SF Symbols** (`sf=`) on iOS and `drawable=` fallbacks on Android.
+- **The home header icon buttons are the other exception**: the Settings + Notifications buttons on
+  the home screen (`src/components/header-icon-button.tsx`) render Apple's native **Liquid Glass**
+  material via **`expo-glass-effect`** (`GlassView`, guarded by `isLiquidGlassAvailable()`), with a
+  `bg-surface` fallback on older iOS / Android. This was an explicit product decision. (`@expo/ui`
+  was tried here but its universal `Button` can't render Liquid Glass, so it was removed — do not
+  reintroduce `@expo/ui`.)
 - **Icons are `lucide-react-native`** in-screen (clean SVG set) + SF Symbols on the tab bar. Do not
   reintroduce the old PNG tab icons.
 - **Target Expo SDK 56.** All `expo-*` packages are pinned to `~56.x`. Before writing any Expo code,
