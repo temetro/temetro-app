@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomSheetBlurOverlay } from '@/components/animated-blur-view';
-
 export type DetailRow = { label: string; value: string };
 
 export type DetailItem = {
@@ -65,7 +63,7 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
           if (!open) setActive(null);
         }}>
         <BottomSheet.Portal>
-          <BottomSheetBlurOverlay />
+          <BottomSheet.Overlay />
           <BottomSheet.Content>
             <BottomSheet.Close />
             {active ? <DetailSheetBody item={active} /> : null}

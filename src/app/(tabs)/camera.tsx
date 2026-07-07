@@ -1,5 +1,5 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { BottomSheet, Button, Separator, Surface, useThemeColor } from 'heroui-native';
 import { Building2, CheckCircle2, QrCode, ShieldCheck, XCircle } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
@@ -7,6 +7,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shareModeLabel } from '@/lib/format';
+import { parsePortalUri } from '@/lib/portal';
 import { parsePairingUri, type Pairing } from '@/lib/relay';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -14,6 +15,7 @@ type Phase = 'review' | 'sending' | 'done' | 'error';
 
 export default function CameraScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const accent = useThemeColor('accent');
   const { record, respondToPairing } = useWallet();
   const [permission, requestPermission] = useCameraPermissions();
@@ -23,16 +25,28 @@ export default function CameraScreen() {
   const [phase, setPhase] = useState<Phase>('review');
   const handled = useRef(false);
 
-  // Only run the camera while this tab is focused.
+  // Only run the camera while this tab is focused. Reset the one-shot guard on
+  // re-focus so a returning user can scan again.
   useFocusEffect(
     useCallback(() => {
       setFocused(true);
+      handled.current = false;
       return () => setFocused(false);
     }, []),
   );
 
   const onBarcodeScanned = (data: string) => {
     if (handled.current) return;
+
+    // A clinic portal QR opens the native Patient Portal (browse doctors + book).
+    const portal = parsePortalUri(data);
+    if (portal) {
+      handled.current = true;
+      router.push({ pathname: '/portal', params: { api: portal.api, slug: portal.slug } });
+      return;
+    }
+
+    // A wallet-pairing QR opens the encrypted share sheet.
     const parsed = parsePairingUri(data);
     if (!parsed) return; // ignore non-temetro QRs
     handled.current = true;

@@ -1,6 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import {
   Button,
+  Dialog,
   ListGroup,
   Separator,
   Surface,
@@ -16,10 +17,12 @@ import {
   Trash2,
   Wallet,
 } from 'lucide-react-native';
+import { useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
+import { GlassButton } from '@/components/glass-button';
 import { shortWallet } from '@/lib/format';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -35,22 +38,22 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useUniwind();
   const { identity, record, status, reset } = useWallet();
-  const [muted, accent] = useThemeColor(['muted', 'accent']);
+  const [muted, accent, foreground, danger] = useThemeColor([
+    'muted',
+    'accent',
+    'foreground',
+    'danger',
+  ]);
+  const [resetOpen, setResetOpen] = useState(false);
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
     Alert.alert('Copied', `${label} copied to clipboard.`);
   };
 
-  const onReset = () => {
-    Alert.alert(
-      'Reset wallet?',
-      'This permanently deletes your keys and on-device record. You will need to register again. This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: () => void reset() },
-      ],
-    );
+  const confirmReset = () => {
+    setResetOpen(false);
+    void reset();
   };
 
   return (
@@ -172,11 +175,36 @@ export default function SettingsScreen() {
         </View>
 
         {/* Danger */}
-        <Button variant="danger-soft" size="lg" onPress={onReset}>
-          <Trash2 size={18} color="#E0352B" />
+        <Button variant="danger-soft" size="lg" onPress={() => setResetOpen(true)}>
+          <Trash2 size={18} color={danger} />
           <Button.Label>Reset wallet</Button.Label>
         </Button>
       </ScrollView>
+
+      {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}
+      <Dialog isOpen={resetOpen} onOpenChange={setResetOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content>
+            <View className="mb-6 gap-2">
+              <Dialog.Title>Reset wallet?</Dialog.Title>
+              <Dialog.Description>
+                This permanently deletes your keys and on-device record. You&apos;ll need to
+                register again. This cannot be undone.
+              </Dialog.Description>
+            </View>
+            <View className="flex-row gap-3">
+              <GlassButton label="Cancel" color={foreground} onPress={() => setResetOpen(false)} />
+              <GlassButton
+                label="Reset"
+                color={danger}
+                tintColor="rgba(255,69,58,0.18)"
+                onPress={confirmReset}
+              />
+            </View>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
     </View>
   );
 }
