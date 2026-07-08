@@ -7,7 +7,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shareModeLabel } from '@/lib/format';
-import { parsePortalUri } from '@/lib/portal';
+import { parsePortalPairing } from '@/lib/portal';
 import { parsePairingUri, type Pairing } from '@/lib/relay';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -38,11 +38,15 @@ export default function CameraScreen() {
   const onBarcodeScanned = (data: string) => {
     if (handled.current) return;
 
-    // A clinic portal QR opens the native Patient Portal (browse doctors + book).
-    const portal = parsePortalUri(data);
+    // A clinic portal QR opens the native Patient Portal over the relay (link,
+    // book, results) — see lib/portal.ts.
+    const portal = parsePortalPairing(data);
     if (portal) {
       handled.current = true;
-      router.push({ pathname: '/portal', params: { api: portal.api, slug: portal.slug } });
+      router.push({
+        pathname: '/portal',
+        params: { relay: portal.relay, clinic: portal.clinic, slug: portal.slug },
+      });
       return;
     }
 

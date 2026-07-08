@@ -1,120 +1,139 @@
-import * as SecureStore from 'expo-secure-store';
+import { File, Paths } from 'expo-file-system';
+import { io, type Socket } from 'socket.io-client';
 
-// Client for a clinic's public Patient Portal API (backend `/api/portal/...`),
-// reached by scanning the clinic's portal QR. Unauthenticated: the clinic is
-// identified by its slug in the URL, and booking verifies name + file number.
+import { fromBase64, signMessage, utf8ToBytes } from './crypto';
+import type { WalletIdentity } from './wallet';
 
-// A parsed clinic portal QR. The QR encodes the web portal URL
-// (`https://<host>/portal/<slug>`); an optional `?api=` query carries the
-// backend base so this native app can reach the JSON API (a phone camera
-// opening the same URL still lands on the working web portal).
-export type PortalRef = { api: string; slug: string; webUrl: string };
+// Client for a clinic's Patient Portal over the Temetro Network relay. Reached
+// by scanning the clinic's `temetro-portal:` QR (relay URL + clinic signing key
+// = the relay's routing id). We connect to {relay}/wallet, prove control of the
+// wallet by signing the challenge, then run `portal:request` calls that the relay
+// forwards to the clinic's backend and acks back — so this works from a real
+// phone without the clinic exposing an HTTP API to the internet.
 
+export type PortalTarget = { relay: string; clinic: string; slug: string };
 export type Doctor = { name: string; specialty: string | null };
 export type Availability = { date: string; provider: string; taken: string[] };
 export type Booking = { date: string; time: string; type: string; provider: string };
+export type PortalResults = {
+  name: string;
+  upcoming: {
+    date: string;
+    time: string;
+    type: string;
+    provider: string;
+    status: string;
+  }[];
+  files: {
+    id: string;
+    filename: string;
+    mimeType: string;
+    sizeBytes: number;
+    labKey: string | null;
+  }[];
+};
+export type ResultFile = { filename: string; mimeType: string; base64: string };
 
-// Parse a scanned string into a PortalRef, or null if it isn't a portal URL.
-// String-based (Hermes' URL is partial) — mirrors parsePairingUri's approach.
-export function parsePortalUri(uri: string): PortalRef | null {
+// Parse a scanned `temetro-portal:` pairing URI. String-based (Hermes' URL is
+// partial) — mirrors parsePairingUri in relay.ts.
+export function parsePortalPairing(uri: string): PortalTarget | null {
   try {
-    const noHash = uri.split('#')[0];
-    const [path, query = ''] = noHash.split('?');
-    const m = path.match(/^(https?):\/\/([^/]+)\/portal\/([^/]+)\/?$/i);
-    if (!m) return null;
-    const origin = `${m[1]}://${m[2]}`;
-    const slug = decodeURIComponent(m[3]);
-    const params = new URLSearchParams(query);
-    const api = (params.get('api') || origin).replace(/\/+$/, '');
-    return { api, slug, webUrl: uri };
+    if (!uri.startsWith('temetro-portal:')) return null;
+    const q = uri.includes('?') ? uri.slice(uri.indexOf('?') + 1) : '';
+    const p = new URLSearchParams(q);
+    const relay = p.get('relay');
+    const clinic = p.get('clinic');
+    if (!relay || !clinic) return null;
+    return { relay, clinic, slug: p.get('slug') ?? '' };
   } catch {
     return null;
   }
 }
 
-async function toError(res: Response): Promise<Error> {
-  try {
-    const body = (await res.json()) as { error?: string; message?: string };
-    return new Error(body.error || body.message || `Request failed (${res.status}).`);
-  } catch {
-    return new Error(`Request failed (${res.status}).`);
-  }
-}
+export type PortalSession = {
+  request: <T = unknown>(action: string, payload?: Record<string, unknown>) => Promise<T>;
+  close: () => void;
+};
 
-async function getJson<T>(ref: PortalRef, path: string): Promise<T> {
-  const res = await fetch(`${ref.api}/api/portal/${ref.slug}${path}`);
-  if (!res.ok) throw await toError(res);
-  return (await res.json()) as T;
-}
-
-export function getClinic(ref: PortalRef): Promise<{ name: string }> {
-  return getJson(ref, '');
-}
-
-export function getDoctors(ref: PortalRef): Promise<Doctor[]> {
-  return getJson(ref, '/doctors');
-}
-
-export function getAvailability(
-  ref: PortalRef,
-  provider: string,
-  date: string,
-): Promise<Availability> {
-  const q = new URLSearchParams({ provider, date }).toString();
-  return getJson(ref, `/availability?${q}`);
-}
-
-// Register the wallet's patient as a demographics-only patient at the clinic so
-// they get a file number to book with. The number is cached per clinic slug so
-// repeat bookings reuse the same record instead of creating duplicates.
-async function ensureFileNumber(
-  ref: PortalRef,
-  demographics: { name: string; sex: string; age: number },
-): Promise<string> {
-  const key = `temetro.portal.file.${ref.slug}`;
-  const cached = await SecureStore.getItemAsync(key).catch(() => null);
-  if (cached) return cached;
-  const res = await fetch(`${ref.api}/api/portal/${ref.slug}/patients`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(demographics),
+export function openPortalSession(
+  target: PortalTarget,
+  identity: WalletIdentity,
+): PortalSession {
+  const socket: Socket = io(`${target.relay}/wallet`, {
+    transports: ['websocket', 'polling'],
+    forceNew: true,
   });
-  if (!res.ok) throw await toError(res);
-  const { fileNumber } = (await res.json()) as { fileNumber: string };
-  await SecureStore.setItemAsync(key, fileNumber).catch(() => {});
-  return fileNumber;
+  let authed = false;
+  let failed = false;
+  const waiters: ((ok: boolean) => void)[] = [];
+  const settleAuth = (ok: boolean) => {
+    authed = ok;
+    failed = !ok;
+    waiters.splice(0).forEach((w) => w(ok));
+  };
+
+  socket.on('wallet:challenge', ({ challenge }: { challenge: string }) => {
+    const signature = signMessage(identity.privateKeyHex, utf8ToBytes(challenge));
+    socket.emit(
+      'wallet:auth',
+      { walletNumber: identity.walletNumber, signature },
+      (ack: { ok: boolean }) => settleAuth(!!ack?.ok),
+    );
+  });
+
+  const waitAuth = () =>
+    new Promise<boolean>((resolve) => {
+      if (authed) return resolve(true);
+      if (failed) return resolve(false);
+      waiters.push(resolve);
+      setTimeout(() => resolve(authed), 15000);
+    });
+
+  const request = async <T>(
+    action: string,
+    payload: Record<string, unknown> = {},
+  ): Promise<T> => {
+    const ok = await waitAuth();
+    if (!ok) {
+      throw new Error('Could not reach the clinic. Check your connection and try again.');
+    }
+    return new Promise<T>((resolve, reject) => {
+      let done = false;
+      const to = setTimeout(() => {
+        if (!done) {
+          done = true;
+          reject(new Error('The request timed out.'));
+        }
+      }, 25000);
+      socket.emit(
+        'portal:request',
+        { clinicId: target.clinic, action, payload },
+        (res: { ok: boolean; data?: T; error?: string }) => {
+          if (done) return;
+          done = true;
+          clearTimeout(to);
+          if (res?.ok) resolve(res.data as T);
+          else reject(new Error(res?.error || 'Request failed.'));
+        },
+      );
+    });
+  };
+
+  return { request, close: () => socket.disconnect() };
 }
 
-// Book an appointment with the chosen doctor at the chosen slot. Registers the
-// patient first if needed, then posts the booking. A 409 (slot just taken) is
-// surfaced to the caller so the UI can refresh availability.
-export async function bookAppointment(
-  ref: PortalRef,
-  args: {
-    demographics: { name: string; sex: string; age: number };
-    provider: string;
-    date: string;
-    time: string;
-  },
-): Promise<Booking> {
-  const fileNumber = await ensureFileNumber(ref, args.demographics);
-  const res = await fetch(`${ref.api}/api/portal/${ref.slug}/appointments`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      fileNumber,
-      name: args.demographics.name,
-      provider: args.provider,
-      date: args.date,
-      time: args.time,
-    }),
-  });
-  if (!res.ok) throw await toError(res);
-  return (await res.json()) as Booking;
+// Write a downloaded result file (base64) into the app document dir. Returns the
+// saved File so the caller can show where it landed.
+export function saveResultFile(filename: string, base64: string): File {
+  const safe = filename.replace(/[^\w.\-]+/g, '_') || 'result';
+  const file = new File(Paths.document, safe);
+  if (file.exists) file.delete();
+  file.create();
+  file.write(fromBase64(base64));
+  return file;
 }
 
 // Candidate booking slots offered on the portal (09:00–16:30, every 30 min).
-// The screen disables any that the availability endpoint reports as taken.
 export const SLOT_TIMES: string[] = (() => {
   const out: string[] = [];
   for (let h = 9; h < 17; h++) {
@@ -124,7 +143,7 @@ export const SLOT_TIMES: string[] = (() => {
   return out;
 })();
 
-// The next `count` calendar days as { date: 'YYYY-MM-DD', label } for the date picker.
+// The next `count` calendar days as { date, label } for the date picker.
 export function upcomingDays(count = 7): { date: string; label: string }[] {
   const days: { date: string; label: string }[] = [];
   const fmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric' });
