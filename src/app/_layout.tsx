@@ -96,6 +96,10 @@ export default function RootLayout() {
                 options={{ headerShown: true, title: 'Documents', headerBackTitle: 'Home' }}
               />
               <Stack.Screen
+                name="invoices"
+                options={{ headerShown: true, title: 'Invoices', headerBackTitle: 'Home' }}
+              />
+              <Stack.Screen
                 name="notifications"
                 options={{ headerShown: true, title: 'Notifications', headerBackTitle: 'Home' }}
               />

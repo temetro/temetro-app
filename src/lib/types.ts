@@ -15,6 +15,38 @@ export type Lab = { name: string; value: string; flag: LabFlag; takenAt: string 
 export type Encounter = { date: string; type: string; provider: string; summary: string };
 export type Trend = { label: string; unit: string; points: number[] };
 
+// Appointments and invoices live in their own clinic tables (not on the canonical
+// Patient snapshot), but the clinic pushes them alongside the record so the wallet
+// can show them. Mirrors backend/src/types/{appointment,invoice}.ts.
+export type AppointmentStatus = 'confirmed' | 'checked-in' | 'completed' | 'cancelled';
+export type Appointment = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  type: string;
+  provider: string;
+  status: AppointmentStatus;
+};
+
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'void';
+export type InvoiceLineItem = { description: string; quantity: number; unitPrice: number };
+export type InvoiceInstallment = {
+  label: string;
+  amount: number;
+  dueAt: string | null;
+  paid: boolean;
+};
+export type Invoice = {
+  id: string;
+  number: string;
+  issuedAt: string; // YYYY-MM-DD
+  dueAt: string | null;
+  status: InvoiceStatus;
+  lineItems: InvoiceLineItem[];
+  installments: InvoiceInstallment[];
+  notes: string | null;
+};
+
 export type Patient = {
   fileNumber: string;
   name: string;
@@ -32,4 +64,7 @@ export type Patient = {
   labs: Lab[];
   labTrend: Trend;
   encounters: Encounter[];
+  // Pushed by the clinic alongside the record (optional on older records).
+  appointments?: Appointment[];
+  invoices?: Invoice[];
 };

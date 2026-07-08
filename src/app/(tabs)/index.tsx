@@ -7,6 +7,7 @@ import {
   FileText,
   type LucideIcon,
   Pill,
+  ReceiptText,
   Settings,
   Stethoscope,
 } from 'lucide-react-native';
@@ -66,7 +67,7 @@ export default function HomeScreen() {
       key: 'appointments',
       title: 'Appointments',
       caption: 'upcoming',
-      count: 0,
+      count: record?.appointments?.filter((a) => a.status !== 'cancelled').length ?? 0,
       icon: CalendarDays,
       color: '#0EA5E9',
       tintClass: 'bg-sky-500/10',
@@ -98,7 +99,7 @@ export default function HomeScreen() {
             accessibilityLabel="Settings"
             onPress={() => router.navigate('/settings')}
           />
-          <Logo size={32} />
+          <Logo size={52} />
           <HeaderIconButton
             icon={Bell}
             color={fg}
@@ -141,6 +142,32 @@ export default function HomeScreen() {
             );
           })}
         </View>
+
+        {/* Invoices — a full-width section button into the billing list */}
+        {(() => {
+          const invoices = record?.invoices ?? [];
+          const unpaid = invoices.filter((i) => i.status === 'sent').length;
+          return (
+            <Pressable onPress={() => router.push('/invoices')} className="active:opacity-80">
+              <Card className="flex-row items-center gap-4">
+                <View className="size-11 items-center justify-center rounded-2xl bg-emerald-500/10">
+                  <ReceiptText size={22} color="#10B981" />
+                </View>
+                <View className="flex-1 gap-0.5">
+                  <Text className="text-sm font-medium text-foreground">Invoices</Text>
+                  <Text className="text-xs text-muted">
+                    {invoices.length === 0
+                      ? 'No invoices'
+                      : unpaid > 0
+                        ? `${unpaid} unpaid of ${invoices.length}`
+                        : `${invoices.length} · all paid`}
+                  </Text>
+                </View>
+                <ChevronRight size={18} color={muted} />
+              </Card>
+            </Pressable>
+          );
+        })()}
       </ScrollView>
     </View>
   );

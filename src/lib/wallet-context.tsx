@@ -93,7 +93,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (!ok) return;
       const bundle = JSON.parse(new TextDecoder().decode(plaintext)) as {
         patient: Patient;
+        appointments?: Patient['appointments'];
+        invoices?: Patient['invoices'];
         changes: string[];
+      };
+      // Appointments/invoices arrive next to the patient snapshot — fold them
+      // onto the record so approving the update persists them together.
+      const mergedPatient: Patient = {
+        ...bundle.patient,
+        appointments: bundle.appointments ?? bundle.patient.appointments ?? [],
+        invoices: bundle.invoices ?? bundle.patient.invoices ?? [],
       };
       void checkAndPinClinicKey(event.clinicName, event.clinicPublicKey).then(
         (keyOk) => {
@@ -103,7 +112,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             clinicPublicKey: event.clinicPublicKey,
             fingerprint: event.fingerprint,
             changes: bundle.changes ?? event.changes ?? [],
-            patient: bundle.patient,
+            patient: mergedPatient,
             createdAt: event.createdAt,
             keyChanged: !keyOk,
           };
