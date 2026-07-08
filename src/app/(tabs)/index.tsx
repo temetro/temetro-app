@@ -39,7 +39,7 @@ function greeting(): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { record } = useWallet();
+  const { record, unreadNotifications } = useWallet();
   const [fg, muted] = useThemeColor(['foreground', 'muted']);
 
   const tiles: Tile[] = [
@@ -104,6 +104,7 @@ export default function HomeScreen() {
             icon={Bell}
             color={fg}
             accessibilityLabel="Notifications"
+            badgeCount={unreadNotifications}
             onPress={() => router.push('/notifications')}
           />
         </View>

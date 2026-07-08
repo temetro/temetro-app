@@ -1,6 +1,6 @@
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import type { LucideIcon } from 'lucide-react-native';
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 const SIZE = 44;
 
@@ -13,11 +13,14 @@ export function HeaderIconButton({
   color,
   onPress,
   accessibilityLabel,
+  badgeCount = 0,
 }: {
   icon: LucideIcon;
   color: string;
   onPress: () => void;
   accessibilityLabel: string;
+  /** Unread count shown as a badge on the top-right corner (0 = hidden). */
+  badgeCount?: number;
 }) {
   const glass = isLiquidGlassAvailable();
   const content = <Icon size={20} color={color} />;
@@ -29,6 +32,15 @@ export function HeaderIconButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       className="active:opacity-70">
+      {badgeCount > 0 ? (
+        <View
+          className="absolute z-10 min-w-[18px] items-center justify-center rounded-full bg-danger px-1"
+          style={{ height: 18, top: -3, right: -3 }}>
+          <Text className="text-[10px] font-bold leading-4 text-white">
+            {badgeCount > 9 ? '9+' : badgeCount}
+          </Text>
+        </View>
+      ) : null}
       {glass ? (
         <GlassView
           glassEffectStyle="regular"

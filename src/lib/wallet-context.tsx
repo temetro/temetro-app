@@ -16,6 +16,12 @@ import {
   type PendingUpdate,
   saveUpdates,
 } from './pending-updates';
+import {
+  type AppNotification,
+  loadNotifications,
+  makeNotification,
+  saveNotifications,
+} from './notifications';
 import { deleteRecord, loadRecord, saveRecord } from './records';
 import { clearRegistered, isRegistered, setRegistered } from './registration';
 import {
@@ -48,6 +54,9 @@ type WalletContextValue = {
   denyUpdate: (update: PendingUpdate) => void;
   respondToPairing: (pairing: Pairing) => Promise<boolean>;
   updateRecord: (patient: Patient) => void;
+  notifications: AppNotification[];
+  unreadNotifications: number;
+  markNotificationsRead: () => void;
   reset: () => Promise<void>;
 };
 
@@ -62,16 +71,44 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [relayUrl, setRelayUrlState] = useState<string>(resolveRelayUrl());
   const [pendingRequest, setPendingRequest] = useState<ShareRequest | null>(null);
   const [pendingUpdates, setPendingUpdates] = useState<PendingUpdate[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const socketRef = useRef<Socket | null>(null);
   const identityRef = useRef<WalletIdentity | null>(null);
   const recordRef = useRef<Patient | null>(null);
   const updatesRef = useRef<PendingUpdate[]>([]);
+  const notificationsRef = useRef<AppNotification[]>([]);
 
   const persistUpdates = (next: PendingUpdate[]) => {
     updatesRef.current = next;
     setPendingUpdates(next);
     const id = identityRef.current;
     if (id) saveUpdates(id.localKey, next);
+  };
+
+  const persistNotifications = (next: AppNotification[]) => {
+    notificationsRef.current = next;
+    setNotifications(next);
+    const id = identityRef.current;
+    if (id) saveNotifications(id.localKey, next);
+  };
+
+  // Record a clinic event in the on-device inbox (newest first).
+  const pushNotification = (
+    kind: AppNotification['kind'],
+    title: string,
+    body?: string,
+  ) => {
+    persistNotifications([
+      makeNotification(kind, title, body),
+      ...notificationsRef.current,
+    ]);
+  };
+
+  const markNotificationsRead = () => {
+    if (!notificationsRef.current.some((n) => !n.read)) return;
+    persistNotifications(
+      notificationsRef.current.map((n) => ({ ...n, read: true })),
+    );
   };
 
   // A clinic pushed a record update: open it with our derived X25519 key, verify
@@ -120,6 +157,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             return;
           }
           persistUpdates([...updatesRef.current, update]);
+          pushNotification(
+            'update',
+            `${event.clinicName} sent a record update`,
+            update.changes.length ? update.changes.join(', ') : undefined,
+          );
         },
       );
     } catch {
@@ -133,7 +175,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setStatus('connecting');
     socketRef.current = connectRelay(url, id, {
       onStatus: setStatus,
-      onShareRequest: (request) => setPendingRequest(request),
+      onShareRequest: (request) => {
+        setPendingRequest(request);
+        pushNotification('share', `${request.clinicName} requested your record`);
+      },
       onUpdateRequest: handleUpdateRequest,
     });
   };
@@ -152,6 +197,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const saved = await loadUpdates(id.localKey);
       updatesRef.current = saved;
       setPendingUpdates(saved);
+      const savedNotes = await loadNotifications(id.localKey);
+      notificationsRef.current = savedNotes;
+      setNotifications(savedNotes);
       setRegisteredState(await isRegistered());
       const url = resolveRelayUrl();
       setRelayUrlState(url);
@@ -248,6 +296,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setRecord(null);
     updatesRef.current = [];
     setPendingUpdates([]);
+    notificationsRef.current = [];
+    setNotifications([]);
     setRegisteredState(false);
     const id = await getWallet();
     identityRef.current = id;
@@ -273,6 +323,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         denyUpdate,
         respondToPairing: respondToPairingShare,
         updateRecord,
+        notifications,
+        unreadNotifications: notifications.filter((n) => !n.read).length,
+        markNotificationsRead,
         reset,
       }}
     >
