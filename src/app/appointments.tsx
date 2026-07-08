@@ -9,11 +9,14 @@ export default function AppointmentsScreen() {
     title: a.type || 'Appointment',
     meta: a.date,
     subtitle: [a.time, a.provider].filter(Boolean).join(' · '),
-    rows: [
-      { label: 'Date', value: a.date },
-      { label: 'Time', value: a.time },
-      { label: 'Provider', value: a.provider || '—' },
-      { label: 'Status', value: a.status },
+    timeline: [
+      {
+        title: a.type || 'Appointment',
+        subtitle: a.provider ? `With ${a.provider}` : undefined,
+        meta: `${a.date} · ${a.time}`,
+        active: true,
+      },
+      { title: `Status: ${a.status}`, active: a.status === 'completed' },
     ],
   }));
   return <DetailList items={items} empty="No upcoming appointments." />;

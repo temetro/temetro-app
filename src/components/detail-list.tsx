@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SheetHeader, SheetTimeline, type TimelineStep } from '@/components/sheet/sheet-parts';
+
 export type DetailRow = { label: string; value: string };
 
 export type DetailItem = {
@@ -13,6 +15,7 @@ export type DetailItem = {
   subtitle?: string; // secondary line (e.g. provider)
   body?: string; // longer text (summary)
   rows?: DetailRow[]; // key/value rows shown in the detail sheet
+  timeline?: TimelineStep[]; // connected-dot timeline shown in the detail sheet
 };
 
 // Shared layout for the record detail pages (visits, prescriptions,
@@ -65,7 +68,6 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
         <BottomSheet.Portal>
           <BottomSheet.Overlay />
           <BottomSheet.Content>
-            <BottomSheet.Close />
             {active ? <DetailSheetBody item={active} /> : null}
           </BottomSheet.Content>
         </BottomSheet.Portal>
@@ -78,10 +80,13 @@ function DetailSheetBody({ item }: { item: DetailItem }) {
   const caption = [item.subtitle, item.meta].filter(Boolean).join(' · ');
   return (
     <View className="gap-5 pt-1">
-      <View className="gap-1 pr-10">
-        <BottomSheet.Title className="text-2xl">{item.title}</BottomSheet.Title>
-        {caption ? <Text className="text-sm text-muted">{caption}</Text> : null}
-      </View>
+      <SheetHeader title={item.title} subtitle={caption || undefined} />
+
+      {item.timeline?.length ? (
+        <Surface variant="secondary" className="rounded-2xl">
+          <SheetTimeline steps={item.timeline} />
+        </Surface>
+      ) : null}
 
       {item.rows?.length ? (
         <Surface variant="secondary" className="overflow-hidden rounded-2xl px-0 py-0">

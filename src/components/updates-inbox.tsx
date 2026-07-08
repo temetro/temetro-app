@@ -1,8 +1,9 @@
 import { BottomSheet, Button, Surface, useThemeColor } from 'heroui-native';
-import { Building2, Check, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react-native';
+import { Building2, Check, ShieldCheck, TriangleAlert } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
+import { SheetHeader } from '@/components/sheet/sheet-parts';
 import type { PendingUpdate } from '@/lib/pending-updates';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -29,15 +30,10 @@ export function UpdatesInbox() {
         <BottomSheet.Content>
           {update ? (
             <View className="gap-5">
-              <View className="items-center gap-3">
-                <View className="size-16 items-center justify-center rounded-full bg-accent/15">
-                  <RefreshCw size={28} color={accent} />
-                </View>
-                <BottomSheet.Title>Record update</BottomSheet.Title>
-                <BottomSheet.Description className="text-center">
-                  {update.clinicName} wants to update the record on this device.
-                </BottomSheet.Description>
-              </View>
+              <SheetHeader
+                title="Record update"
+                subtitle={`${update.clinicName} wants to update the record on this device.`}
+              />
 
               <Surface variant="secondary" className="gap-3 rounded-2xl">
                 <View className="flex-row items-center gap-2">
