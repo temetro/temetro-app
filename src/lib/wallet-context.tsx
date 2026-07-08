@@ -36,6 +36,7 @@ import {
 } from './relay';
 import { buildPatientFromProfile, type RegistrationProfile } from './sample';
 import type { Patient } from './types';
+import { removeVault } from './vault';
 import { getWallet, resetWallet, type WalletIdentity } from './wallet';
 
 type WalletContextValue = {
@@ -291,6 +292,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     // to a clean first-run state (onboarding stays done; registration repeats).
     await resetWallet();
     deleteRecord();
+    await removeVault();
     await clearRegistered();
     recordRef.current = null;
     setRecord(null);

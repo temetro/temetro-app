@@ -9,10 +9,12 @@ import {
   Switch,
   useThemeColor,
 } from 'heroui-native';
+import { useRouter } from 'expo-router';
 import {
   Copy,
   Fingerprint,
   KeyRound,
+  LogOut,
   Moon,
   Server,
   Trash2,
@@ -25,6 +27,7 @@ import { Uniwind, useUniwind } from 'uniwind';
 
 import { GlassButton } from '@/components/glass-button';
 import { shortWallet } from '@/lib/format';
+import { useVault } from '@/lib/vault-context';
 import { useWallet } from '@/lib/wallet-context';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -38,7 +41,9 @@ const STATUS_LABEL: Record<string, string> = {
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useUniwind();
+  const router = useRouter();
   const { identity, record, status, reset } = useWallet();
+  const { lock, refresh: refreshVault } = useVault();
   const [muted, accent, foreground, danger] = useThemeColor([
     'muted',
     'accent',
@@ -52,9 +57,17 @@ export default function SettingsScreen() {
     Alert.alert('Copied', `${label} copied to clipboard.`);
   };
 
-  const confirmReset = () => {
+  const confirmReset = async () => {
     setResetOpen(false);
-    void reset();
+    await reset();
+    await refreshVault();
+  };
+
+  // Lock the app without wiping anything — the vault (encrypted record) stays on
+  // device; the next launch asks for the PIN/passphrase again.
+  const logout = () => {
+    lock();
+    router.replace('/lock');
   };
 
   return (
@@ -174,6 +187,12 @@ export default function SettingsScreen() {
             </ListGroup.Item>
           </ListGroup>
         </View>
+
+        {/* Session */}
+        <Button variant="secondary" size="lg" onPress={logout}>
+          <LogOut size={18} color={foreground} />
+          <Button.Label>Log out</Button.Label>
+        </Button>
 
         {/* Danger */}
         <Button variant="danger-soft" size="lg" onPress={() => setResetOpen(true)}>

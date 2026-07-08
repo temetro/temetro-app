@@ -12,6 +12,7 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { UpdatesInbox } from '@/components/updates-inbox';
 import { useOnboarding } from '@/lib/onboarding';
 import { darkPalette, lightPalette } from '@/lib/theme';
+import { useVault, VaultProvider } from '@/lib/vault-context';
 import { useWallet, WalletProvider } from '@/lib/wallet-context';
 
 // Navigation themes whose surfaces match the app palette (src/lib/theme.ts) so
@@ -36,21 +37,40 @@ function GateRedirector() {
   const segments = useSegments();
   const { ready: onbReady, onboarded } = useOnboarding();
   const { ready: walletReady, registered } = useWallet();
+  const { ready: vaultReady, hasVault, unlocked } = useVault();
 
   useEffect(() => {
-    if (!onbReady || !walletReady) return;
+    if (!onbReady || !walletReady || !vaultReady) return;
     const top = segments[0];
     const inOnboarding = top === 'onboarding';
     const inRegister = top === 'register';
+    const inSetup = top === 'vault-setup';
+    const inLock = top === 'lock';
 
     if (!onboarded) {
       if (!inOnboarding) router.replace('/onboarding');
     } else if (!registered) {
       if (!inRegister) router.replace('/register');
-    } else if (inOnboarding || inRegister) {
+    } else if (!hasVault) {
+      // Registered but no app-lock yet — set a PIN/passphrase before entering.
+      if (!inSetup) router.replace('/vault-setup');
+    } else if (!unlocked) {
+      // Locked (cold start or after logout) — require the password.
+      if (!inLock) router.replace('/lock');
+    } else if (inOnboarding || inRegister || inSetup || inLock) {
       router.replace('/');
     }
-  }, [onbReady, walletReady, onboarded, registered, segments, router]);
+  }, [
+    onbReady,
+    walletReady,
+    vaultReady,
+    onboarded,
+    registered,
+    hasVault,
+    unlocked,
+    segments,
+    router,
+  ]);
 
   return null;
 }
@@ -70,6 +90,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.bg }}>
       <ThemeProvider value={dark ? navDark : navLight}>
         <HeroUINativeProvider>
+          <VaultProvider>
           <WalletProvider>
             <Stack
               screenOptions={{
@@ -79,6 +100,8 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
               <Stack.Screen name="register" options={{ animation: 'fade' }} />
+              <Stack.Screen name="vault-setup" options={{ animation: 'fade' }} />
+              <Stack.Screen name="lock" options={{ animation: 'fade', gestureEnabled: false }} />
               <Stack.Screen
                 name="visits"
                 options={{ headerShown: true, title: 'Patient Visits', headerBackTitle: 'Home' }}
@@ -112,6 +135,7 @@ export default function RootLayout() {
             <UpdatesInbox />
             <GateRedirector />
           </WalletProvider>
+          </VaultProvider>
         </HeroUINativeProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
