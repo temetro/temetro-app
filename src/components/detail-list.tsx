@@ -1,7 +1,7 @@
-import { BottomSheet, Card, Separator, Surface } from 'heroui-native';
+import { BottomSheet, Card, Separator, Surface, Typography } from 'heroui-native';
 import { InboxIcon } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader, SheetTimeline, type TimelineStep } from '@/components/sheet/sheet-parts';
@@ -29,7 +29,7 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-background px-10">
         <InboxIcon size={40} color="#9aa0a6" />
-        <Text className="text-center text-base text-muted">{empty}</Text>
+        <Typography className="text-center text-base text-muted">{empty}</Typography>
       </View>
     );
   }
@@ -44,16 +44,16 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
           <Pressable key={item.id} onPress={() => setActive(item)} className="active:opacity-80">
             <Card className="gap-2">
               <View className="flex-row items-start justify-between gap-3">
-                <Text className="flex-1 text-base font-semibold text-foreground">{item.title}</Text>
-                {item.meta ? <Text className="text-sm text-muted">{item.meta}</Text> : null}
+                <Typography className="flex-1 text-base font-semibold text-foreground">{item.title}</Typography>
+                {item.meta ? <Typography className="text-sm text-muted">{item.meta}</Typography> : null}
               </View>
               {item.subtitle ? (
-                <Text className="text-sm font-medium text-foreground">{item.subtitle}</Text>
+                <Typography className="text-sm font-medium text-foreground">{item.subtitle}</Typography>
               ) : null}
               {item.body ? (
-                <Text numberOfLines={2} className="text-sm leading-5 text-muted">
+                <Typography numberOfLines={2} className="text-sm leading-5 text-muted">
                   {item.body}
-                </Text>
+                </Typography>
               ) : null}
             </Card>
           </Pressable>
@@ -94,10 +94,10 @@ function DetailSheetBody({ item }: { item: DetailItem }) {
             <View key={row.label}>
               {i > 0 ? <Separator /> : null}
               <View className="flex-row items-center justify-between gap-4 px-4 py-3">
-                <Text className="text-sm text-muted">{row.label}</Text>
-                <Text className="flex-1 text-right text-sm font-medium text-foreground">
+                <Typography className="text-sm text-muted">{row.label}</Typography>
+                <Typography className="flex-1 text-right text-sm font-medium text-foreground">
                   {row.value}
-                </Text>
+                </Typography>
               </View>
             </View>
           ))}
@@ -105,7 +105,7 @@ function DetailSheetBody({ item }: { item: DetailItem }) {
       ) : null}
 
       {item.body ? (
-        <Text className="text-sm leading-6 text-foreground">{item.body}</Text>
+        <Typography className="text-sm leading-6 text-foreground">{item.body}</Typography>
       ) : null}
     </View>
   );

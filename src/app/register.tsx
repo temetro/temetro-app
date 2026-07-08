@@ -7,9 +7,10 @@ import {
   RadioGroup,
   Surface,
   TextField,
+  Typography,
 } from 'heroui-native';
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Logo } from '@/components/logo';
@@ -50,11 +51,11 @@ export default function RegisterScreen() {
           <View className="gap-4">
             <Logo size={60} />
             <View className="gap-1.5">
-              <Text className="text-3xl font-bold text-foreground">Create your wallet</Text>
-              <Text className="text-base leading-6 text-muted">
+              <Typography className="text-3xl font-bold text-foreground">Create your wallet</Typography>
+              <Typography className="text-base leading-6 text-muted">
                 Your record lives on this device, encrypted with keys only you hold. Tell us who
                 you are to get started.
-              </Text>
+              </Typography>
             </View>
           </View>
 
@@ -96,12 +97,12 @@ export default function RegisterScreen() {
 
           {identity ? (
             <Surface variant="secondary" className="gap-1 rounded-2xl">
-              <Text className="text-xs font-medium uppercase tracking-wide text-muted">
+              <Typography className="text-xs font-medium uppercase tracking-wide text-muted">
                 Your wallet number
-              </Text>
-              <Text className="font-mono text-base text-foreground">
+              </Typography>
+              <Typography className="font-mono text-base text-foreground">
                 {shortWallet(identity.walletNumber)}
-              </Text>
+              </Typography>
             </Surface>
           ) : null}
 

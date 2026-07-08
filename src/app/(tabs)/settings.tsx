@@ -7,6 +7,7 @@ import {
   Separator,
   Surface,
   Switch,
+  Typography,
   useThemeColor,
 } from 'heroui-native';
 import { useRouter } from 'expo-router';
@@ -21,7 +22,7 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
@@ -76,28 +77,28 @@ export default function SettingsScreen() {
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
         contentContainerClassName="px-5 gap-6"
         showsVerticalScrollIndicator={false}>
-        <Text className="text-3xl font-bold text-foreground">Settings</Text>
+        <Typography className="text-3xl font-bold text-foreground">Settings</Typography>
 
         {/* Identity hero */}
         <Surface className="flex-row items-center gap-4 rounded-3xl">
           <View className="size-14 items-center justify-center rounded-full bg-accent/15">
-            <Text className="text-xl font-bold" style={{ color: accent }}>
+            <Typography className="text-xl font-bold" style={{ color: accent }}>
               {record?.initials ?? '?'}
-            </Text>
+            </Typography>
           </View>
           <View className="flex-1">
-            <Text className="text-lg font-semibold text-foreground">
+            <Typography className="text-lg font-semibold text-foreground">
               {record?.name ?? 'Patient'}
-            </Text>
-            <Text className="text-sm text-muted">Stored only on this device</Text>
+            </Typography>
+            <Typography className="text-sm text-muted">Stored only on this device</Typography>
           </View>
         </Surface>
 
         {/* Wallet */}
         <View className="gap-2">
-          <Text className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+          <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
             Wallet
-          </Text>
+          </Typography>
           <ListGroup>
             <ListGroup.Item onPress={() => identity && copy(identity.walletNumber, 'Wallet number')}>
               <ListGroup.ItemPrefix>
@@ -144,9 +145,9 @@ export default function SettingsScreen() {
 
         {/* Network */}
         <View className="gap-2">
-          <Text className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+          <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
             Network
-          </Text>
+          </Typography>
           <ListGroup>
             <ListGroup.Item>
               <ListGroup.ItemPrefix>
@@ -167,9 +168,9 @@ export default function SettingsScreen() {
 
         {/* Appearance */}
         <View className="gap-2">
-          <Text className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+          <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
             Appearance
-          </Text>
+          </Typography>
           <ListGroup>
             <ListGroup.Item isDisabled>
               <ListGroup.ItemPrefix>

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Card, useThemeColor } from 'heroui-native';
+import { Card, Typography, useThemeColor } from 'heroui-native';
 import {
   Bell,
   CalendarDays,
@@ -11,7 +11,7 @@ import {
   Settings,
   Stethoscope,
 } from 'lucide-react-native';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HeaderIconButton } from '@/components/header-icon-button';
@@ -111,9 +111,9 @@ export default function HomeScreen() {
 
         {/* Greeting */}
         <View className="gap-1">
-          <Text className="text-base text-muted">{greeting()},</Text>
-          <Text className="text-3xl font-bold text-foreground">{record?.name ?? 'Patient'}</Text>
-          <Text className="text-sm text-muted">Your record, stored on this device.</Text>
+          <Typography className="text-base text-muted">{greeting()},</Typography>
+          <Typography className="text-3xl font-bold text-foreground">{record?.name ?? 'Patient'}</Typography>
+          <Typography className="text-sm text-muted">Your record, stored on this device.</Typography>
         </View>
 
         {/* Grid */}
@@ -134,9 +134,9 @@ export default function HomeScreen() {
                     <ChevronRight size={18} color={muted} />
                   </View>
                   <View className="gap-0.5">
-                    <Text className="text-3xl font-bold text-foreground">{tile.count}</Text>
-                    <Text className="text-sm font-medium text-foreground">{tile.title}</Text>
-                    <Text className="text-xs text-muted">{tile.caption}</Text>
+                    <Typography className="text-3xl font-bold text-foreground">{tile.count}</Typography>
+                    <Typography className="text-sm font-medium text-foreground">{tile.title}</Typography>
+                    <Typography className="text-xs text-muted">{tile.caption}</Typography>
                   </View>
                 </Card>
               </Pressable>
@@ -155,14 +155,14 @@ export default function HomeScreen() {
                   <ReceiptText size={22} color="#10B981" />
                 </View>
                 <View className="flex-1 gap-0.5">
-                  <Text className="text-sm font-medium text-foreground">Invoices</Text>
-                  <Text className="text-xs text-muted">
+                  <Typography className="text-sm font-medium text-foreground">Invoices</Typography>
+                  <Typography className="text-xs text-muted">
                     {invoices.length === 0
                       ? 'No invoices'
                       : unpaid > 0
                         ? `${unpaid} unpaid of ${invoices.length}`
                         : `${invoices.length} · all paid`}
-                  </Text>
+                  </Typography>
                 </View>
                 <ChevronRight size={18} color={muted} />
               </Card>
