@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
 import {
   Button,
@@ -18,7 +19,7 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
@@ -184,7 +185,19 @@ export default function SettingsScreen() {
       {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}
       <Dialog isOpen={resetOpen} onOpenChange={setResetOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay />
+          {/* Blurred backdrop behind the dialog (the BlurView lets taps fall
+              through to the overlay so tapping outside still dismisses). */}
+          <Dialog.Overlay
+            style={{
+              backgroundColor: theme === 'dark' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.15)',
+            }}>
+            <BlurView
+              intensity={24}
+              tint={theme === 'dark' ? 'dark' : 'light'}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
+          </Dialog.Overlay>
           <Dialog.Content>
             <View className="mb-6 gap-2">
               <Dialog.Title>Reset wallet?</Dialog.Title>
