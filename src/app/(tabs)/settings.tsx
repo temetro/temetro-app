@@ -22,7 +22,9 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
+
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
@@ -43,7 +45,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useUniwind();
   const router = useRouter();
-  const { identity, record, status, reset } = useWallet();
+  const { identity, record, status, reset, reloadRecord } = useWallet();
   const { lock, refresh: refreshVault } = useVault();
   const [muted, accent, foreground, danger] = useThemeColor([
     'muted',
@@ -73,7 +75,8 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <RefreshableScrollView
+        onRefresh={reloadRecord}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
         contentContainerClassName="px-5 gap-6"
         showsVerticalScrollIndicator={false}>
@@ -200,7 +203,7 @@ export default function SettingsScreen() {
           <Trash2 size={18} color={danger} />
           <Button.Label>Reset wallet</Button.Label>
         </Button>
-      </ScrollView>
+      </RefreshableScrollView>
 
       {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}
       <Dialog isOpen={resetOpen} onOpenChange={setResetOpen}>

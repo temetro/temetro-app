@@ -4,6 +4,7 @@ import {
   Input,
   InputOTP,
   REGEXP_ONLY_DIGITS,
+  Spinner,
   TextField,
   Typography,
   useThemeColor,
@@ -67,23 +68,25 @@ export default function LockScreen() {
         </View>
 
         {isPin ? (
-          <InputOTP
-            value={value}
-            onChange={(v) => {
-              setValue(v);
-              setError(null);
-            }}
-            onComplete={attempt}
-            maxLength={PIN_LENGTH}
-            pattern={REGEXP_ONLY_DIGITS}
-            isInvalid={!!error}>
-            <InputOTP.Group>
-              <InputOTP.Slot index={0} />
-              <InputOTP.Slot index={1} />
-              <InputOTP.Slot index={2} />
-              <InputOTP.Slot index={3} />
-            </InputOTP.Group>
-          </InputOTP>
+          <View className="items-center gap-4" style={{ opacity: busy ? 0.5 : 1 }}>
+            <InputOTP
+              value={value}
+              onChange={(v) => {
+                setValue(v);
+                setError(null);
+              }}
+              onComplete={attempt}
+              maxLength={PIN_LENGTH}
+              pattern={REGEXP_ONLY_DIGITS}
+              isInvalid={!!error}>
+              <InputOTP.Group>
+                <InputOTP.Slot index={0} />
+                <InputOTP.Slot index={1} />
+                <InputOTP.Slot index={2} />
+                <InputOTP.Slot index={3} />
+              </InputOTP.Group>
+            </InputOTP>
+          </View>
         ) : (
           <View className="w-full">
             <TextField>
@@ -102,7 +105,14 @@ export default function LockScreen() {
           </View>
         )}
 
-        {error ? (
+        {busy ? (
+          <View className="flex-row items-center gap-2">
+            <Spinner />
+            <Typography type="body-sm" color="muted">
+              Checking…
+            </Typography>
+          </View>
+        ) : error ? (
           <Typography type="body-sm" align="center" style={{ color: danger }}>
             {error}
           </Typography>
@@ -111,6 +121,7 @@ export default function LockScreen() {
         {!isPin ? (
           <View className="w-full">
             <Button size="lg" isDisabled={!minOk || busy} onPress={() => attempt(value)}>
+              {busy ? <Spinner /> : null}
               <Button.Label>Unlock</Button.Label>
             </Button>
           </View>

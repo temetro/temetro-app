@@ -2,10 +2,8 @@ import { useLocalSearchParams } from 'expo-router';
 import {
   Button,
   Card,
-  Input,
   Spinner,
   Surface,
-  TextField,
   Typography,
   useThemeColor,
 } from 'heroui-native';
@@ -15,6 +13,7 @@ import {
   Download,
   FileText,
   Link2,
+  RefreshCw,
   Stethoscope,
   UserRound,
 } from 'lucide-react-native';
@@ -119,7 +118,7 @@ export default function PortalScreen() {
       {mode === 'menu' ? (
         <MenuView onPick={setMode} accent={accent} muted={muted} />
       ) : mode === 'link' ? (
-        <LinkView session={session} danger={danger} onDone={() => setMode('menu')} />
+        <LinkView session={session} accent={accent} onDone={() => setMode('menu')} />
       ) : mode === 'book' ? (
         <BookView
           session={session}
@@ -177,34 +176,50 @@ function MenuView({
 
 function LinkView({
   session,
-  danger,
+  accent,
   onDone,
 }: {
   session: PortalSession;
-  danger: string;
+  accent: string;
   onDone: () => void;
 }) {
-  const [name, setName] = useState('');
-  const [fileNumber, setFileNumber] = useState('');
-  const [busy, setBusy] = useState(false);
+  // The wallet is identified by its cryptographic identity (carried by the
+  // signed relay session), so there's nothing to type: we just ask the clinic
+  // whether this wallet is already paired to a file. The clinic attaches the
+  // wallet number ahead of time via "Import from a patient app" / QR pairing.
+  const [status, setStatus] = useState<'checking' | 'linked' | 'error'>('checking');
+  const [linkedName, setLinkedName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
 
-  const submit = async () => {
-    if (busy || !name.trim() || !fileNumber.trim()) return;
-    setBusy(true);
+  const attempt = useCallback(async () => {
+    setStatus('checking');
     setError(null);
     try {
-      await session.request('link', { name: name.trim(), fileNumber: fileNumber.trim() });
-      setDone(true);
+      const res = await session.request<{ fileNumber: string; name: string }>('link');
+      setLinkedName(res.name);
+      setStatus('linked');
     } catch (e) {
       setError((e as Error).message);
-    } finally {
-      setBusy(false);
+      setStatus('error');
     }
-  };
+  }, [session]);
 
-  if (done) {
+  useEffect(() => {
+    void attempt();
+  }, [attempt]);
+
+  if (status === 'checking') {
+    return (
+      <View className="items-center gap-4 py-12">
+        <Spinner />
+        <Typography type="body-sm" color="muted" align="center">
+          Checking your wallet link…
+        </Typography>
+      </View>
+    );
+  }
+
+  if (status === 'linked') {
     return (
       <View className="items-center gap-4 py-8">
         <CheckCircle2 size={52} color="#22C55E" />
@@ -212,7 +227,9 @@ function LinkView({
           Wallet linked
         </Typography>
         <Typography type="body-sm" color="muted" align="center">
-          You can now book appointments and view your results here.
+          {linkedName
+            ? `You're linked to ${linkedName}'s file. You can now book appointments and view your results here.`
+            : 'You can now book appointments and view your results here.'}
         </Typography>
         <Button variant="secondary" onPress={onDone}>
           <Button.Label>Back</Button.Label>
@@ -222,25 +239,28 @@ function LinkView({
   }
 
   return (
-    <View className="gap-4">
-      <Typography type="body-sm" color="muted">
-        Enter the name and file number the clinic has on record to link this wallet.
-      </Typography>
-      <TextField>
-        <Input placeholder="Full name" value={name} onChangeText={setName} autoCapitalize="words" />
-      </TextField>
-      <TextField>
-        <Input placeholder="File number" value={fileNumber} onChangeText={setFileNumber} autoCapitalize="none" />
-      </TextField>
-      {error ? (
-        <Typography type="body-sm" style={{ color: danger }}>
-          {error}
+    <View className="items-center gap-4 py-8">
+      <View className="size-16 items-center justify-center rounded-full bg-accent/12">
+        <Link2 size={28} color={accent} />
+      </View>
+      <View className="items-center gap-1.5">
+        <Typography type="h4" className="font-bold text-foreground">
+          Not linked yet
         </Typography>
-      ) : null}
-      <Button size="lg" isDisabled={busy || !name.trim() || !fileNumber.trim()} onPress={submit}>
-        <Link2 size={18} color="#fff" />
-        <Button.Label>{busy ? 'Linking…' : 'Link wallet'}</Button.Label>
-      </Button>
+        <Typography type="body-sm" color="muted" align="center">
+          {error ??
+            'Ask the clinic to add your wallet number to your file, then try again.'}
+        </Typography>
+      </View>
+      <View className="w-full gap-2 pt-2">
+        <Button size="lg" onPress={attempt}>
+          <RefreshCw size={18} color="#fff" />
+          <Button.Label>Try again</Button.Label>
+        </Button>
+        <Button variant="secondary" onPress={onDone}>
+          <Button.Label>Back</Button.Label>
+        </Button>
+      </View>
     </View>
   );
 }

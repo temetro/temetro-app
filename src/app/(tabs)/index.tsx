@@ -11,7 +11,9 @@ import {
   Settings,
   Stethoscope,
 } from 'lucide-react-native';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HeaderIconButton } from '@/components/header-icon-button';
@@ -39,7 +41,7 @@ function greeting(): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { record, unreadNotifications } = useWallet();
+  const { record, unreadNotifications, reloadRecord } = useWallet();
   const [fg, muted] = useThemeColor(['foreground', 'muted']);
 
   const tiles: Tile[] = [
@@ -87,7 +89,8 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <RefreshableScrollView
+        onRefresh={reloadRecord}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
         contentContainerClassName="px-5 gap-6"
         showsVerticalScrollIndicator={false}>
@@ -169,7 +172,7 @@ export default function HomeScreen() {
             </Pressable>
           );
         })()}
-      </ScrollView>
+      </RefreshableScrollView>
     </View>
   );
 }

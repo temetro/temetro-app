@@ -1,6 +1,8 @@
 import { Card, Separator, Typography, useThemeColor } from 'heroui-native';
 import { ReceiptText } from 'lucide-react-native';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
+
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Invoice, InvoiceStatus } from '@/lib/types';
@@ -36,7 +38,7 @@ function StatusPill({ status }: { status: InvoiceStatus }) {
 
 export default function InvoicesScreen() {
   const insets = useSafeAreaInsets();
-  const { record } = useWallet();
+  const { record, reloadRecord } = useWallet();
   const muted = useThemeColor('muted');
   const invoices = record?.invoices ?? [];
 
@@ -53,7 +55,8 @@ export default function InvoicesScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <RefreshableScrollView
+        onRefresh={reloadRecord}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         contentContainerClassName="px-5 pt-4 gap-3"
         showsVerticalScrollIndicator={false}>
@@ -116,7 +119,7 @@ export default function InvoicesScreen() {
             </Card>
           );
         })}
-      </ScrollView>
+      </RefreshableScrollView>
     </View>
   );
 }

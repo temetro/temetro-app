@@ -4,6 +4,7 @@ import {
   Input,
   InputOTP,
   REGEXP_ONLY_DIGITS,
+  Spinner,
   TextField,
   Typography,
   useThemeColor,
@@ -93,24 +94,26 @@ export default function VaultSetupScreen() {
         </View>
 
         {method === 'pin' ? (
-          <InputOTP
-            key={stage}
-            value={value}
-            onChange={(v) => {
-              setValue(v);
-              setError(null);
-            }}
-            onComplete={submit}
-            maxLength={PIN_LENGTH}
-            pattern={REGEXP_ONLY_DIGITS}
-            isInvalid={!!error}>
-            <InputOTP.Group>
-              <InputOTP.Slot index={0} />
-              <InputOTP.Slot index={1} />
-              <InputOTP.Slot index={2} />
-              <InputOTP.Slot index={3} />
-            </InputOTP.Group>
-          </InputOTP>
+          <View className="items-center gap-4" style={{ opacity: busy ? 0.5 : 1 }}>
+            <InputOTP
+              key={stage}
+              value={value}
+              onChange={(v) => {
+                setValue(v);
+                setError(null);
+              }}
+              onComplete={submit}
+              maxLength={PIN_LENGTH}
+              pattern={REGEXP_ONLY_DIGITS}
+              isInvalid={!!error}>
+              <InputOTP.Group>
+                <InputOTP.Slot index={0} />
+                <InputOTP.Slot index={1} />
+                <InputOTP.Slot index={2} />
+                <InputOTP.Slot index={3} />
+              </InputOTP.Group>
+            </InputOTP>
+          </View>
         ) : (
           <View className="w-full">
             <TextField>
@@ -129,7 +132,14 @@ export default function VaultSetupScreen() {
           </View>
         )}
 
-        {error ? (
+        {busy ? (
+          <View className="flex-row items-center gap-2">
+            <Spinner />
+            <Typography type="body-sm" color="muted">
+              Securing your wallet…
+            </Typography>
+          </View>
+        ) : error ? (
           <Typography type="body-sm" align="center" style={{ color: danger }}>
             {error}
           </Typography>
@@ -138,6 +148,7 @@ export default function VaultSetupScreen() {
         <View className="w-full gap-3">
           {method === 'passphrase' ? (
             <Button size="lg" isDisabled={!minOk || busy} onPress={() => submit(value)}>
+              {busy ? <Spinner /> : null}
               <Button.Label>{stage === 'enter' ? 'Continue' : 'Confirm'}</Button.Label>
             </Button>
           ) : null}

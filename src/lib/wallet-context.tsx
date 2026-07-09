@@ -55,6 +55,7 @@ type WalletContextValue = {
   denyUpdate: (update: PendingUpdate) => void;
   respondToPairing: (pairing: Pairing) => Promise<boolean>;
   updateRecord: (patient: Patient) => void;
+  reloadRecord: () => Promise<void>;
   notifications: AppNotification[];
   unreadNotifications: number;
   markNotificationsRead: () => void;
@@ -285,6 +286,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setRecord(patient);
   };
 
+  // Re-read the on-device record, pending updates, and inbox from disk, and nudge
+  // the relay to re-deliver anything queued. Backs pull-to-refresh app-wide.
+  const reloadRecord = async () => {
+    const id = identityRef.current;
+    if (!id) return;
+    const rec = await loadRecord(id.localKey);
+    recordRef.current = rec;
+    setRecord(rec);
+    const saved = await loadUpdates(id.localKey);
+    updatesRef.current = saved;
+    setPendingUpdates(saved);
+    const savedNotes = await loadNotifications(id.localKey);
+    notificationsRef.current = savedNotes;
+    setNotifications(savedNotes);
+    if (!socketRef.current?.connected) connect(id, resolveRelayUrl());
+  };
+
   const reset = async () => {
     socketRef.current?.disconnect();
     socketRef.current = null;
@@ -325,6 +343,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         denyUpdate,
         respondToPairing: respondToPairingShare,
         updateRecord,
+        reloadRecord,
         notifications,
         unreadNotifications: notifications.filter((n) => !n.read).length,
         markNotificationsRead,

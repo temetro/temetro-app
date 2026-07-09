@@ -1,7 +1,9 @@
 import { Card, Typography, useThemeColor } from 'heroui-native';
 import { BellOff, FileText, Share2, Info, type LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
+
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { NotificationKind } from '@/lib/notifications';
@@ -25,7 +27,7 @@ function relativeTime(iso: string): string {
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
-  const { notifications, markNotificationsRead } = useWallet();
+  const { notifications, markNotificationsRead, reloadRecord } = useWallet();
   const [accent, muted] = useThemeColor(['accent', 'muted']);
 
   // Viewing the inbox clears the unread badge.
@@ -50,7 +52,8 @@ export default function NotificationsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <RefreshableScrollView
+        onRefresh={reloadRecord}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         contentContainerClassName="px-5 pt-4 gap-3"
         showsVerticalScrollIndicator={false}>
@@ -80,7 +83,7 @@ export default function NotificationsScreen() {
             </Card>
           );
         })}
-      </ScrollView>
+      </RefreshableScrollView>
     </View>
   );
 }

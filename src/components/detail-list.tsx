@@ -1,10 +1,17 @@
-import { BottomSheet, Card, Separator, Surface, Typography } from 'heroui-native';
+import { BottomSheet, Card, Surface, Typography } from 'heroui-native';
 import { InboxIcon } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SheetHeader, SheetTimeline, type TimelineStep } from '@/components/sheet/sheet-parts';
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
+import {
+  SheetHeader,
+  SheetRows,
+  SheetTimeline,
+  type TimelineStep,
+} from '@/components/sheet/sheet-parts';
+import { useWallet } from '@/lib/wallet-context';
 
 export type DetailRow = { label: string; value: string };
 
@@ -23,6 +30,7 @@ export type DetailItem = {
 // blurred bottom sheet with the item's full details.
 export function DetailList({ items, empty }: { items: DetailItem[]; empty: string }) {
   const insets = useSafeAreaInsets();
+  const { reloadRecord } = useWallet();
   const [active, setActive] = useState<DetailItem | null>(null);
 
   if (items.length === 0) {
@@ -36,7 +44,8 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <RefreshableScrollView
+        onRefresh={reloadRecord}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         contentContainerClassName="px-5 pt-4 gap-3"
         showsVerticalScrollIndicator={false}>
@@ -58,7 +67,7 @@ export function DetailList({ items, empty }: { items: DetailItem[]; empty: strin
             </Card>
           </Pressable>
         ))}
-      </ScrollView>
+      </RefreshableScrollView>
 
       <BottomSheet
         isOpen={active !== null}
@@ -83,26 +92,12 @@ function DetailSheetBody({ item }: { item: DetailItem }) {
       <SheetHeader title={item.title} subtitle={caption || undefined} />
 
       {item.timeline?.length ? (
-        <Surface variant="secondary" className="rounded-2xl">
+        <Surface variant="secondary" className="rounded-2xl px-0 py-0">
           <SheetTimeline steps={item.timeline} />
         </Surface>
       ) : null}
 
-      {item.rows?.length ? (
-        <Surface variant="secondary" className="overflow-hidden rounded-2xl px-0 py-0">
-          {item.rows.map((row, i) => (
-            <View key={row.label}>
-              {i > 0 ? <Separator /> : null}
-              <View className="flex-row items-center justify-between gap-4 px-4 py-3">
-                <Typography className="text-sm text-muted">{row.label}</Typography>
-                <Typography className="flex-1 text-right text-sm font-medium text-foreground">
-                  {row.value}
-                </Typography>
-              </View>
-            </View>
-          ))}
-        </Surface>
-      ) : null}
+      {item.rows?.length ? <SheetRows rows={item.rows} /> : null}
 
       {item.body ? (
         <Typography className="text-sm leading-6 text-foreground">{item.body}</Typography>
