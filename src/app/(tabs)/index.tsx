@@ -1,29 +1,44 @@
+import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
-import { Card, Separator, Typography, useThemeColor } from 'heroui-native';
+import {
+  BottomSheet,
+  Card,
+  Separator,
+  Surface,
+  Typography,
+  useThemeColor,
+} from 'heroui-native';
 import {
   Bell,
   CalendarDays,
   ChevronRight,
+  Copy,
   FileText,
+  Fingerprint,
   Info,
+  KeyRound,
   type LucideIcon,
   Pill,
   QrCode,
   ReceiptText,
   RefreshCw,
+  ScanLine,
   Settings,
   Share2,
   Stethoscope,
   Wallet,
 } from 'lucide-react-native';
-import { Pressable, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Pressable, View } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HeaderIconButton } from '@/components/header-icon-button';
 import { Logo } from '@/components/logo';
-import { formatDate } from '@/lib/format';
+import { SheetHeader } from '@/components/sheet/sheet-parts';
+import { formatDate, shortWallet } from '@/lib/format';
 import type { NotificationKind } from '@/lib/notifications';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -57,27 +72,35 @@ function greeting(): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { record, notifications, unreadNotifications, reloadRecord } = useWallet();
+  const { identity, record, notifications, unreadNotifications, reloadRecord } =
+    useWallet();
   const [fg, muted, accent] = useThemeColor(['foreground', 'muted', 'accent']);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
+
+  const copy = async (value: string, label: string) => {
+    await Clipboard.setStringAsync(value);
+    Alert.alert('Copied', `${label} copied to clipboard.`);
+  };
 
   const quickActions: QuickAction[] = [
     {
       key: 'share',
       label: 'Share record',
       icon: QrCode,
-      onPress: () => router.navigate('/camera'),
+      onPress: () => setShareOpen(true),
     },
     {
       key: 'wallet',
       label: 'My wallet',
       icon: Wallet,
-      onPress: () => router.navigate('/settings'),
+      onPress: () => setWalletOpen(true),
     },
     {
-      key: 'activity',
-      label: 'Notifications',
-      icon: Bell,
-      onPress: () => router.push('/notifications'),
+      key: 'scan',
+      label: 'Scan',
+      icon: ScanLine,
+      onPress: () => router.navigate('/camera'),
     },
   ];
 
@@ -281,6 +304,131 @@ export default function HomeScreen() {
           </View>
         ) : null}
       </RefreshableScrollView>
+
+      {/* Share record — a QR a clinic scans to request the record. The full
+          share handshake completes on the clinic side. */}
+      <BottomSheet isOpen={shareOpen} onOpenChange={setShareOpen}>
+        <BottomSheet.Portal>
+          <BottomSheet.Overlay />
+          <BottomSheet.Content>
+            <View className="gap-5 pt-1">
+              <SheetHeader
+                title="Share your record"
+                subtitle="Let a clinic scan this to request your record"
+                icon={QrCode}
+              />
+              {identity ? (
+                <View className="items-center gap-4 pb-2">
+                  <View className="rounded-3xl bg-white p-5">
+                    <QRCode value={identity.walletNumber} size={200} />
+                  </View>
+                  <Pressable
+                    onPress={() => copy(identity.walletNumber, 'Wallet number')}
+                    accessibilityRole="button"
+                    className="flex-row items-center gap-1.5 active:opacity-70">
+                    <Typography className="text-sm font-medium" style={{ color: accent }}>
+                      {shortWallet(identity.walletNumber)}
+                    </Typography>
+                    <Copy size={14} color={accent} />
+                  </Pressable>
+                  <Typography type="body-xs" color="muted" className="px-6 text-center">
+                    The clinic completes the request on their side after scanning.
+                  </Typography>
+                </View>
+              ) : (
+                <Typography className="text-sm text-muted">Wallet not ready yet.</Typography>
+              )}
+            </View>
+          </BottomSheet.Content>
+        </BottomSheet.Portal>
+      </BottomSheet>
+
+      {/* My wallet — quick-copy identity, without leaving Home. */}
+      <BottomSheet isOpen={walletOpen} onOpenChange={setWalletOpen}>
+        <BottomSheet.Portal>
+          <BottomSheet.Overlay />
+          <BottomSheet.Content>
+            <View className="gap-5 pt-1">
+              <SheetHeader
+                title="My wallet"
+                subtitle="Your identity on this device"
+                icon={Wallet}
+              />
+              <Surface variant="secondary" className="overflow-hidden rounded-3xl px-0 py-0">
+                <CopyRow
+                  accent={accent}
+                  icon={Wallet}
+                  label="Wallet number"
+                  muted={muted}
+                  onCopy={
+                    identity
+                      ? () => copy(identity.walletNumber, 'Wallet number')
+                      : undefined
+                  }
+                  value={identity ? shortWallet(identity.walletNumber) : '—'}
+                />
+                <Separator />
+                <CopyRow
+                  accent={accent}
+                  icon={Fingerprint}
+                  label="Fingerprint"
+                  muted={muted}
+                  onCopy={
+                    identity
+                      ? () => copy(identity.fingerprint, 'Fingerprint')
+                      : undefined
+                  }
+                  value={identity?.fingerprint ?? '—'}
+                />
+                <Separator />
+                <CopyRow
+                  accent={accent}
+                  icon={KeyRound}
+                  label="Algorithm"
+                  muted={muted}
+                  value="Ed25519"
+                />
+              </Surface>
+            </View>
+          </BottomSheet.Content>
+        </BottomSheet.Portal>
+      </BottomSheet>
     </View>
+  );
+}
+
+// A copyable identity row for the "My wallet" sheet.
+function CopyRow({
+  icon: Icon,
+  label,
+  value,
+  onCopy,
+  accent,
+  muted,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  onCopy?: () => void;
+  accent: string;
+  muted: string;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      className="flex-row items-center gap-3 px-4 py-3.5 active:opacity-70"
+      disabled={!onCopy}
+      onPress={onCopy}>
+      <View className="size-9 items-center justify-center rounded-full bg-accent/12">
+        <Icon size={18} color={accent} />
+      </View>
+      <View className="flex-1 gap-0.5">
+        <Typography className="text-xs text-muted">{label}</Typography>
+        <Typography className="text-sm font-medium text-foreground" numberOfLines={1}>
+          {value}
+        </Typography>
+      </View>
+      {onCopy ? <Copy size={16} color={muted} /> : null}
+    </Pressable>
   );
 }
