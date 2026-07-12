@@ -1,5 +1,6 @@
 import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
+import Constants from 'expo-constants';
 import {
   Button,
   Dialog,
@@ -12,17 +13,26 @@ import {
 } from 'heroui-native';
 import { useRouter } from 'expo-router';
 import {
+  BookOpen,
   Copy,
+  ExternalLink,
   Fingerprint,
+  Info,
   KeyRound,
   LogOut,
   Moon,
+  Newspaper,
   Server,
+  ShieldCheck,
   Trash2,
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
+
+const DOCS_URL = 'https://github.com/temetro/temetro';
+const BLOG_URL = 'https://blog.temetro.com';
+const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
 import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -192,6 +202,51 @@ export default function SettingsScreen() {
           </ListGroup>
         </View>
 
+        {/* About */}
+        <View className="gap-2">
+          <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+            About
+          </Typography>
+          <ListGroup>
+            <ListGroup.Item>
+              <ListGroup.ItemPrefix>
+                <Info size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>Version</ListGroup.ItemTitle>
+                <ListGroup.ItemDescription>{APP_VERSION}</ListGroup.ItemDescription>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <View />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
+            <Separator className="mx-4" />
+            <ListGroup.Item onPress={() => Linking.openURL(DOCS_URL)}>
+              <ListGroup.ItemPrefix>
+                <BookOpen size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>Help &amp; documentation</ListGroup.ItemTitle>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <ExternalLink size={18} color={muted} />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
+            <Separator className="mx-4" />
+            <ListGroup.Item onPress={() => Linking.openURL(BLOG_URL)}>
+              <ListGroup.ItemPrefix>
+                <Newspaper size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>Blog</ListGroup.ItemTitle>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <ExternalLink size={18} color={muted} />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
+          </ListGroup>
+        </View>
+
         {/* Session */}
         <Button variant="secondary" size="lg" onPress={logout}>
           <LogOut size={18} color={foreground} />
@@ -203,6 +258,14 @@ export default function SettingsScreen() {
           <Trash2 size={18} color={danger} />
           <Button.Label>Reset wallet</Button.Label>
         </Button>
+
+        {/* Privacy reassurance footer */}
+        <View className="flex-row items-center justify-center gap-1.5 pt-1">
+          <ShieldCheck size={14} color={muted} />
+          <Typography className="text-xs text-muted">
+            Your keys and record never leave this device.
+          </Typography>
+        </View>
       </RefreshableScrollView>
 
       {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}

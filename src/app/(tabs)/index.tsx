@@ -1,15 +1,20 @@
 import { useRouter } from 'expo-router';
-import { Card, Typography, useThemeColor } from 'heroui-native';
+import { Card, Separator, Typography, useThemeColor } from 'heroui-native';
 import {
   Bell,
   CalendarDays,
   ChevronRight,
   FileText,
+  Info,
   type LucideIcon,
   Pill,
+  QrCode,
   ReceiptText,
+  RefreshCw,
   Settings,
+  Share2,
   Stethoscope,
+  Wallet,
 } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
@@ -18,7 +23,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HeaderIconButton } from '@/components/header-icon-button';
 import { Logo } from '@/components/logo';
+import { formatDate } from '@/lib/format';
+import type { NotificationKind } from '@/lib/notifications';
 import { useWallet } from '@/lib/wallet-context';
+
+type QuickAction = { key: string; label: string; icon: LucideIcon; onPress: () => void };
+
+// Icon per notification kind for the recent-activity feed.
+const ACTIVITY_ICON: Record<NotificationKind, LucideIcon> = {
+  update: RefreshCw,
+  share: Share2,
+  info: Info,
+};
 
 type Tile = {
   key: string;
@@ -41,8 +57,29 @@ function greeting(): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { record, unreadNotifications, reloadRecord } = useWallet();
-  const [fg, muted] = useThemeColor(['foreground', 'muted']);
+  const { record, notifications, unreadNotifications, reloadRecord } = useWallet();
+  const [fg, muted, accent] = useThemeColor(['foreground', 'muted', 'accent']);
+
+  const quickActions: QuickAction[] = [
+    {
+      key: 'share',
+      label: 'Share record',
+      icon: QrCode,
+      onPress: () => router.navigate('/camera'),
+    },
+    {
+      key: 'wallet',
+      label: 'My wallet',
+      icon: Wallet,
+      onPress: () => router.navigate('/settings'),
+    },
+    {
+      key: 'activity',
+      label: 'Notifications',
+      icon: Bell,
+      onPress: () => router.push('/notifications'),
+    },
+  ];
 
   const tiles: Tile[] = [
     {
@@ -119,6 +156,28 @@ export default function HomeScreen() {
           <Typography className="text-sm text-muted">Your record, stored on this device.</Typography>
         </View>
 
+        {/* Quick actions — the core patient actions, one tap each */}
+        <View className="flex-row gap-3">
+          {quickActions.map((qa) => {
+            const Icon = qa.icon;
+            return (
+              <Pressable
+                key={qa.key}
+                onPress={qa.onPress}
+                accessibilityRole="button"
+                accessibilityLabel={qa.label}
+                className="flex-1 active:opacity-80">
+                <Card className="items-center gap-2 py-4">
+                  <View className="size-11 items-center justify-center rounded-2xl bg-accent/12">
+                    <Icon size={22} color={accent} />
+                  </View>
+                  <Typography className="text-xs font-medium text-foreground">{qa.label}</Typography>
+                </Card>
+              </Pressable>
+            );
+          })}
+        </View>
+
         {/* Grid */}
         <View className="flex-row flex-wrap justify-between gap-y-4">
           {tiles.map((tile) => {
@@ -172,6 +231,55 @@ export default function HomeScreen() {
             </Pressable>
           );
         })()}
+
+        {/* Recent activity — latest clinic updates / share requests / info */}
+        {notifications.length > 0 ? (
+          <View className="gap-3">
+            <View className="flex-row items-center justify-between px-1">
+              <Typography className="text-sm font-semibold text-foreground">
+                Recent activity
+              </Typography>
+              <Pressable
+                onPress={() => router.push('/notifications')}
+                accessibilityRole="button"
+                className="active:opacity-70">
+                <Typography className="text-sm font-medium" style={{ color: accent }}>
+                  See all
+                </Typography>
+              </Pressable>
+            </View>
+            <Card className="gap-0">
+              {notifications.slice(0, 3).map((n, i) => {
+                const Icon = ACTIVITY_ICON[n.kind] ?? Info;
+                return (
+                  <View key={n.id}>
+                    {i > 0 ? <Separator className="my-2.5" /> : null}
+                    <View className="flex-row items-start gap-3">
+                      <View className="size-9 items-center justify-center rounded-full bg-accent/12">
+                        <Icon size={16} color={accent} />
+                      </View>
+                      <View className="flex-1 gap-0.5">
+                        <Typography
+                          className="text-sm font-medium text-foreground"
+                          numberOfLines={1}>
+                          {n.title}
+                        </Typography>
+                        {n.body ? (
+                          <Typography className="text-xs text-muted" numberOfLines={1}>
+                            {n.body}
+                          </Typography>
+                        ) : null}
+                      </View>
+                      <Typography className="text-xs text-muted">
+                        {formatDate(n.createdAt)}
+                      </Typography>
+                    </View>
+                  </View>
+                );
+              })}
+            </Card>
+          </View>
+        ) : null}
       </RefreshableScrollView>
     </View>
   );

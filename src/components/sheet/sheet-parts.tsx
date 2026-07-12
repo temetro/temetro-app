@@ -26,14 +26,14 @@ export function SheetHeader({
 }) {
   const [foreground, accent] = useThemeColor(['foreground', 'accent']);
   return (
-    <View className="flex-row items-start gap-3">
+    <View className="flex-row items-start gap-3.5">
       {Icon ? (
-        <View className="size-11 items-center justify-center rounded-2xl bg-accent/12">
-          <Icon size={22} color={accent} />
+        <View className="size-12 items-center justify-center rounded-2xl bg-accent/12">
+          <Icon size={23} color={accent} />
         </View>
       ) : null}
-      <View className="flex-1 gap-0.5 pt-0.5">
-        <Typography type="h4" className="font-bold text-foreground">
+      <View className="flex-1 gap-1 pt-0.5">
+        <Typography type="h4" className="font-bold tracking-tight text-foreground">
           {title}
         </Typography>
         {subtitle ? (
@@ -43,7 +43,7 @@ export function SheetHeader({
         ) : null}
       </View>
       <BottomSheet.Close>
-        <View className="size-8 items-center justify-center rounded-full bg-surface active:opacity-70">
+        <View className="size-8 items-center justify-center rounded-full border border-border bg-surface active:opacity-70">
           <X size={16} color={foreground} />
         </View>
       </BottomSheet.Close>
@@ -76,13 +76,13 @@ export type SheetRow = { label: string; value: string };
 // Key/value rows in a single rounded surface, hairline-separated.
 export function SheetRows({ rows }: { rows: SheetRow[] }) {
   return (
-    <Surface variant="secondary" className="overflow-hidden rounded-2xl px-0 py-0">
+    <Surface variant="secondary" className="overflow-hidden rounded-3xl px-0 py-0">
       {rows.map((row, i) => (
         <View key={row.label}>
           {i > 0 ? <Separator /> : null}
-          <View className="flex-row items-center justify-between gap-4 px-4 py-3">
+          <View className="flex-row items-center justify-between gap-4 px-4 py-3.5">
             <Typography className="text-sm text-muted">{row.label}</Typography>
-            <Typography className="flex-1 text-right text-sm font-medium text-foreground">
+            <Typography className="flex-1 text-right text-sm font-semibold text-foreground">
               {row.value}
             </Typography>
           </View>
@@ -159,11 +159,11 @@ export function SheetHighlight({
   hint?: string;
 }) {
   return (
-    <View className="items-center gap-1 rounded-3xl bg-accent/10 px-5 py-6">
+    <View className="items-center gap-1 rounded-3xl border border-accent/15 bg-accent/10 px-5 py-7">
       <Typography type="body-sm" color="muted">
         {label}
       </Typography>
-      <Typography type="h2" className="font-bold text-foreground">
+      <Typography type="h2" className="font-bold tracking-tight text-foreground">
         {value}
       </Typography>
       {hint ? (
@@ -205,7 +205,7 @@ export function SheetActionBar({
             onPress={onIcon}
             accessibilityRole="button"
             accessibilityLabel={iconAccessibilityLabel}
-            className="size-12 items-center justify-center rounded-full bg-surface active:opacity-70">
+            className="size-12 items-center justify-center rounded-full border border-border bg-surface active:opacity-70">
             <Icon size={20} color={foreground} />
           </Pressable>
         ) : null}
