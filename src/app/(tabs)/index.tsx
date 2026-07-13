@@ -29,6 +29,7 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -62,14 +63,15 @@ type Tile = {
   route: '/visits' | '/prescriptions' | '/appointments' | '/documents';
 };
 
-function greeting(): string {
+function greetingKey(): string {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return 'home.greetingMorning';
+  if (h < 18) return 'home.greetingAfternoon';
+  return 'home.greetingEvening';
 }
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { identity, record, notifications, unreadNotifications, reloadRecord } =
@@ -80,25 +82,25 @@ export default function HomeScreen() {
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
-    Alert.alert('Copied', `${label} copied to clipboard.`);
+    Alert.alert(t('common.copied'), t('common.copiedToClipboard', { label }));
   };
 
   const quickActions: QuickAction[] = [
     {
       key: 'share',
-      label: 'Share record',
+      label: t('home.actions.shareRecord'),
       icon: QrCode,
       onPress: () => setShareOpen(true),
     },
     {
       key: 'wallet',
-      label: 'My wallet',
+      label: t('home.actions.myWallet'),
       icon: Wallet,
       onPress: () => setWalletOpen(true),
     },
     {
       key: 'scan',
-      label: 'Scan',
+      label: t('home.actions.scan'),
       icon: ScanLine,
       onPress: () => router.navigate('/camera'),
     },
@@ -107,8 +109,8 @@ export default function HomeScreen() {
   const tiles: Tile[] = [
     {
       key: 'visits',
-      title: 'Patient Visits',
-      caption: 'clinical encounters',
+      title: t('home.tiles.visitsTitle'),
+      caption: t('home.tiles.visitsCaption'),
       count: record?.encounters.length ?? 0,
       icon: Stethoscope,
       color: '#5B6CF0',
@@ -117,8 +119,8 @@ export default function HomeScreen() {
     },
     {
       key: 'prescriptions',
-      title: 'Prescriptions',
-      caption: 'active medications',
+      title: t('home.tiles.prescriptionsTitle'),
+      caption: t('home.tiles.prescriptionsCaption'),
       count: record?.medications.length ?? 0,
       icon: Pill,
       color: '#2D7FF9',
@@ -127,8 +129,8 @@ export default function HomeScreen() {
     },
     {
       key: 'appointments',
-      title: 'Appointments',
-      caption: 'upcoming',
+      title: t('home.tiles.appointmentsTitle'),
+      caption: t('home.tiles.appointmentsCaption'),
       count: record?.appointments?.filter((a) => a.status !== 'cancelled').length ?? 0,
       icon: CalendarDays,
       color: '#0EA5E9',
@@ -137,9 +139,9 @@ export default function HomeScreen() {
     },
     {
       key: 'documents',
-      title: 'Documents',
-      caption: 'records & notes',
-      count: 0,
+      title: t('home.tiles.documentsTitle'),
+      caption: t('home.tiles.documentsCaption'),
+      count: record?.documents?.length ?? 0,
       icon: FileText,
       color: '#8B5CF6',
       tintClass: 'bg-violet-500/10',
@@ -159,14 +161,14 @@ export default function HomeScreen() {
           <HeaderIconButton
             icon={Settings}
             color={fg}
-            accessibilityLabel="Settings"
+            accessibilityLabel={t('home.a11y.settings')}
             onPress={() => router.navigate('/settings')}
           />
           <Logo size={52} />
           <HeaderIconButton
             icon={Bell}
             color={fg}
-            accessibilityLabel="Notifications"
+            accessibilityLabel={t('home.a11y.notifications')}
             badgeCount={unreadNotifications}
             onPress={() => router.push('/notifications')}
           />
@@ -174,9 +176,13 @@ export default function HomeScreen() {
 
         {/* Greeting */}
         <View className="gap-1">
-          <Typography className="text-base text-muted">{greeting()},</Typography>
-          <Typography className="text-3xl font-bold text-foreground">{record?.name ?? 'Patient'}</Typography>
-          <Typography className="text-sm text-muted">Your record, stored on this device.</Typography>
+          <Typography className="text-base text-muted">
+            {t('home.greetingLine', { greeting: t(greetingKey()) })}
+          </Typography>
+          <Typography className="text-3xl font-bold text-foreground">
+            {record?.name ?? t('home.patientFallback')}
+          </Typography>
+          <Typography className="text-sm text-muted">{t('home.subtitle')}</Typography>
         </View>
 
         {/* Quick actions — the core patient actions, one tap each */}
@@ -240,13 +246,15 @@ export default function HomeScreen() {
                   <ReceiptText size={22} color="#10B981" />
                 </View>
                 <View className="flex-1 gap-0.5">
-                  <Typography className="text-sm font-medium text-foreground">Invoices</Typography>
+                  <Typography className="text-sm font-medium text-foreground">
+                    {t('home.invoices.title')}
+                  </Typography>
                   <Typography className="text-xs text-muted">
                     {invoices.length === 0
-                      ? 'No invoices'
+                      ? t('home.invoices.none')
                       : unpaid > 0
-                        ? `${unpaid} unpaid of ${invoices.length}`
-                        : `${invoices.length} · all paid`}
+                        ? t('home.invoices.unpaidOf', { unpaid, total: invoices.length })
+                        : t('home.invoices.allPaid', { total: invoices.length })}
                   </Typography>
                 </View>
                 <ChevronRight size={18} color={muted} />
@@ -260,14 +268,14 @@ export default function HomeScreen() {
           <View className="gap-3">
             <View className="flex-row items-center justify-between px-1">
               <Typography className="text-sm font-semibold text-foreground">
-                Recent activity
+                {t('home.recentActivity')}
               </Typography>
               <Pressable
                 onPress={() => router.push('/notifications')}
                 accessibilityRole="button"
                 className="active:opacity-70">
                 <Typography className="text-sm font-medium" style={{ color: accent }}>
-                  See all
+                  {t('common.seeAll')}
                 </Typography>
               </Pressable>
             </View>
@@ -313,8 +321,8 @@ export default function HomeScreen() {
           <BottomSheet.Content>
             <View className="gap-5 pt-1">
               <SheetHeader
-                title="Share your record"
-                subtitle="Let a clinic scan this to request your record"
+                title={t('home.share.title')}
+                subtitle={t('home.share.subtitle')}
                 icon={QrCode}
               />
               {identity ? (
@@ -323,7 +331,9 @@ export default function HomeScreen() {
                     <QRCode value={identity.walletNumber} size={200} />
                   </View>
                   <Pressable
-                    onPress={() => copy(identity.walletNumber, 'Wallet number')}
+                    onPress={() =>
+                      copy(identity.walletNumber, t('home.share.walletNumberLabel'))
+                    }
                     accessibilityRole="button"
                     className="flex-row items-center gap-1.5 active:opacity-70">
                     <Typography className="text-sm font-medium" style={{ color: accent }}>
@@ -332,11 +342,13 @@ export default function HomeScreen() {
                     <Copy size={14} color={accent} />
                   </Pressable>
                   <Typography type="body-xs" color="muted" className="px-6 text-center">
-                    The clinic completes the request on their side after scanning.
+                    {t('home.share.hint')}
                   </Typography>
                 </View>
               ) : (
-                <Typography className="text-sm text-muted">Wallet not ready yet.</Typography>
+                <Typography className="text-sm text-muted">
+                  {t('home.share.notReady')}
+                </Typography>
               )}
             </View>
           </BottomSheet.Content>
@@ -350,41 +362,41 @@ export default function HomeScreen() {
           <BottomSheet.Content>
             <View className="gap-5 pt-1">
               <SheetHeader
-                title="My wallet"
-                subtitle="Your identity on this device"
+                title={t('home.wallet.title')}
+                subtitle={t('home.wallet.subtitle')}
                 icon={Wallet}
               />
               <Surface variant="secondary" className="overflow-hidden rounded-3xl px-0 py-0">
                 <CopyRow
                   accent={accent}
                   icon={Wallet}
-                  label="Wallet number"
+                  label={t('home.wallet.walletNumber')}
                   muted={muted}
                   onCopy={
                     identity
-                      ? () => copy(identity.walletNumber, 'Wallet number')
+                      ? () => copy(identity.walletNumber, t('home.wallet.walletNumber'))
                       : undefined
                   }
-                  value={identity ? shortWallet(identity.walletNumber) : '—'}
+                  value={identity ? shortWallet(identity.walletNumber) : t('common.dash')}
                 />
                 <Separator />
                 <CopyRow
                   accent={accent}
                   icon={Fingerprint}
-                  label="Fingerprint"
+                  label={t('home.wallet.fingerprint')}
                   muted={muted}
                   onCopy={
                     identity
-                      ? () => copy(identity.fingerprint, 'Fingerprint')
+                      ? () => copy(identity.fingerprint, t('home.wallet.fingerprint'))
                       : undefined
                   }
-                  value={identity?.fingerprint ?? '—'}
+                  value={identity?.fingerprint ?? t('common.dash')}
                 />
                 <Separator />
                 <CopyRow
                   accent={accent}
                   icon={KeyRound}
-                  label="Algorithm"
+                  label={t('home.wallet.algorithm')}
                   muted={muted}
                   value="Ed25519"
                 />

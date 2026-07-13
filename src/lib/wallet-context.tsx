@@ -129,19 +129,33 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         event.signature,
         plaintext,
       );
-      if (!ok) return;
+      if (!ok) {
+        // Don't silently swallow a failed push — surface it so a broken update
+        // (e.g. a crypto/signature mismatch) is visible instead of vanishing.
+        console.warn(
+          `[wallet] dropped record update ${event.requestId}: signature did not verify`,
+        );
+        pushNotification(
+          'info',
+          `Couldn't verify an update from ${event.clinicName}`,
+          'The update was ignored because its signature did not match.',
+        );
+        return;
+      }
       const bundle = JSON.parse(new TextDecoder().decode(plaintext)) as {
         patient: Patient;
         appointments?: Patient['appointments'];
         invoices?: Patient['invoices'];
+        documents?: Patient['documents'];
         changes: string[];
       };
-      // Appointments/invoices arrive next to the patient snapshot — fold them
-      // onto the record so approving the update persists them together.
+      // Appointments/invoices/documents arrive next to the patient snapshot —
+      // fold them onto the record so approving the update persists them together.
       const mergedPatient: Patient = {
         ...bundle.patient,
         appointments: bundle.appointments ?? bundle.patient.appointments ?? [],
         invoices: bundle.invoices ?? bundle.patient.invoices ?? [],
+        documents: bundle.documents ?? bundle.patient.documents ?? [],
       };
       void checkAndPinClinicKey(event.clinicName, event.clinicPublicKey).then(
         (keyOk) => {
@@ -166,8 +180,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           );
         },
       );
-    } catch {
-      /* undecryptable / malformed — drop it */
+    } catch (err) {
+      // Undecryptable / malformed bundle — log it instead of dropping silently
+      // so a genuine delivery bug (bad seal, key mismatch, JSON error) surfaces.
+      console.warn(
+        `[wallet] failed to process record update ${event.requestId}:`,
+        err,
+      );
     }
   };
 

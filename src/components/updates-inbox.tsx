@@ -1,6 +1,7 @@
 import { BottomSheet, Button, Surface, useThemeColor } from 'heroui-native';
 import { Building2, Check, ShieldCheck, TriangleAlert } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 
 import { SheetHeader } from '@/components/sheet/sheet-parts';
@@ -12,6 +13,7 @@ import { useWallet } from '@/lib/wallet-context';
 // the patient reviews what changed and approves or denies — only an approval
 // replaces the on-device record. Mirrors the share-review bottom sheet.
 export function UpdatesInbox() {
+  const { t } = useTranslation();
   const { pendingUpdates, approveUpdate, denyUpdate } = useWallet();
   const [accent, muted] = useThemeColor(['accent', 'muted']);
   const [snoozed, setSnoozed] = useState(false);
@@ -31,8 +33,8 @@ export function UpdatesInbox() {
           {update ? (
             <View className="gap-5">
               <SheetHeader
-                title="Record update"
-                subtitle={`${update.clinicName} wants to update the record on this device.`}
+                title={t('updates.title')}
+                subtitle={t('updates.subtitle', { clinic: update.clinicName })}
               />
 
               <Surface variant="secondary" className="gap-3 rounded-2xl">
@@ -54,15 +56,16 @@ export function UpdatesInbox() {
                 <Surface variant="secondary" className="flex-row items-center gap-3 rounded-2xl">
                   <TriangleAlert size={18} color="#E0352B" />
                   <Text className="flex-1 text-sm font-medium text-foreground">
-                    This clinic&apos;s signing key changed since you last trusted it. Only
-                    approve if you expected a new key.
+                    {t('updates.keyChangedWarning')}
                   </Text>
                 </Surface>
               ) : null}
 
               {update.changes.length ? (
                 <View className="gap-2">
-                  <Text className="text-sm font-medium text-foreground">What changed</Text>
+                  <Text className="text-sm font-medium text-foreground">
+                    {t('updates.whatChanged')}
+                  </Text>
                   <ScrollView className="max-h-40">
                     <View className="gap-1.5">
                       {update.changes.map((change, i) => (
@@ -77,18 +80,18 @@ export function UpdatesInbox() {
               ) : null}
 
               <Text className="text-center text-xs text-muted">
-                Approving replaces your on-device record with this version.
+                {t('updates.replaceNote')}
               </Text>
 
               <View className="gap-2">
                 <Button variant="primary" onPress={() => approveUpdate(update)}>
-                  <Button.Label>Approve update</Button.Label>
+                  <Button.Label>{t('updates.approve')}</Button.Label>
                 </Button>
                 <Button variant="secondary" onPress={() => denyUpdate(update)}>
-                  <Button.Label>Decline</Button.Label>
+                  <Button.Label>{t('updates.decline')}</Button.Label>
                 </Button>
                 <Button variant="ghost" onPress={() => setSnoozed(true)}>
-                  <Button.Label>Later</Button.Label>
+                  <Button.Label>{t('updates.later')}</Button.Label>
                 </Button>
               </View>
             </View>

@@ -28,6 +28,17 @@ export type Appointment = {
   status: AppointmentStatus;
 };
 
+// A file/document the clinic attached to the record. The wallet receives the
+// metadata (not the bytes yet) so it can list documents and show a count.
+// Mirrors the trimmed shape pushed from backend/src/services/wallet-updates.ts.
+export type WalletDocument = {
+  id: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  createdAt: string; // ISO timestamp
+};
+
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'void';
 export type InvoiceLineItem = { description: string; quantity: number; unitPrice: number };
 export type InvoiceInstallment = {
@@ -67,4 +78,5 @@ export type Patient = {
   // Pushed by the clinic alongside the record (optional on older records).
   appointments?: Appointment[];
   invoices?: Invoice[];
+  documents?: WalletDocument[];
 };

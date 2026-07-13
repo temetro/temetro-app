@@ -47,7 +47,8 @@
         {
           "cameraPermission": "Allow temetro to scan a clinic's QR code to share your record."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

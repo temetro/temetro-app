@@ -1,0 +1,108 @@
+{
+  "common": {
+    "home": "Home",
+    "seeAll": "See all",
+    "copied": "Copied",
+    "copiedToClipboard": "{{label}} copied to clipboard.",
+    "dash": "—"
+  },
+  "nav": {
+    "visits": "Patient Visits",
+    "prescriptions": "Prescriptions",
+    "appointments": "Appointments",
+    "documents": "Documents",
+    "invoices": "Invoices",
+    "notifications": "Notifications",
+    "portal": "Patient Portal",
+    "scan": "Scan"
+  },
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "greetingLine": "{{greeting}},",
+    "patientFallback": "Patient",
+    "subtitle": "Your record, stored on this device.",
+    "actions": {
+      "shareRecord": "Share record",
+      "myWallet": "My wallet",
+      "scan": "Scan"
+    },
+    "tiles": {
+      "visitsTitle": "Patient Visits",
+      "visitsCaption": "clinical encounters",
+      "prescriptionsTitle": "Prescriptions",
+      "prescriptionsCaption": "active medications",
+      "appointmentsTitle": "Appointments",
+      "appointmentsCaption": "upcoming",
+      "documentsTitle": "Documents",
+      "documentsCaption": "records & notes"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "none": "No invoices",
+      "unpaidOf": "{{unpaid}} unpaid of {{total}}",
+      "allPaid": "{{total}} · all paid"
+    },
+    "recentActivity": "Recent activity",
+    "share": {
+      "title": "Share your record",
+      "subtitle": "Let a clinic scan this to request your record",
+      "hint": "The clinic completes the request on their side after scanning.",
+      "notReady": "Wallet not ready yet.",
+      "walletNumberLabel": "Wallet number"
+    },
+    "wallet": {
+      "title": "My wallet",
+      "subtitle": "Your identity on this device",
+      "walletNumber": "Wallet number",
+      "fingerprint": "Fingerprint",
+      "algorithm": "Algorithm"
+    },
+    "a11y": {
+      "settings": "Settings",
+      "notifications": "Notifications"
+    }
+  },
+  "updates": {
+    "title": "Record update",
+    "subtitle": "{{clinic}} wants to update the record on this device.",
+    "whatChanged": "What changed",
+    "keyChangedWarning": "This clinic's signing key changed since you last trusted it. Only approve if you expected a new key.",
+    "replaceNote": "Approving replaces your on-device record with this version.",
+    "approve": "Approve update",
+    "decline": "Decline",
+    "later": "Later"
+  },
+  "documentsScreen": {
+    "empty": "No documents yet.",
+    "type": "Type",
+    "size": "Size",
+    "added": "Added"
+  },
+  "visitsScreen": {
+    "empty": "No visits recorded yet.",
+    "date": "Date",
+    "type": "Type",
+    "provider": "Provider"
+  },
+  "appointmentsScreen": {
+    "empty": "No upcoming appointments.",
+    "fallback": "Appointment",
+    "with": "With {{provider}}",
+    "status": "Status: {{status}}"
+  },
+  "invoicesScreen": {
+    "empty": "No invoices yet.",
+    "fallbackNumber": "Invoice",
+    "issued": "Issued {{date}}",
+    "due": "Due {{date}}",
+    "installmentsPaid": "{{paid}}/{{total}} installments paid",
+    "status": {
+      "paid": "Paid",
+      "sent": "Unpaid",
+      "draft": "Draft",
+      "void": "Void"
+    }
+  }
+}

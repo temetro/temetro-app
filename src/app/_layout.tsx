@@ -1,10 +1,12 @@
 import '@/global.css';
+import '@/lib/i18n';
 
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SystemUI from 'expo-system-ui';
 import { HeroUINativeProvider } from 'heroui-native';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -76,6 +78,7 @@ function GateRedirector() {
 }
 
 export default function RootLayout() {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const dark = colorScheme === 'dark';
   const palette = dark ? darkPalette : lightPalette;
@@ -104,31 +107,31 @@ export default function RootLayout() {
               <Stack.Screen name="lock" options={{ animation: 'fade', gestureEnabled: false }} />
               <Stack.Screen
                 name="visits"
-                options={{ headerShown: true, title: 'Patient Visits', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.visits'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="prescriptions"
-                options={{ headerShown: true, title: 'Prescriptions', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.prescriptions'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="appointments"
-                options={{ headerShown: true, title: 'Appointments', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.appointments'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="documents"
-                options={{ headerShown: true, title: 'Documents', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.documents'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="invoices"
-                options={{ headerShown: true, title: 'Invoices', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.invoices'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="notifications"
-                options={{ headerShown: true, title: 'Notifications', headerBackTitle: 'Home' }}
+                options={{ headerShown: true, title: t('nav.notifications'), headerBackTitle: t('common.home') }}
               />
               <Stack.Screen
                 name="portal"
-                options={{ headerShown: true, title: 'Patient Portal', headerBackTitle: 'Scan' }}
+                options={{ headerShown: true, title: t('nav.portal'), headerBackTitle: t('nav.scan') }}
               />
             </Stack>
             <AnimatedSplashOverlay />
