@@ -66,6 +66,9 @@ export type Patient = {
   pcp: string;
   status: PatientStatus;
   initials: string;
+  // The patient's own phone number, kept on-device only (never seeded by the
+  // clinic). Optional so older records without it stay valid.
+  phone?: string;
   allergies: Allergy[];
   alerts: string[];
   medications: Medication[];

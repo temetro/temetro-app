@@ -5,10 +5,13 @@ import {
   BottomSheet,
   Button,
   Dialog,
+  Input,
+  Label,
   ListGroup,
   Separator,
   Surface,
   Switch,
+  TextField,
   Typography,
   useThemeColor,
 } from 'heroui-native';
@@ -25,6 +28,7 @@ import {
   LogOut,
   Moon,
   Newspaper,
+  Phone,
   Server,
   ShieldCheck,
   Trash2,
@@ -59,7 +63,7 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const { theme } = useUniwind();
   const router = useRouter();
-  const { identity, record, status, reset, reloadRecord } = useWallet();
+  const { identity, record, status, reset, reloadRecord, updateRecord } = useWallet();
   const { lock, refresh: refreshVault } = useVault();
   const [muted, accent, foreground, danger] = useThemeColor([
     'muted',
@@ -69,6 +73,22 @@ export default function SettingsScreen() {
   ]);
   const [resetOpen, setResetOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [phoneOpen, setPhoneOpen] = useState(false);
+  const [phoneDraft, setPhoneDraft] = useState('');
+
+  const openPhone = () => {
+    setPhoneDraft(record?.phone ?? '');
+    setPhoneOpen(true);
+  };
+
+  // Persist the patient's phone to the on-device record only. Trimming to empty
+  // clears it (stored as undefined so the field simply drops off the record).
+  const savePhone = () => {
+    setPhoneOpen(false);
+    if (!record) return;
+    const trimmed = phoneDraft.trim();
+    updateRecord({ ...record, phone: trimmed || undefined });
+  };
 
   const statusLabel: Record<string, string> = {
     connecting: t('settings.status.connecting'),
@@ -120,7 +140,7 @@ export default function SettingsScreen() {
       <RefreshableScrollView
         onRefresh={reloadRecord}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
-        contentContainerClassName="px-5 gap-6"
+        contentContainerClassName="px-5 gap-6 w-full max-w-2xl self-center"
         showsVerticalScrollIndicator={false}>
         <Typography className="text-3xl font-bold text-foreground">
           {t('settings.title')}
@@ -193,6 +213,29 @@ export default function SettingsScreen() {
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
                 <View />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
+          </ListGroup>
+        </View>
+
+        {/* Profile — the patient's own details, on-device only */}
+        <View className="gap-2">
+          <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
+            {t('settings.sections.profile')}
+          </Typography>
+          <ListGroup>
+            <ListGroup.Item onPress={openPhone}>
+              <ListGroup.ItemPrefix>
+                <Phone size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>{t('settings.phone')}</ListGroup.ItemTitle>
+                <ListGroup.ItemDescription>
+                  {record?.phone ? record.phone : t('settings.phoneNotSet')}
+                </ListGroup.ItemDescription>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <ExternalLink size={18} color={muted} />
               </ListGroup.ItemSuffix>
             </ListGroup.Item>
           </ListGroup>
@@ -352,6 +395,42 @@ export default function SettingsScreen() {
                     </Pressable>
                   );
                 })}
+              </View>
+            </View>
+          </BottomSheet.Content>
+        </BottomSheet.Portal>
+      </BottomSheet>
+
+      {/* Phone number editor — persists to the on-device record only */}
+      <BottomSheet isOpen={phoneOpen} onOpenChange={setPhoneOpen}>
+        <BottomSheet.Portal>
+          <BottomSheet.Overlay />
+          <BottomSheet.Content>
+            <View className="gap-5 pt-1">
+              <View className="gap-1">
+                <BottomSheet.Title>{t('settings.phoneDialog.title')}</BottomSheet.Title>
+                <BottomSheet.Description>
+                  {t('settings.phoneDialog.description')}
+                </BottomSheet.Description>
+              </View>
+              <TextField>
+                <Label>{t('settings.phone')}</Label>
+                <Input
+                  value={phoneDraft}
+                  onChangeText={setPhoneDraft}
+                  placeholder={t('settings.phoneDialog.placeholder')}
+                  keyboardType="phone-pad"
+                  autoComplete="tel"
+                  autoFocus
+                />
+              </TextField>
+              <View className="flex-row gap-3">
+                <Button variant="secondary" className="flex-1" onPress={() => setPhoneOpen(false)}>
+                  <Button.Label>{t('settings.phoneDialog.cancel')}</Button.Label>
+                </Button>
+                <Button variant="primary" className="flex-1" onPress={savePhone}>
+                  <Button.Label>{t('settings.phoneDialog.save')}</Button.Label>
+                </Button>
               </View>
             </View>
           </BottomSheet.Content>
