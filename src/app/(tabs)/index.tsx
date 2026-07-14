@@ -154,7 +154,7 @@ export default function HomeScreen() {
       <RefreshableScrollView
         onRefresh={reloadRecord}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
-        contentContainerClassName="px-5 gap-6"
+        contentContainerClassName="px-5 gap-6 w-full max-w-2xl self-center"
         showsVerticalScrollIndicator={false}>
         {/* Top bar — Liquid Glass icon buttons flanking the app mark */}
         <View className="flex-row items-center justify-between">
