@@ -1,0 +1,309 @@
+{
+  "common": {
+    "home": "Accueil",
+    "seeAll": "Tout voir",
+    "copied": "Copié",
+    "copiedToClipboard": "{{label}} copié dans le presse-papiers.",
+    "dash": "—",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "back": "Retour",
+    "tryAgain": "Réessayer",
+    "continue": "Continuer"
+  },
+  "nav": {
+    "visits": "Consultations",
+    "prescriptions": "Ordonnances",
+    "appointments": "Rendez-vous",
+    "documents": "Documents",
+    "invoices": "Factures",
+    "notifications": "Notifications",
+    "portal": "Portail patient",
+    "scan": "Scanner"
+  },
+  "home": {
+    "greetingMorning": "Bonjour",
+    "greetingAfternoon": "Bon après-midi",
+    "greetingEvening": "Bonsoir",
+    "greetingLine": "{{greeting}},",
+    "patientFallback": "Patient",
+    "subtitle": "Votre dossier, conservé sur cet appareil.",
+    "actions": {
+      "shareRecord": "Partager le dossier",
+      "myWallet": "Mon portefeuille",
+      "scan": "Scanner"
+    },
+    "tiles": {
+      "visitsTitle": "Consultations",
+      "visitsCaption": "rencontres cliniques",
+      "prescriptionsTitle": "Ordonnances",
+      "prescriptionsCaption": "traitements actifs",
+      "appointmentsTitle": "Rendez-vous",
+      "appointmentsCaption": "à venir",
+      "documentsTitle": "Documents",
+      "documentsCaption": "dossiers et notes"
+    },
+    "invoices": {
+      "title": "Factures",
+      "none": "Aucune facture",
+      "unpaidOf": "{{unpaid}} impayée(s) sur {{total}}",
+      "allPaid": "{{total}} · tout est payé"
+    },
+    "recentActivity": "Activité récente",
+    "share": {
+      "title": "Partager votre dossier",
+      "subtitle": "Laissez une clinique scanner ceci pour demander votre dossier",
+      "hint": "La clinique finalise la demande de son côté après le scan.",
+      "notReady": "Le portefeuille n'est pas encore prêt.",
+      "walletNumberLabel": "Numéro de portefeuille"
+    },
+    "wallet": {
+      "title": "Mon portefeuille",
+      "subtitle": "Votre identité sur cet appareil",
+      "walletNumber": "Numéro de portefeuille",
+      "fingerprint": "Empreinte",
+      "algorithm": "Algorithme"
+    },
+    "a11y": {
+      "settings": "Réglages",
+      "notifications": "Notifications"
+    }
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "continue": "Continuer",
+    "getStarted": "Commencer",
+    "slides": {
+      "welcomeTitle": "Bienvenue sur temetro",
+      "welcomeBody": "Votre dossier de santé — qui vous appartient, que vous emportez, partagé uniquement selon votre choix.",
+      "ownTitle": "Votre dossier, votre appareil",
+      "ownBody": "temetro conserve votre dossier de santé sur votre téléphone, et non enfermé dans la base de données d'une clinique.",
+      "encryptedTitle": "Chiffré sur cet appareil",
+      "encryptedBody": "Vos données sont scellées par des clés qui ne quittent jamais votre téléphone. Vous seul pouvez les déverrouiller.",
+      "shareTitle": "Partagez en un seul geste",
+      "shareBody": "Scannez le QR d'une clinique pour partager en toute sécurité — et vous approuvez chaque demande avant que rien ne soit envoyé."
+    },
+    "mock": {
+      "vitals": "Signes vitaux",
+      "vitalsValue": "Stables",
+      "ownedBy": "Propriétaire",
+      "ownedByValue": "Vous",
+      "storage": "Stockage",
+      "storageValue": "Cet appareil"
+    }
+  },
+  "register": {
+    "title": "Créez votre portefeuille",
+    "subtitle": "Votre dossier réside sur cet appareil, chiffré avec des clés que vous seul détenez. Dites-nous qui vous êtes pour commencer.",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "ex. Amina Yusuf",
+    "dob": "Date de naissance",
+    "dobHelper": "Utilisée pour afficher votre âge sur votre dossier.",
+    "dobLooksGood": "Parfait",
+    "sex": "Sexe",
+    "female": "Femme",
+    "male": "Homme",
+    "selectDate": "Sélectionner une date",
+    "walletNumber": "Votre numéro de portefeuille",
+    "create": "Créer le portefeuille",
+    "creating": "Création…"
+  },
+  "settings": {
+    "title": "Réglages",
+    "storedOnDevice": "Conservé uniquement sur cet appareil",
+    "patientFallback": "Patient",
+    "sections": {
+      "wallet": "Portefeuille",
+      "profile": "Profil",
+      "network": "Réseau",
+      "appearance": "Apparence",
+      "language": "Langue",
+      "about": "À propos"
+    },
+    "walletNumber": "Numéro de portefeuille",
+    "fingerprint": "Empreinte",
+    "algorithm": "Algorithme",
+    "temetroNetwork": "Réseau Temetro",
+    "darkMode": "Mode sombre",
+    "language": "Langue",
+    "phone": "Numéro de téléphone",
+    "phoneNotSet": "Non défini",
+    "version": "Version",
+    "help": "Aide et documentation",
+    "blog": "Blog",
+    "logout": "Se déconnecter",
+    "resetWallet": "Réinitialiser le portefeuille",
+    "footer": "Vos clés et votre dossier ne quittent jamais cet appareil.",
+    "reset": {
+      "title": "Réinitialiser le portefeuille ?",
+      "body": "Cela supprime définitivement vos clés et votre dossier sur l'appareil. Vous devrez vous réinscrire. Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Réinitialiser"
+    },
+    "phoneDialog": {
+      "title": "Numéro de téléphone",
+      "description": "Conservé uniquement sur cet appareil, dans votre dossier.",
+      "placeholder": "ex. +33 6 12 34 56 78",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "languageSheet": {
+      "title": "Langue",
+      "subtitle": "Choisissez la langue de l'application",
+      "restartTitle": "Redémarrage nécessaire",
+      "restartBody": "Veuillez fermer et rouvrir temetro pour terminer le changement du sens de lecture."
+    },
+    "status": {
+      "connecting": "Connexion…",
+      "connected": "Connecté",
+      "authenticated": "En ligne",
+      "authFailed": "Échec de l'authentification",
+      "disconnected": "Hors ligne"
+    }
+  },
+  "lock": {
+    "welcomeBack": "Bon retour",
+    "foundWallet": "Nous avons trouvé votre portefeuille enregistré sur cet appareil.",
+    "enterPin": "Saisissez votre code PIN pour le déverrouiller.",
+    "enterPassphrase": "Saisissez votre phrase secrète pour le déverrouiller.",
+    "wrongPin": "Code PIN incorrect. Réessayez.",
+    "wrongPassphrase": "Phrase secrète incorrecte. Réessayez.",
+    "checking": "Vérification…",
+    "unlock": "Déverrouiller",
+    "passphrasePlaceholder": "Phrase secrète"
+  },
+  "vaultSetup": {
+    "secure": "Sécurisez votre portefeuille",
+    "confirmHeading": "Confirmez-le",
+    "choosePin": "Choisissez un code PIN à 4 chiffres pour ouvrir l'application.",
+    "confirmPin": "Saisissez à nouveau votre code PIN pour confirmer.",
+    "choosePassphrase": "Choisissez une phrase secrète pour ouvrir l'application.",
+    "confirmPassphrase": "Saisissez à nouveau votre phrase secrète pour confirmer.",
+    "noMatch": "Ils ne correspondent pas. Réessayez.",
+    "securing": "Sécurisation de votre portefeuille…",
+    "continue": "Continuer",
+    "confirm": "Confirmer",
+    "usePassphrase": "Utiliser plutôt une phrase secrète",
+    "usePin": "Utiliser plutôt un code PIN à 4 chiffres",
+    "passphrasePlaceholder": "Phrase secrète"
+  },
+  "camera": {
+    "accessNeeded": "Accès à la caméra requis",
+    "accessBody": "temetro utilise la caméra pour scanner le QR d'une clinique afin de partager votre dossier.",
+    "allow": "Autoriser la caméra",
+    "scanTitle": "Scanner le QR de la clinique",
+    "scanHint": "Pointez votre caméra vers le QR affiché sur l'écran de la clinique.",
+    "shared": "Dossier partagé",
+    "sharedBody": "La clinique a reçu votre dossier chiffré.",
+    "failedTitle": "Partage impossible",
+    "failedBody": "Impossible de joindre le relais de la clinique. Vérifiez votre connexion et réessayez.",
+    "shareTitle": "Partager votre dossier ?",
+    "shareBody": "Une clinique demande {{name}}. Votre dossier lui est chiffré et signé par votre portefeuille — rien n'est partagé avant votre approbation.",
+    "recordFallback": "votre dossier",
+    "accessSuffix": "accès",
+    "modePermanent": "Permanent",
+    "modeTemporary": "Temporaire",
+    "modeTemporaryHours": "Temporaire · {{hours}} h",
+    "whatShared": "Ce qui sera partagé",
+    "approve": "Approuver et partager",
+    "sharing": "Partage…",
+    "cancel": "Annuler",
+    "lineVisits": "{{count}} consultations cliniques",
+    "lineMedications": "{{count}} traitements",
+    "lineProblems": "{{count}} problèmes",
+    "lineAllergies": "{{count}} allergies"
+  },
+  "portal": {
+    "invalidLink": "Lien de portail invalide.",
+    "titleMenu": "Portail patient",
+    "titleLink": "Lier votre portefeuille",
+    "titleBook": "Prendre rendez-vous",
+    "titleResults": "Vos résultats",
+    "menu": {
+      "linkTitle": "Lier votre portefeuille",
+      "linkDesc": "Connectez ce portefeuille à votre dossier à la clinique.",
+      "bookTitle": "Prendre rendez-vous",
+      "bookDesc": "Choisissez un médecin et un créneau libre.",
+      "resultsTitle": "Voir les résultats",
+      "resultsDesc": "Consultez les visites à venir et téléchargez les fichiers de laboratoire."
+    },
+    "checkingLink": "Vérification du lien de votre portefeuille…",
+    "linkedTitle": "Portefeuille lié",
+    "linkedNamed": "Vous êtes lié au dossier de {{name}}. Vous pouvez désormais prendre rendez-vous et consulter vos résultats ici.",
+    "linkedGeneric": "Vous pouvez désormais prendre rendez-vous et consulter vos résultats ici.",
+    "back": "Retour",
+    "notLinkedTitle": "Pas encore lié",
+    "notLinkedBody": "Demandez à la clinique d'ajouter votre numéro de portefeuille à votre dossier, puis réessayez.",
+    "tryAgain": "Réessayer",
+    "chooseDoctor": "Choisir un médecin",
+    "noDoctors": "Aucun médecin disponible pour le moment.",
+    "chooseDay": "Choisir un jour",
+    "chooseTime": "Choisir une heure",
+    "booking": "Réservation…",
+    "bookTime": "Réserver {{time}}",
+    "selectTime": "Sélectionnez une heure",
+    "bookedTitle": "Rendez-vous confirmé",
+    "upcomingVisits": "Visites à venir",
+    "noUpcoming": "Aucune visite à venir.",
+    "labFiles": "Fichiers de laboratoire",
+    "noFiles": "Aucun fichier au dossier.",
+    "downloadedTitle": "Téléchargé",
+    "downloadedBody": "« {{name}} » enregistré sur votre appareil.",
+    "downloadFailed": "Échec du téléchargement"
+  },
+  "updates": {
+    "title": "Mise à jour du dossier",
+    "subtitle": "{{clinic}} souhaite mettre à jour le dossier sur cet appareil.",
+    "whatChanged": "Ce qui a changé",
+    "keyChangedWarning": "La clé de signature de cette clinique a changé depuis la dernière fois que vous lui avez fait confiance. N'approuvez que si vous attendiez une nouvelle clé.",
+    "replaceNote": "Approuver remplace votre dossier sur l'appareil par cette version.",
+    "approve": "Approuver la mise à jour",
+    "decline": "Refuser",
+    "later": "Plus tard"
+  },
+  "documentsScreen": {
+    "empty": "Aucun document pour le moment.",
+    "type": "Type",
+    "size": "Taille",
+    "added": "Ajouté"
+  },
+  "visitsScreen": {
+    "empty": "Aucune consultation enregistrée pour le moment.",
+    "date": "Date",
+    "type": "Type",
+    "provider": "Praticien"
+  },
+  "prescriptionsScreen": {
+    "empty": "Aucune ordonnance active.",
+    "dose": "Dose",
+    "frequency": "Fréquence"
+  },
+  "notificationsScreen": {
+    "empty": "Aucune notification pour le moment.",
+    "emptyBody": "Les mises à jour des cliniques et les demandes de partage apparaîtront ici.",
+    "justNow": "à l'instant",
+    "minutesAgo": "il y a {{count}} min",
+    "hoursAgo": "il y a {{count}} h",
+    "daysAgo": "il y a {{count}} j"
+  },
+  "appointmentsScreen": {
+    "empty": "Aucun rendez-vous à venir.",
+    "fallback": "Rendez-vous",
+    "with": "Avec {{provider}}",
+    "status": "Statut : {{status}}"
+  },
+  "invoicesScreen": {
+    "empty": "Aucune facture pour le moment.",
+    "fallbackNumber": "Facture",
+    "issued": "Émise le {{date}}",
+    "due": "Échéance {{date}}",
+    "installmentsPaid": "{{paid}}/{{total}} échéances payées",
+    "status": {
+      "paid": "Payée",
+      "sent": "Impayée",
+      "draft": "Brouillon",
+      "void": "Annulée"
+    }
+  }
+}

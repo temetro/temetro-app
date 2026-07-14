@@ -2,6 +2,7 @@ import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
 import Constants from 'expo-constants';
 import {
+  BottomSheet,
   Button,
   Dialog,
   ListGroup,
@@ -14,9 +15,11 @@ import {
 import { useRouter } from 'expo-router';
 import {
   BookOpen,
+  Check,
   Copy,
   ExternalLink,
   Fingerprint,
+  Globe,
   Info,
   KeyRound,
   LogOut,
@@ -28,7 +31,8 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, Linking, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 const DOCS_URL = 'https://github.com/temetro/temetro';
 const BLOG_URL = 'https://blog.temetro.com';
@@ -40,19 +44,19 @@ import { Uniwind, useUniwind } from 'uniwind';
 
 import { GlassButton } from '@/components/glass-button';
 import { shortWallet } from '@/lib/format';
+import i18n from '@/lib/i18n';
+import {
+  applyDirectionForLanguage,
+  LANGUAGES,
+  type LanguageCode,
+  persistLanguage,
+} from '@/lib/language';
 import { useVault } from '@/lib/vault-context';
 import { useWallet } from '@/lib/wallet-context';
 
-const STATUS_LABEL: Record<string, string> = {
-  connecting: 'Connecting…',
-  connected: 'Connected',
-  authenticated: 'Online',
-  'auth-failed': 'Auth failed',
-  disconnected: 'Offline',
-};
-
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { theme } = useUniwind();
   const router = useRouter();
   const { identity, record, status, reset, reloadRecord } = useWallet();
@@ -64,10 +68,38 @@ export default function SettingsScreen() {
     'danger',
   ]);
   const [resetOpen, setResetOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+
+  const statusLabel: Record<string, string> = {
+    connecting: t('settings.status.connecting'),
+    connected: t('settings.status.connected'),
+    authenticated: t('settings.status.authenticated'),
+    'auth-failed': t('settings.status.authFailed'),
+    disconnected: t('settings.status.disconnected'),
+  };
+
+  const currentLanguage =
+    LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
-    Alert.alert('Copied', `${label} copied to clipboard.`);
+    Alert.alert(t('common.copied'), t('common.copiedToClipboard', { label }));
+  };
+
+  const chooseLanguage = async (code: LanguageCode) => {
+    setLangOpen(false);
+    if (code === i18n.language) return;
+    persistLanguage(code);
+    await i18n.changeLanguage(code);
+    // RN only mirrors the layout after a reload, so if the direction flips
+    // (to/from Arabic) ask the patient to relaunch to finish applying it.
+    const directionChanged = applyDirectionForLanguage(code);
+    if (directionChanged) {
+      Alert.alert(
+        t('settings.languageSheet.restartTitle'),
+        t('settings.languageSheet.restartBody'),
+      );
+    }
   };
 
   const confirmReset = async () => {
@@ -90,7 +122,9 @@ export default function SettingsScreen() {
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 90 }}
         contentContainerClassName="px-5 gap-6"
         showsVerticalScrollIndicator={false}>
-        <Typography className="text-3xl font-bold text-foreground">Settings</Typography>
+        <Typography className="text-3xl font-bold text-foreground">
+          {t('settings.title')}
+        </Typography>
 
         {/* Identity hero */}
         <Surface className="flex-row items-center gap-4 rounded-3xl">
@@ -101,24 +135,29 @@ export default function SettingsScreen() {
           </View>
           <View className="flex-1">
             <Typography className="text-lg font-semibold text-foreground">
-              {record?.name ?? 'Patient'}
+              {record?.name ?? t('settings.patientFallback')}
             </Typography>
-            <Typography className="text-sm text-muted">Stored only on this device</Typography>
+            <Typography className="text-sm text-muted">
+              {t('settings.storedOnDevice')}
+            </Typography>
           </View>
         </Surface>
 
         {/* Wallet */}
         <View className="gap-2">
           <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
-            Wallet
+            {t('settings.sections.wallet')}
           </Typography>
           <ListGroup>
-            <ListGroup.Item onPress={() => identity && copy(identity.walletNumber, 'Wallet number')}>
+            <ListGroup.Item
+              onPress={() =>
+                identity && copy(identity.walletNumber, t('settings.walletNumber'))
+              }>
               <ListGroup.ItemPrefix>
                 <Wallet size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Wallet number</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.walletNumber')}</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>
                   {identity ? shortWallet(identity.walletNumber) : '—'}
                 </ListGroup.ItemDescription>
@@ -128,12 +167,15 @@ export default function SettingsScreen() {
               </ListGroup.ItemSuffix>
             </ListGroup.Item>
             <Separator className="mx-4" />
-            <ListGroup.Item onPress={() => identity && copy(identity.fingerprint, 'Fingerprint')}>
+            <ListGroup.Item
+              onPress={() =>
+                identity && copy(identity.fingerprint, t('settings.fingerprint'))
+              }>
               <ListGroup.ItemPrefix>
                 <Fingerprint size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Fingerprint</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.fingerprint')}</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>{identity?.fingerprint ?? '—'}</ListGroup.ItemDescription>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
@@ -141,12 +183,12 @@ export default function SettingsScreen() {
               </ListGroup.ItemSuffix>
             </ListGroup.Item>
             <Separator className="mx-4" />
-            <ListGroup.Item isDisabled>
+            <ListGroup.Item disabled>
               <ListGroup.ItemPrefix>
                 <KeyRound size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Algorithm</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.algorithm')}</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>Ed25519</ListGroup.ItemDescription>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
@@ -159,7 +201,7 @@ export default function SettingsScreen() {
         {/* Network */}
         <View className="gap-2">
           <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
-            Network
+            {t('settings.sections.network')}
           </Typography>
           <ListGroup>
             <ListGroup.Item>
@@ -167,9 +209,9 @@ export default function SettingsScreen() {
                 <Server size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Temetro Network</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.temetroNetwork')}</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>
-                  {STATUS_LABEL[status] ?? status}
+                  {statusLabel[status] ?? status}
                 </ListGroup.ItemDescription>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
@@ -179,18 +221,18 @@ export default function SettingsScreen() {
           </ListGroup>
         </View>
 
-        {/* Appearance */}
+        {/* Appearance & language */}
         <View className="gap-2">
           <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
-            Appearance
+            {t('settings.sections.appearance')}
           </Typography>
           <ListGroup>
-            <ListGroup.Item isDisabled>
+            <ListGroup.Item disabled>
               <ListGroup.ItemPrefix>
                 <Moon size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Dark mode</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.darkMode')}</ListGroup.ItemTitle>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
                 <Switch
@@ -199,13 +241,26 @@ export default function SettingsScreen() {
                 />
               </ListGroup.ItemSuffix>
             </ListGroup.Item>
+            <Separator className="mx-4" />
+            <ListGroup.Item onPress={() => setLangOpen(true)}>
+              <ListGroup.ItemPrefix>
+                <Globe size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>{t('settings.language')}</ListGroup.ItemTitle>
+                <ListGroup.ItemDescription>{currentLanguage.label}</ListGroup.ItemDescription>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <ExternalLink size={18} color={muted} />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
           </ListGroup>
         </View>
 
         {/* About */}
         <View className="gap-2">
           <Typography className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">
-            About
+            {t('settings.sections.about')}
           </Typography>
           <ListGroup>
             <ListGroup.Item>
@@ -213,7 +268,7 @@ export default function SettingsScreen() {
                 <Info size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Version</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.version')}</ListGroup.ItemTitle>
                 <ListGroup.ItemDescription>{APP_VERSION}</ListGroup.ItemDescription>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
@@ -226,7 +281,7 @@ export default function SettingsScreen() {
                 <BookOpen size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Help &amp; documentation</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.help')}</ListGroup.ItemTitle>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
                 <ExternalLink size={18} color={muted} />
@@ -238,7 +293,7 @@ export default function SettingsScreen() {
                 <Newspaper size={20} color={accent} />
               </ListGroup.ItemPrefix>
               <ListGroup.ItemContent>
-                <ListGroup.ItemTitle>Blog</ListGroup.ItemTitle>
+                <ListGroup.ItemTitle>{t('settings.blog')}</ListGroup.ItemTitle>
               </ListGroup.ItemContent>
               <ListGroup.ItemSuffix>
                 <ExternalLink size={18} color={muted} />
@@ -250,23 +305,58 @@ export default function SettingsScreen() {
         {/* Session */}
         <Button variant="secondary" size="lg" onPress={logout}>
           <LogOut size={18} color={foreground} />
-          <Button.Label>Log out</Button.Label>
+          <Button.Label>{t('settings.logout')}</Button.Label>
         </Button>
 
         {/* Danger */}
         <Button variant="danger-soft" size="lg" onPress={() => setResetOpen(true)}>
           <Trash2 size={18} color={danger} />
-          <Button.Label>Reset wallet</Button.Label>
+          <Button.Label>{t('settings.resetWallet')}</Button.Label>
         </Button>
 
         {/* Privacy reassurance footer */}
         <View className="flex-row items-center justify-center gap-1.5 pt-1">
           <ShieldCheck size={14} color={muted} />
-          <Typography className="text-xs text-muted">
-            Your keys and record never leave this device.
-          </Typography>
+          <Typography className="text-xs text-muted">{t('settings.footer')}</Typography>
         </View>
       </RefreshableScrollView>
+
+      {/* Language picker */}
+      <BottomSheet isOpen={langOpen} onOpenChange={setLangOpen}>
+        <BottomSheet.Portal>
+          <BottomSheet.Overlay />
+          <BottomSheet.Content>
+            <View className="gap-4 pt-1">
+              <View className="gap-1">
+                <BottomSheet.Title>{t('settings.languageSheet.title')}</BottomSheet.Title>
+                <BottomSheet.Description>
+                  {t('settings.languageSheet.subtitle')}
+                </BottomSheet.Description>
+              </View>
+              <View className="gap-1">
+                {LANGUAGES.map((lang) => {
+                  const selected = lang.code === i18n.language;
+                  return (
+                    <Pressable
+                      key={lang.code}
+                      onPress={() => chooseLanguage(lang.code)}
+                      accessibilityRole="button"
+                      className="flex-row items-center gap-3 rounded-2xl px-3 py-3.5 active:opacity-70">
+                      <View className="flex-1">
+                        <Typography className="text-base font-medium text-foreground">
+                          {lang.label}
+                        </Typography>
+                        <Typography className="text-xs text-muted">{lang.english}</Typography>
+                      </View>
+                      {selected ? <Check size={20} color={accent} /> : null}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          </BottomSheet.Content>
+        </BottomSheet.Portal>
+      </BottomSheet>
 
       {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}
       <Dialog isOpen={resetOpen} onOpenChange={setResetOpen}>
@@ -286,16 +376,17 @@ export default function SettingsScreen() {
           </Dialog.Overlay>
           <Dialog.Content>
             <View className="mb-6 gap-2">
-              <Dialog.Title>Reset wallet?</Dialog.Title>
-              <Dialog.Description>
-                This permanently deletes your keys and on-device record. You&apos;ll need to
-                register again. This cannot be undone.
-              </Dialog.Description>
+              <Dialog.Title>{t('settings.reset.title')}</Dialog.Title>
+              <Dialog.Description>{t('settings.reset.body')}</Dialog.Description>
             </View>
             <View className="flex-row gap-3">
-              <GlassButton label="Cancel" color={foreground} onPress={() => setResetOpen(false)} />
               <GlassButton
-                label="Reset"
+                label={t('settings.reset.cancel')}
+                color={foreground}
+                onPress={() => setResetOpen(false)}
+              />
+              <GlassButton
+                label={t('settings.reset.confirm')}
                 color={danger}
                 tintColor="rgba(255,69,58,0.18)"
                 onPress={confirmReset}

@@ -3,10 +3,10 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { BottomSheet, Button, Separator, Surface, useThemeColor } from 'heroui-native';
 import { Building2, CheckCircle2, QrCode, ShieldCheck, XCircle } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { shareModeLabel } from '@/lib/format';
 import { parsePortalPairing } from '@/lib/portal';
 import { parsePairingUri, type Pairing } from '@/lib/relay';
 import { useWallet } from '@/lib/wallet-context';
@@ -16,6 +16,7 @@ type Phase = 'review' | 'sending' | 'done' | 'error';
 export default function CameraScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const accent = useThemeColor('accent');
   const { record, respondToPairing } = useWallet();
   const [permission, requestPermission] = useCameraPermissions();
@@ -82,14 +83,14 @@ export default function CameraScreen() {
         </View>
         <View className="gap-2">
           <Text className="text-center text-2xl font-bold text-foreground">
-            Camera access needed
+            {t('camera.accessNeeded')}
           </Text>
           <Text className="text-center text-base leading-6 text-muted">
-            temetro uses the camera to scan a clinic&apos;s QR code so you can share your record.
+            {t('camera.accessBody')}
           </Text>
         </View>
         <Button variant="primary" size="lg" onPress={() => requestPermission()}>
-          <Button.Label>Allow camera</Button.Label>
+          <Button.Label>{t('camera.allow')}</Button.Label>
         </Button>
       </View>
     );
@@ -111,10 +112,8 @@ export default function CameraScreen() {
         style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 100 }}
         pointerEvents="none">
         <View className="items-center gap-1.5 px-10">
-          <Text className="text-xl font-bold text-white">Scan clinic QR</Text>
-          <Text className="text-center text-sm text-white/80">
-            Point your camera at the QR shown on the clinic screen.
-          </Text>
+          <Text className="text-xl font-bold text-white">{t('camera.scanTitle')}</Text>
+          <Text className="text-center text-sm text-white/80">{t('camera.scanHint')}</Text>
         </View>
 
         <View className="size-64 rounded-[28px] border-2 border-white/30">
@@ -135,7 +134,7 @@ export default function CameraScreen() {
             <ShareSheet
               phase={phase}
               pairing={pairing}
-              patientName={record?.name ?? 'your record'}
+              patientName={record?.name ?? t('camera.recordFallback')}
               counts={{
                 medications: record?.medications.length ?? 0,
                 problems: record?.problems.length ?? 0,
@@ -170,13 +169,15 @@ function ShareSheet({
   onApprove: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   if (phase === 'done') {
     return (
       <View className="items-center gap-3 py-4">
         <CheckCircle2 size={48} color={accent} />
-        <BottomSheet.Title>Record shared</BottomSheet.Title>
+        <BottomSheet.Title>{t('camera.shared')}</BottomSheet.Title>
         <BottomSheet.Description className="text-center">
-          The clinic has received your encrypted record.
+          {t('camera.sharedBody')}
         </BottomSheet.Description>
       </View>
     );
@@ -187,28 +188,31 @@ function ShareSheet({
       <View className="gap-4 py-2">
         <View className="items-center gap-3">
           <XCircle size={48} color="#E0352B" />
-          <BottomSheet.Title>Couldn&apos;t share</BottomSheet.Title>
+          <BottomSheet.Title>{t('camera.failedTitle')}</BottomSheet.Title>
           <BottomSheet.Description className="text-center">
-            We couldn&apos;t reach the clinic relay. Check your connection and try again.
+            {t('camera.failedBody')}
           </BottomSheet.Description>
         </View>
         <Button variant="secondary" onPress={onCancel}>
-          <Button.Label>Close</Button.Label>
+          <Button.Label>{t('common.close')}</Button.Label>
         </Button>
       </View>
     );
   }
 
-  const mode = (pairing?.mode === 'temporary' ? 'temporary' : 'permanent') as
-    | 'temporary'
-    | 'permanent';
+  const isTemporary = pairing?.mode === 'temporary';
   const dur = pairing?.dur ? Number(pairing.dur) : null;
+  const modeLabel = isTemporary
+    ? dur
+      ? t('camera.modeTemporaryHours', { hours: dur })
+      : t('camera.modeTemporary')
+    : t('camera.modePermanent');
 
   const lines = [
-    `${counts.encounters} clinical visit${counts.encounters === 1 ? '' : 's'}`,
-    `${counts.medications} medication${counts.medications === 1 ? '' : 's'}`,
-    `${counts.problems} problem${counts.problems === 1 ? '' : 's'}`,
-    `${counts.allergies} allerg${counts.allergies === 1 ? 'y' : 'ies'}`,
+    t('camera.lineVisits', { count: counts.encounters }),
+    t('camera.lineMedications', { count: counts.medications }),
+    t('camera.lineProblems', { count: counts.problems }),
+    t('camera.lineAllergies', { count: counts.allergies }),
   ];
 
   return (
@@ -217,10 +221,9 @@ function ShareSheet({
         <View className="size-16 items-center justify-center rounded-full bg-accent/15">
           <ShieldCheck size={32} color={accent} />
         </View>
-        <BottomSheet.Title className="text-center">Share your record?</BottomSheet.Title>
+        <BottomSheet.Title className="text-center">{t('camera.shareTitle')}</BottomSheet.Title>
         <BottomSheet.Description className="text-center">
-          A clinic is requesting {patientName}. Your record is encrypted to them and signed by your
-          wallet — nothing is shared until you approve.
+          {t('camera.shareBody', { name: patientName })}
         </BottomSheet.Description>
       </View>
 
@@ -228,12 +231,12 @@ function ShareSheet({
         <View className="flex-row items-center gap-2">
           <Building2 size={16} color={accent} />
           <Text className="text-sm font-medium text-foreground">
-            {shareModeLabel(mode, dur)} access
+            {modeLabel} {t('camera.accessSuffix')}
           </Text>
         </View>
         <Separator />
         <Text className="text-xs font-medium uppercase tracking-wide text-muted">
-          What will be shared
+          {t('camera.whatShared')}
         </Text>
         <View className="gap-1">
           {lines.map((l) => (
@@ -246,10 +249,10 @@ function ShareSheet({
 
       <View className="gap-3">
         <Button variant="primary" size="lg" isDisabled={phase === 'sending'} onPress={onApprove}>
-          <Button.Label>{phase === 'sending' ? 'Sharing…' : 'Approve & share'}</Button.Label>
+          <Button.Label>{phase === 'sending' ? t('camera.sharing') : t('camera.approve')}</Button.Label>
         </Button>
         <Button variant="tertiary" isDisabled={phase === 'sending'} onPress={onCancel}>
-          <Button.Label>Cancel</Button.Label>
+          <Button.Label>{t('camera.cancel')}</Button.Label>
         </Button>
       </View>
     </View>

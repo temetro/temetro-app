@@ -4,7 +4,13 @@
     "seeAll": "See all",
     "copied": "Copied",
     "copiedToClipboard": "{{label}} copied to clipboard.",
-    "dash": "—"
+    "dash": "—",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "tryAgain": "Try again",
+    "continue": "Continue"
   },
   "nav": {
     "visits": "Patient Visits",
@@ -64,6 +70,188 @@
       "notifications": "Notifications"
     }
   },
+  "onboarding": {
+    "skip": "Skip",
+    "continue": "Continue",
+    "getStarted": "Get started",
+    "slides": {
+      "welcomeTitle": "Welcome to temetro",
+      "welcomeBody": "Your health record — owned by you, carried with you, shared only when you choose.",
+      "ownTitle": "Your record, your device",
+      "ownBody": "temetro keeps your health record on your phone, not locked inside a clinic database.",
+      "encryptedTitle": "Encrypted on this device",
+      "encryptedBody": "Your data is sealed with keys that never leave your phone. Only you can unlock it.",
+      "shareTitle": "Share in a single tap",
+      "shareBody": "Scan a clinic's QR to share securely — and you approve every request before anything leaves."
+    },
+    "mock": {
+      "vitals": "Vitals",
+      "vitalsValue": "Stable",
+      "ownedBy": "Owned by",
+      "ownedByValue": "You",
+      "storage": "Storage",
+      "storageValue": "This device"
+    }
+  },
+  "register": {
+    "title": "Create your wallet",
+    "subtitle": "Your record lives on this device, encrypted with keys only you hold. Tell us who you are to get started.",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "e.g. Amina Yusuf",
+    "dob": "Date of birth",
+    "dobHelper": "Used to show your age on your record.",
+    "dobLooksGood": "Looks good",
+    "sex": "Sex",
+    "female": "Female",
+    "male": "Male",
+    "selectDate": "Select date",
+    "walletNumber": "Your wallet number",
+    "create": "Create wallet",
+    "creating": "Creating…"
+  },
+  "settings": {
+    "title": "Settings",
+    "storedOnDevice": "Stored only on this device",
+    "patientFallback": "Patient",
+    "sections": {
+      "wallet": "Wallet",
+      "profile": "Profile",
+      "network": "Network",
+      "appearance": "Appearance",
+      "language": "Language",
+      "about": "About"
+    },
+    "walletNumber": "Wallet number",
+    "fingerprint": "Fingerprint",
+    "algorithm": "Algorithm",
+    "temetroNetwork": "Temetro Network",
+    "darkMode": "Dark mode",
+    "language": "Language",
+    "phone": "Phone number",
+    "phoneNotSet": "Not set",
+    "version": "Version",
+    "help": "Help & documentation",
+    "blog": "Blog",
+    "logout": "Log out",
+    "resetWallet": "Reset wallet",
+    "footer": "Your keys and record never leave this device.",
+    "reset": {
+      "title": "Reset wallet?",
+      "body": "This permanently deletes your keys and on-device record. You'll need to register again. This cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Reset"
+    },
+    "phoneDialog": {
+      "title": "Phone number",
+      "description": "Kept only on this device, as part of your record.",
+      "placeholder": "e.g. +1 202 555 0142",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "languageSheet": {
+      "title": "Language",
+      "subtitle": "Choose the language for the app",
+      "restartTitle": "Restart needed",
+      "restartBody": "Please close and reopen temetro to finish switching the layout direction."
+    },
+    "status": {
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "authenticated": "Online",
+      "authFailed": "Auth failed",
+      "disconnected": "Offline"
+    }
+  },
+  "lock": {
+    "welcomeBack": "Welcome back",
+    "foundWallet": "We found your saved wallet on this device.",
+    "enterPin": "Enter your PIN to unlock it.",
+    "enterPassphrase": "Enter your passphrase to unlock it.",
+    "wrongPin": "Wrong PIN. Try again.",
+    "wrongPassphrase": "Wrong passphrase. Try again.",
+    "checking": "Checking…",
+    "unlock": "Unlock",
+    "passphrasePlaceholder": "Passphrase"
+  },
+  "vaultSetup": {
+    "secure": "Secure your wallet",
+    "confirmHeading": "Confirm it",
+    "choosePin": "Choose a 4-digit PIN to open the app.",
+    "confirmPin": "Enter your PIN again to confirm.",
+    "choosePassphrase": "Choose a passphrase to open the app.",
+    "confirmPassphrase": "Enter your passphrase again to confirm.",
+    "noMatch": "Those didn't match. Try again.",
+    "securing": "Securing your wallet…",
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "usePassphrase": "Use a passphrase instead",
+    "usePin": "Use a 4-digit PIN instead",
+    "passphrasePlaceholder": "Passphrase"
+  },
+  "camera": {
+    "accessNeeded": "Camera access needed",
+    "accessBody": "temetro uses the camera to scan a clinic's QR code so you can share your record.",
+    "allow": "Allow camera",
+    "scanTitle": "Scan clinic QR",
+    "scanHint": "Point your camera at the QR shown on the clinic screen.",
+    "shared": "Record shared",
+    "sharedBody": "The clinic has received your encrypted record.",
+    "failedTitle": "Couldn't share",
+    "failedBody": "We couldn't reach the clinic relay. Check your connection and try again.",
+    "shareTitle": "Share your record?",
+    "shareBody": "A clinic is requesting {{name}}. Your record is encrypted to them and signed by your wallet — nothing is shared until you approve.",
+    "recordFallback": "your record",
+    "accessSuffix": "access",
+    "modePermanent": "Permanent",
+    "modeTemporary": "Temporary",
+    "modeTemporaryHours": "Temporary · {{hours}}h",
+    "whatShared": "What will be shared",
+    "approve": "Approve & share",
+    "sharing": "Sharing…",
+    "cancel": "Cancel",
+    "lineVisits": "{{count}} clinical visits",
+    "lineMedications": "{{count}} medications",
+    "lineProblems": "{{count}} problems",
+    "lineAllergies": "{{count}} allergies"
+  },
+  "portal": {
+    "invalidLink": "Invalid portal link.",
+    "titleMenu": "Patient Portal",
+    "titleLink": "Link your wallet",
+    "titleBook": "Book an appointment",
+    "titleResults": "Your results",
+    "menu": {
+      "linkTitle": "Link your wallet",
+      "linkDesc": "Connect this wallet to your file at the clinic.",
+      "bookTitle": "Book an appointment",
+      "bookDesc": "Pick a doctor and a free time slot.",
+      "resultsTitle": "View results",
+      "resultsDesc": "See upcoming visits and download lab files."
+    },
+    "checkingLink": "Checking your wallet link…",
+    "linkedTitle": "Wallet linked",
+    "linkedNamed": "You're linked to {{name}}'s file. You can now book appointments and view your results here.",
+    "linkedGeneric": "You can now book appointments and view your results here.",
+    "back": "Back",
+    "notLinkedTitle": "Not linked yet",
+    "notLinkedBody": "Ask the clinic to add your wallet number to your file, then try again.",
+    "tryAgain": "Try again",
+    "chooseDoctor": "Choose a doctor",
+    "noDoctors": "No doctors are available right now.",
+    "chooseDay": "Choose a day",
+    "chooseTime": "Choose a time",
+    "booking": "Booking…",
+    "bookTime": "Book {{time}}",
+    "selectTime": "Select a time",
+    "bookedTitle": "Appointment booked",
+    "upcomingVisits": "Upcoming visits",
+    "noUpcoming": "No upcoming visits.",
+    "labFiles": "Lab files",
+    "noFiles": "No files on record.",
+    "downloadedTitle": "Downloaded",
+    "downloadedBody": "Saved \"{{name}}\" to your device.",
+    "downloadFailed": "Download failed"
+  },
   "updates": {
     "title": "Record update",
     "subtitle": "{{clinic}} wants to update the record on this device.",
@@ -85,6 +273,19 @@
     "date": "Date",
     "type": "Type",
     "provider": "Provider"
+  },
+  "prescriptionsScreen": {
+    "empty": "No active prescriptions.",
+    "dose": "Dose",
+    "frequency": "Frequency"
+  },
+  "notificationsScreen": {
+    "empty": "No notifications yet.",
+    "emptyBody": "Clinic updates and share requests will appear here.",
+    "justNow": "just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
   },
   "appointmentsScreen": {
     "empty": "No upcoming appointments.",

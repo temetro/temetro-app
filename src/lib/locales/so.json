@@ -1,0 +1,309 @@
+{
+  "common": {
+    "home": "Guriga",
+    "seeAll": "Dhammaan arag",
+    "copied": "La koobiyeeyay",
+    "copiedToClipboard": "{{label}} waa lagu koobiyeeyay boodhka.",
+    "dash": "—",
+    "cancel": "Jooji",
+    "save": "Kaydi",
+    "close": "Xir",
+    "back": "Dib u noqo",
+    "tryAgain": "Isku day mar kale",
+    "continue": "Sii wad"
+  },
+  "nav": {
+    "visits": "Booqashooyinka",
+    "prescriptions": "Daawooyinka la qoray",
+    "appointments": "Ballamaha",
+    "documents": "Dukumentiyada",
+    "invoices": "Qaansheegadaha",
+    "notifications": "Ogeysiisyada",
+    "portal": "Boggga Bukaanka",
+    "scan": "Iskaan garee"
+  },
+  "home": {
+    "greetingMorning": "Subax wanaagsan",
+    "greetingAfternoon": "Galab wanaagsan",
+    "greetingEvening": "Fiid wanaagsan",
+    "greetingLine": "{{greeting}},",
+    "patientFallback": "Bukaan",
+    "subtitle": "Diiwaankaaga, wuxuu ku kaydsan yahay qalabkan.",
+    "actions": {
+      "shareRecord": "Wadaag diiwaanka",
+      "myWallet": "Boorsadayda",
+      "scan": "Iskaan garee"
+    },
+    "tiles": {
+      "visitsTitle": "Booqashooyinka",
+      "visitsCaption": "kulamada caafimaad",
+      "prescriptionsTitle": "Daawooyinka la qoray",
+      "prescriptionsCaption": "daawooyin firfircoon",
+      "appointmentsTitle": "Ballamaha",
+      "appointmentsCaption": "soo socda",
+      "documentsTitle": "Dukumentiyada",
+      "documentsCaption": "diiwaanno & qoraallo"
+    },
+    "invoices": {
+      "title": "Qaansheegadaha",
+      "none": "Qaansheegad ma jirto",
+      "unpaidOf": "{{unpaid}} aan la bixin oo ka mid ah {{total}}",
+      "allPaid": "{{total}} · dhammaan waa la bixiyay"
+    },
+    "recentActivity": "Dhaqdhaqaaqa dhawaan",
+    "share": {
+      "title": "Wadaag diiwaankaaga",
+      "subtitle": "U ogolow rugta caafimaadka inay tan iskaan gareyso si ay u codsato diiwaankaaga",
+      "hint": "Rugta caafimaadku waxay dhammaystiraysaa codsiga dhinaceeda kadib iskaanka.",
+      "notReady": "Boorsadu weli diyaar ma ahan.",
+      "walletNumberLabel": "Lambarka boorsada"
+    },
+    "wallet": {
+      "title": "Boorsadayda",
+      "subtitle": "Aqoonsigaaga qalabkan",
+      "walletNumber": "Lambarka boorsada",
+      "fingerprint": "Faraha",
+      "algorithm": "Algorithm"
+    },
+    "a11y": {
+      "settings": "Dejinta",
+      "notifications": "Ogeysiisyada"
+    }
+  },
+  "onboarding": {
+    "skip": "Ka bood",
+    "continue": "Sii wad",
+    "getStarted": "Bilow",
+    "slides": {
+      "welcomeTitle": "Ku soo dhawoow temetro",
+      "welcomeBody": "Diiwaankaaga caafimaad — adiga ayaa iska leh, waad qaadan kartaa, waxaana la wadaagaa marka aad doorato oo keliya.",
+      "ownTitle": "Diiwaankaaga, qalabkaaga",
+      "ownBody": "temetro wuxuu diiwaankaaga caafimaad ku hayaa taleefankaaga, ee kuma xirna kaydka xogta rug caafimaad.",
+      "encryptedTitle": "Waa la sireeyay qalabkan",
+      "encryptedBody": "Xogtaadu waxay ku xiran tahay furayaal aan waligood ka bixin taleefankaaga. Adiga oo keliya ayaa fasax u ah.",
+      "shareTitle": "Wadaag hal taabasho",
+      "shareBody": "Iskaan garee QR-ka rugta si aad ammaan ugu wadaagto — adigaana ansixinaya codsi kasta ka hor inta aan waxba bixin."
+    },
+    "mock": {
+      "vitals": "Calaamadaha muhiimka ah",
+      "vitalsValue": "Deggan",
+      "ownedBy": "Waxaa iska leh",
+      "ownedByValue": "Adiga",
+      "storage": "Kaydinta",
+      "storageValue": "Qalabkan"
+    }
+  },
+  "register": {
+    "title": "Samee boorsadaada",
+    "subtitle": "Diiwaankaagu wuxuu ku nool yahay qalabkan, isagoo lagu sireeyay furayaal adiga oo keliya haysto. Noo sheeg cidaad tahay si aad u bilowdo.",
+    "fullName": "Magaca oo dhan",
+    "fullNamePlaceholder": "tusaale: Amina Yusuf",
+    "dob": "Taariikhda dhalashada",
+    "dobHelper": "Waxaa loo isticmaalaa in lagu muujiyo da'daada diiwaankaaga.",
+    "dobLooksGood": "Way fiican tahay",
+    "sex": "Jinsiga",
+    "female": "Dheddig",
+    "male": "Lab",
+    "selectDate": "Dooro taariikhda",
+    "walletNumber": "Lambarka boorsadaada",
+    "create": "Samee boorsada",
+    "creating": "Waa la abuurayaa…"
+  },
+  "settings": {
+    "title": "Dejinta",
+    "storedOnDevice": "Waxaa lagu kaydiyaa qalabkan oo keliya",
+    "patientFallback": "Bukaan",
+    "sections": {
+      "wallet": "Boorsada",
+      "profile": "Astaanta",
+      "network": "Shabakadda",
+      "appearance": "Muuqaalka",
+      "language": "Luqadda",
+      "about": "Ku saabsan"
+    },
+    "walletNumber": "Lambarka boorsada",
+    "fingerprint": "Faraha",
+    "algorithm": "Algorithm",
+    "temetroNetwork": "Shabakadda Temetro",
+    "darkMode": "Habka madow",
+    "language": "Luqadda",
+    "phone": "Lambarka taleefanka",
+    "phoneNotSet": "La dejin",
+    "version": "Nooca",
+    "help": "Caawinta & dukumentiyada",
+    "blog": "Bloog",
+    "logout": "Ka bax",
+    "resetWallet": "Dib u deji boorsada",
+    "footer": "Furayaashaada iyo diiwaankaagu waligood kama baxaan qalabkan.",
+    "reset": {
+      "title": "Dib u deji boorsada?",
+      "body": "Tani waxay si joogto ah u tirtiraysaa furayaashaada iyo diiwaankaaga qalabka ku jira. Waxaad u baahan doontaa inaad dib u diiwaan gasho. Tan lama soo celin karo.",
+      "cancel": "Jooji",
+      "confirm": "Dib u deji"
+    },
+    "phoneDialog": {
+      "title": "Lambarka taleefanka",
+      "description": "Waxaa lagu hayaa qalabkan oo keliya, qayb ka mid ah diiwaankaaga.",
+      "placeholder": "tusaale: +252 61 234 5678",
+      "save": "Kaydi",
+      "cancel": "Jooji"
+    },
+    "languageSheet": {
+      "title": "Luqadda",
+      "subtitle": "Dooro luqadda barnaamijka",
+      "restartTitle": "Dib u bilow ayaa loo baahan yahay",
+      "restartBody": "Fadlan xir oo dib u fur temetro si aad u dhammaystirto beddelka jihada muuqaalka."
+    },
+    "status": {
+      "connecting": "Waa la xiriirayaa…",
+      "connected": "La xiriiray",
+      "authenticated": "Khadka tooska ah",
+      "authFailed": "Xaqiijinta way fashilantay",
+      "disconnected": "Ma xiriirsana"
+    }
+  },
+  "lock": {
+    "welcomeBack": "Ku soo dhawoow",
+    "foundWallet": "Waxaan ka helnay boorsadaada la kaydiyay qalabkan.",
+    "enterPin": "Geli PIN-kaaga si aad u furto.",
+    "enterPassphrase": "Geli erayga sirta ah si aad u furto.",
+    "wrongPin": "PIN qaldan. Isku day mar kale.",
+    "wrongPassphrase": "Eray sir qaldan. Isku day mar kale.",
+    "checking": "Waa la hubinayaa…",
+    "unlock": "Fur",
+    "passphrasePlaceholder": "Erayga sirta ah"
+  },
+  "vaultSetup": {
+    "secure": "Sugto boorsadaada",
+    "confirmHeading": "Xaqiiji",
+    "choosePin": "Dooro PIN 4-god ah si aad barnaamijka u furto.",
+    "confirmPin": "Mar kale geli PIN-kaaga si aad u xaqiijiso.",
+    "choosePassphrase": "Dooro eray sir ah si aad barnaamijka u furto.",
+    "confirmPassphrase": "Mar kale geli erayga sirta ah si aad u xaqiijiso.",
+    "noMatch": "Isma waafaqaan. Isku day mar kale.",
+    "securing": "Boorsadaada waa la sugayaa…",
+    "continue": "Sii wad",
+    "confirm": "Xaqiiji",
+    "usePassphrase": "Halkii isticmaal eray sir ah",
+    "usePin": "Halkii isticmaal PIN 4-god ah",
+    "passphrasePlaceholder": "Erayga sirta ah"
+  },
+  "camera": {
+    "accessNeeded": "Waxaa loo baahan yahay galitaanka kamarada",
+    "accessBody": "temetro wuxuu kamarada u isticmaalaa iskaanka QR-ka rugta si aad u wadaagto diiwaankaaga.",
+    "allow": "Ogolow kamarada",
+    "scanTitle": "Iskaan garee QR-ka rugta",
+    "scanHint": "U jeedi kamaradaada QR-ka lagu muujiyay shaashadda rugta.",
+    "shared": "Diiwaanka waa la wadaagay",
+    "sharedBody": "Rugtu waxay heshay diiwaankaaga la sireeyay.",
+    "failedTitle": "Lama wadaagi karo",
+    "failedBody": "Ma aanan gaari karin gudbiyaha rugta. Hubi xiriirkaaga oo isku day mar kale.",
+    "shareTitle": "Wadaag diiwaankaaga?",
+    "shareBody": "Rug ayaa codsanaysa {{name}}. Diiwaankaaga waa loo sireeyay oo waxaa saxeexay boorsadaada — waxba lama wadaago ilaa aad ansixiso.",
+    "recordFallback": "diiwaankaaga",
+    "accessSuffix": "galitaan",
+    "modePermanent": "Joogto ah",
+    "modeTemporary": "Ku meel gaar ah",
+    "modeTemporaryHours": "Ku meel gaar ah · {{hours}} saac",
+    "whatShared": "Waxa la wadaagi doono",
+    "approve": "Ansixi & wadaag",
+    "sharing": "Waa la wadaagayaa…",
+    "cancel": "Jooji",
+    "lineVisits": "{{count}} booqasho caafimaad",
+    "lineMedications": "{{count}} daawo",
+    "lineProblems": "{{count}} dhibaato",
+    "lineAllergies": "{{count}} xasaasiyad"
+  },
+  "portal": {
+    "invalidLink": "Xiriirka boggga waa mid aan sax ahayn.",
+    "titleMenu": "Boggga Bukaanka",
+    "titleLink": "Xir boorsadaada",
+    "titleBook": "Qabso ballan",
+    "titleResults": "Natiijooyinkaaga",
+    "menu": {
+      "linkTitle": "Xir boorsadaada",
+      "linkDesc": "Ku xir boorsadan faylkaaga rugta.",
+      "bookTitle": "Qabso ballan",
+      "bookDesc": "Dooro dhakhtar iyo waqti bannaan.",
+      "resultsTitle": "Arag natiijooyinka",
+      "resultsDesc": "Arag booqashooyinka soo socda oo soo dejiso faylasha shaybaarka."
+    },
+    "checkingLink": "Waa la hubinayaa xiriirka boorsadaada…",
+    "linkedTitle": "Boorsada waa la xiray",
+    "linkedNamed": "Waxaad ku xiran tahay faylka {{name}}. Hadda waad qaban kartaa ballamaha oo arki kartaa natiijooyinkaaga halkan.",
+    "linkedGeneric": "Hadda waad qaban kartaa ballamaha oo arki kartaa natiijooyinkaaga halkan.",
+    "back": "Dib u noqo",
+    "notLinkedTitle": "Weli lama xirin",
+    "notLinkedBody": "Weydiiso rugta inay lambarka boorsadaada ku darto faylkaaga, ka dibna isku day mar kale.",
+    "tryAgain": "Isku day mar kale",
+    "chooseDoctor": "Dooro dhakhtar",
+    "noDoctors": "Ma jiraan dhakhaatiir hadda diyaar ah.",
+    "chooseDay": "Dooro maalin",
+    "chooseTime": "Dooro waqti",
+    "booking": "Waa la qabanayaa…",
+    "bookTime": "Qabso {{time}}",
+    "selectTime": "Dooro waqti",
+    "bookedTitle": "Ballanka waa la qabtay",
+    "upcomingVisits": "Booqashooyinka soo socda",
+    "noUpcoming": "Booqasho soo socota ma jirto.",
+    "labFiles": "Faylasha shaybaarka",
+    "noFiles": "Fayl diiwaanka kuma jiro.",
+    "downloadedTitle": "La soo dejiyay",
+    "downloadedBody": "Waxaa qalabkaaga lagu kaydiyay \"{{name}}\".",
+    "downloadFailed": "Soo dejintu way fashilantay"
+  },
+  "updates": {
+    "title": "Cusboonaysiinta diiwaanka",
+    "subtitle": "{{clinic}} waxay rabtaa inay cusboonaysiiso diiwaanka qalabkan ku jira.",
+    "whatChanged": "Waxa isbeddelay",
+    "keyChangedWarning": "Furaha saxeexa rugtan ayaa isbeddelay tan iyo markii ugu dambeysay ee aad aamintay. Kaliya ansixi haddii aad filaysay fur cusub.",
+    "replaceNote": "Ansixintu waxay ku beddeshaa diiwaankaaga qalabka ku jira nooca cusub.",
+    "approve": "Ansixi cusboonaysiinta",
+    "decline": "Diid",
+    "later": "Goor dambe"
+  },
+  "documentsScreen": {
+    "empty": "Weli dukumenti ma jiro.",
+    "type": "Nooca",
+    "size": "Cabbirka",
+    "added": "La daray"
+  },
+  "visitsScreen": {
+    "empty": "Weli booqasho lama diiwaan gelin.",
+    "date": "Taariikhda",
+    "type": "Nooca",
+    "provider": "Bixiyaha"
+  },
+  "prescriptionsScreen": {
+    "empty": "Daawo firfircoon ma jirto.",
+    "dose": "Qiyaasta",
+    "frequency": "Inta jeer"
+  },
+  "notificationsScreen": {
+    "empty": "Weli ogeysiis ma jiro.",
+    "emptyBody": "Cusboonaysiinta rugaha iyo codsiyada wadaagista halkan ayay ka soo muuqan doonaan.",
+    "justNow": "hadda",
+    "minutesAgo": "{{count}}d ka hor",
+    "hoursAgo": "{{count}}s ka hor",
+    "daysAgo": "{{count}} maalmood ka hor"
+  },
+  "appointmentsScreen": {
+    "empty": "Ballan soo socda ma jiro.",
+    "fallback": "Ballan",
+    "with": "La {{provider}}",
+    "status": "Xaaladda: {{status}}"
+  },
+  "invoicesScreen": {
+    "empty": "Weli qaansheegad ma jirto.",
+    "fallbackNumber": "Qaansheegad",
+    "issued": "La soo saaray {{date}}",
+    "due": "Waqtiga {{date}}",
+    "installmentsPaid": "{{paid}}/{{total}} qaybood ayaa la bixiyay",
+    "status": {
+      "paid": "La bixiyay",
+      "sent": "Aan la bixin",
+      "draft": "Qabyo",
+      "void": "La buriyay"
+    }
+  }
+}

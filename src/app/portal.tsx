@@ -18,6 +18,7 @@ import {
   UserRound,
 } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -43,6 +44,7 @@ type Mode = 'menu' | 'link' | 'book' | 'results';
 // download results — all syncing back to the clinic's web app.
 export default function PortalScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { identity } = useWallet();
   const [accent, muted, danger] = useThemeColor(['accent', 'muted', 'danger']);
 
@@ -71,7 +73,7 @@ export default function PortalScreen() {
     return (
       <Centered>
         <Typography type="body" color="muted" align="center">
-          Invalid portal link.
+          {t('portal.invalidLink')}
         </Typography>
       </Centered>
     );
@@ -106,12 +108,12 @@ export default function PortalScreen() {
         </Typography>
         <Typography type="h3" className="font-bold text-foreground">
           {mode === 'menu'
-            ? 'Patient Portal'
+            ? t('portal.titleMenu')
             : mode === 'link'
-              ? 'Link your wallet'
+              ? t('portal.titleLink')
               : mode === 'book'
-                ? 'Book an appointment'
-                : 'Your results'}
+                ? t('portal.titleBook')
+                : t('portal.titleResults')}
         </Typography>
       </View>
 
@@ -143,10 +145,11 @@ function MenuView({
   accent: string;
   muted: string;
 }) {
+  const { t } = useTranslation();
   const items: { mode: Mode; icon: typeof Link2; title: string; desc: string }[] = [
-    { mode: 'link', icon: Link2, title: 'Link your wallet', desc: 'Connect this wallet to your file at the clinic.' },
-    { mode: 'book', icon: CalendarCheck, title: 'Book an appointment', desc: 'Pick a doctor and a free time slot.' },
-    { mode: 'results', icon: FileText, title: 'View results', desc: 'See upcoming visits and download lab files.' },
+    { mode: 'link', icon: Link2, title: t('portal.menu.linkTitle'), desc: t('portal.menu.linkDesc') },
+    { mode: 'book', icon: CalendarCheck, title: t('portal.menu.bookTitle'), desc: t('portal.menu.bookDesc') },
+    { mode: 'results', icon: FileText, title: t('portal.menu.resultsTitle'), desc: t('portal.menu.resultsDesc') },
   ];
   return (
     <View className="gap-3">
@@ -183,6 +186,7 @@ function LinkView({
   accent: string;
   onDone: () => void;
 }) {
+  const { t } = useTranslation();
   // The wallet is identified by its cryptographic identity (carried by the
   // signed relay session), so there's nothing to type: we just ask the clinic
   // whether this wallet is already paired to a file. The clinic attaches the
@@ -213,7 +217,7 @@ function LinkView({
       <View className="items-center gap-4 py-12">
         <Spinner />
         <Typography type="body-sm" color="muted" align="center">
-          Checking your wallet link…
+          {t('portal.checkingLink')}
         </Typography>
       </View>
     );
@@ -224,15 +228,15 @@ function LinkView({
       <View className="items-center gap-4 py-8">
         <CheckCircle2 size={52} color="#22C55E" />
         <Typography type="h4" className="font-bold text-foreground">
-          Wallet linked
+          {t('portal.linkedTitle')}
         </Typography>
         <Typography type="body-sm" color="muted" align="center">
           {linkedName
-            ? `You're linked to ${linkedName}'s file. You can now book appointments and view your results here.`
-            : 'You can now book appointments and view your results here.'}
+            ? t('portal.linkedNamed', { name: linkedName })
+            : t('portal.linkedGeneric')}
         </Typography>
         <Button variant="secondary" onPress={onDone}>
-          <Button.Label>Back</Button.Label>
+          <Button.Label>{t('portal.back')}</Button.Label>
         </Button>
       </View>
     );
@@ -245,20 +249,19 @@ function LinkView({
       </View>
       <View className="items-center gap-1.5">
         <Typography type="h4" className="font-bold text-foreground">
-          Not linked yet
+          {t('portal.notLinkedTitle')}
         </Typography>
         <Typography type="body-sm" color="muted" align="center">
-          {error ??
-            'Ask the clinic to add your wallet number to your file, then try again.'}
+          {error ?? t('portal.notLinkedBody')}
         </Typography>
       </View>
       <View className="w-full gap-2 pt-2">
         <Button size="lg" onPress={attempt}>
           <RefreshCw size={18} color="#fff" />
-          <Button.Label>Try again</Button.Label>
+          <Button.Label>{t('portal.tryAgain')}</Button.Label>
         </Button>
         <Button variant="secondary" onPress={onDone}>
-          <Button.Label>Back</Button.Label>
+          <Button.Label>{t('portal.back')}</Button.Label>
         </Button>
       </View>
     </View>
@@ -278,6 +281,7 @@ function BookView({
   danger: string;
   onNeedsLink: () => void;
 }) {
+  const { t } = useTranslation();
   const days = useMemo(() => upcomingDays(7), []);
   const [doctors, setDoctors] = useState<Doctor[] | null>(null);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
@@ -343,7 +347,7 @@ function BookView({
       <View className="items-center gap-3 py-8">
         <CheckCircle2 size={52} color={accent} />
         <Typography type="h4" className="font-bold text-foreground">
-          Appointment booked
+          {t('portal.bookedTitle')}
         </Typography>
         <Typography type="body-sm" color="muted" align="center">
           {doctor?.name} · {booked.date} at {booked.time}
@@ -363,11 +367,11 @@ function BookView({
   return (
     <View className="gap-4">
       <Typography type="body-xs" className="px-1 font-semibold uppercase tracking-wide text-muted">
-        Choose a doctor
+        {t('portal.chooseDoctor')}
       </Typography>
       {doctors.length === 0 ? (
         <Typography type="body-sm" color="muted" className="px-1">
-          No doctors are available right now.
+          {t('portal.noDoctors')}
         </Typography>
       ) : (
         doctors.map((d) => {
@@ -409,7 +413,7 @@ function BookView({
       {doctor ? (
         <View className="gap-4">
           <Typography type="body-xs" className="px-1 font-semibold uppercase tracking-wide text-muted">
-            Choose a day
+            {t('portal.chooseDay')}
           </Typography>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 px-0.5">
             {days.map((d) => {
@@ -439,7 +443,7 @@ function BookView({
           </ScrollView>
 
           <Typography type="body-xs" className="px-1 font-semibold uppercase tracking-wide text-muted">
-            Choose a time
+            {t('portal.chooseTime')}
           </Typography>
           {slotsLoading ? (
             <View className="items-center py-6">
@@ -486,7 +490,13 @@ function BookView({
 
           <Button variant="primary" size="lg" isDisabled={!time || busy} onPress={confirm}>
             <CalendarCheck size={18} color="#fff" />
-            <Button.Label>{busy ? 'Booking…' : time ? `Book ${time}` : 'Select a time'}</Button.Label>
+            <Button.Label>
+              {busy
+                ? t('portal.booking')
+                : time
+                  ? t('portal.bookTime', { time })
+                  : t('portal.selectTime')}
+            </Button.Label>
           </Button>
         </View>
       ) : null}
@@ -505,6 +515,7 @@ function ResultsView({
   muted: string;
   onNeedsLink: () => void;
 }) {
+  const { t } = useTranslation();
   const [data, setData] = useState<PortalResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -524,9 +535,9 @@ function ResultsView({
     try {
       const file = await session.request<ResultFile>('result-file', { id });
       const saved = saveResultFile(file.filename || filename, file.base64);
-      Alert.alert('Downloaded', `Saved "${saved.name}" to your device.`);
+      Alert.alert(t('portal.downloadedTitle'), t('portal.downloadedBody', { name: saved.name }));
     } catch (e) {
-      Alert.alert('Download failed', (e as Error).message);
+      Alert.alert(t('portal.downloadFailed'), (e as Error).message);
     } finally {
       setDownloading(null);
     }
@@ -551,11 +562,11 @@ function ResultsView({
     <View className="gap-5">
       <View className="gap-2">
         <Typography type="body-xs" className="px-1 font-semibold uppercase tracking-wide text-muted">
-          Upcoming visits
+          {t('portal.upcomingVisits')}
         </Typography>
         {data.upcoming.length === 0 ? (
           <Typography type="body-sm" color="muted" className="px-1">
-            No upcoming visits.
+            {t('portal.noUpcoming')}
           </Typography>
         ) : (
           data.upcoming.map((a) => (
@@ -573,11 +584,11 @@ function ResultsView({
 
       <View className="gap-2">
         <Typography type="body-xs" className="px-1 font-semibold uppercase tracking-wide text-muted">
-          Lab files
+          {t('portal.labFiles')}
         </Typography>
         {data.files.length === 0 ? (
           <Typography type="body-sm" color="muted" className="px-1">
-            No files on record.
+            {t('portal.noFiles')}
           </Typography>
         ) : (
           data.files.map((f) => (

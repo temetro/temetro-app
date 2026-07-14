@@ -10,6 +10,7 @@ import {
   useThemeColor,
 } from 'heroui-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -24,6 +25,7 @@ const PIN_LENGTH = 4;
 export default function LockScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { method, unlock } = useVault();
 
   const danger = useThemeColor('danger');
@@ -42,7 +44,7 @@ export default function LockScreen() {
     if (ok) {
       router.replace('/');
     } else {
-      setError(isPin ? 'Wrong PIN. Try again.' : 'Wrong passphrase. Try again.');
+      setError(isPin ? t('lock.wrongPin') : t('lock.wrongPassphrase'));
       setValue('');
     }
   };
@@ -58,11 +60,11 @@ export default function LockScreen() {
           <Logo size={64} />
           <View className="items-center gap-1.5">
             <Typography type="h3" className="font-bold text-foreground">
-              Welcome back
+              {t('lock.welcomeBack')}
             </Typography>
             <Typography type="body-sm" color="muted" align="center">
-              We found your saved wallet on this device.{'\n'}
-              {isPin ? 'Enter your PIN to unlock it.' : 'Enter your passphrase to unlock it.'}
+              {t('lock.foundWallet')}{'\n'}
+              {isPin ? t('lock.enterPin') : t('lock.enterPassphrase')}
             </Typography>
           </View>
         </View>
@@ -91,7 +93,7 @@ export default function LockScreen() {
           <View className="w-full">
             <TextField>
               <Input
-                placeholder="Passphrase"
+                placeholder={t('lock.passphrasePlaceholder')}
                 secureTextEntry
                 autoFocus
                 value={value}
@@ -109,7 +111,7 @@ export default function LockScreen() {
           <View className="flex-row items-center gap-2">
             <Spinner />
             <Typography type="body-sm" color="muted">
-              Checking…
+              {t('lock.checking')}
             </Typography>
           </View>
         ) : error ? (
@@ -122,7 +124,7 @@ export default function LockScreen() {
           <View className="w-full">
             <Button size="lg" isDisabled={!minOk || busy} onPress={() => attempt(value)}>
               {busy ? <Spinner /> : null}
-              <Button.Label>Unlock</Button.Label>
+              <Button.Label>{t('lock.unlock')}</Button.Label>
             </Button>
           </View>
         ) : null}

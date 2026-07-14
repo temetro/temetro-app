@@ -1,6 +1,8 @@
 import { Card, Typography, useThemeColor } from 'heroui-native';
+import type { TFunction } from 'i18next';
 import { BellOff, FileText, Share2, Info, type LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
@@ -15,18 +17,19 @@ const ICON: Record<NotificationKind, LucideIcon> = {
   info: Info,
 };
 
-// ISO -> "just now" / "10m ago" / "3h ago" / "2d ago".
-function relativeTime(iso: string): string {
+// ISO -> "just now" / "10m ago" / "3h ago" / "2d ago" (localized).
+function relativeTime(iso: string, t: TFunction): string {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t('notificationsScreen.justNow');
+  if (mins < 60) return t('notificationsScreen.minutesAgo', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return t('notificationsScreen.hoursAgo', { count: hours });
+  return t('notificationsScreen.daysAgo', { count: Math.floor(hours / 24) });
 }
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { notifications, markNotificationsRead, reloadRecord } = useWallet();
   const [accent, muted] = useThemeColor(['accent', 'muted']);
 
@@ -41,10 +44,10 @@ export default function NotificationsScreen() {
       <View className="flex-1 items-center justify-center gap-3 bg-background px-10">
         <BellOff size={40} color={muted} />
         <Typography type="body" align="center" className="text-foreground">
-          No notifications yet.
+          {t('notificationsScreen.empty')}
         </Typography>
         <Typography type="body-sm" color="muted" align="center">
-          Clinic updates and share requests will appear here.
+          {t('notificationsScreen.emptyBody')}
         </Typography>
       </View>
     );
@@ -74,7 +77,7 @@ export default function NotificationsScreen() {
                   </Typography>
                 ) : null}
                 <Typography type="body-xs" color="muted">
-                  {relativeTime(n.createdAt)}
+                  {relativeTime(n.createdAt, t)}
                 </Typography>
               </View>
               {!n.read ? (

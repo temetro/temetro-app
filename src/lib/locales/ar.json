@@ -1,0 +1,309 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "seeAll": "عرض الكل",
+    "copied": "تم النسخ",
+    "copiedToClipboard": "تم نسخ {{label}} إلى الحافظة.",
+    "dash": "—",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "tryAgain": "أعد المحاولة",
+    "continue": "متابعة"
+  },
+  "nav": {
+    "visits": "الزيارات",
+    "prescriptions": "الوصفات الطبية",
+    "appointments": "المواعيد",
+    "documents": "المستندات",
+    "invoices": "الفواتير",
+    "notifications": "الإشعارات",
+    "portal": "بوابة المريض",
+    "scan": "مسح"
+  },
+  "home": {
+    "greetingMorning": "صباح الخير",
+    "greetingAfternoon": "مساء الخير",
+    "greetingEvening": "مساء الخير",
+    "greetingLine": "{{greeting}}،",
+    "patientFallback": "المريض",
+    "subtitle": "سجلّك، محفوظ على هذا الجهاز.",
+    "actions": {
+      "shareRecord": "مشاركة السجل",
+      "myWallet": "محفظتي",
+      "scan": "مسح"
+    },
+    "tiles": {
+      "visitsTitle": "الزيارات",
+      "visitsCaption": "زيارات سريرية",
+      "prescriptionsTitle": "الوصفات الطبية",
+      "prescriptionsCaption": "أدوية نشطة",
+      "appointmentsTitle": "المواعيد",
+      "appointmentsCaption": "القادمة",
+      "documentsTitle": "المستندات",
+      "documentsCaption": "سجلات وملاحظات"
+    },
+    "invoices": {
+      "title": "الفواتير",
+      "none": "لا توجد فواتير",
+      "unpaidOf": "{{unpaid}} غير مدفوعة من {{total}}",
+      "allPaid": "{{total}} · كلها مدفوعة"
+    },
+    "recentActivity": "النشاط الأخير",
+    "share": {
+      "title": "شارك سجلّك",
+      "subtitle": "دع العيادة تمسح هذا الرمز لطلب سجلّك",
+      "hint": "تُكمل العيادة الطلب من جهتها بعد المسح.",
+      "notReady": "المحفظة ليست جاهزة بعد.",
+      "walletNumberLabel": "رقم المحفظة"
+    },
+    "wallet": {
+      "title": "محفظتي",
+      "subtitle": "هويتك على هذا الجهاز",
+      "walletNumber": "رقم المحفظة",
+      "fingerprint": "البصمة",
+      "algorithm": "الخوارزمية"
+    },
+    "a11y": {
+      "settings": "الإعدادات",
+      "notifications": "الإشعارات"
+    }
+  },
+  "onboarding": {
+    "skip": "تخطٍّ",
+    "continue": "متابعة",
+    "getStarted": "ابدأ الآن",
+    "slides": {
+      "welcomeTitle": "مرحبًا بك في temetro",
+      "welcomeBody": "سجلّك الصحي — ملكك، تحمله معك، ويُشارك فقط عندما تختار.",
+      "ownTitle": "سجلّك، على جهازك",
+      "ownBody": "يحفظ temetro سجلّك الصحي على هاتفك، وليس محبوسًا داخل قاعدة بيانات عيادة.",
+      "encryptedTitle": "مشفَّر على هذا الجهاز",
+      "encryptedBody": "بياناتك مختومة بمفاتيح لا تغادر هاتفك أبدًا. أنت وحدك من يمكنه فتحها.",
+      "shareTitle": "شارك بلمسة واحدة",
+      "shareBody": "امسح رمز العيادة للمشاركة بأمان — وأنت توافق على كل طلب قبل أن يُرسل أي شيء."
+    },
+    "mock": {
+      "vitals": "المؤشرات الحيوية",
+      "vitalsValue": "مستقرة",
+      "ownedBy": "المالك",
+      "ownedByValue": "أنت",
+      "storage": "التخزين",
+      "storageValue": "هذا الجهاز"
+    }
+  },
+  "register": {
+    "title": "أنشئ محفظتك",
+    "subtitle": "يبقى سجلّك على هذا الجهاز، مشفَّرًا بمفاتيح تملكها أنت وحدك. أخبرنا من أنت لتبدأ.",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "مثال: أمينة يوسف",
+    "dob": "تاريخ الميلاد",
+    "dobHelper": "يُستخدم لعرض عمرك في سجلّك.",
+    "dobLooksGood": "ممتاز",
+    "sex": "الجنس",
+    "female": "أنثى",
+    "male": "ذكر",
+    "selectDate": "اختر التاريخ",
+    "walletNumber": "رقم محفظتك",
+    "create": "إنشاء المحفظة",
+    "creating": "جارٍ الإنشاء…"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "storedOnDevice": "محفوظ فقط على هذا الجهاز",
+    "patientFallback": "المريض",
+    "sections": {
+      "wallet": "المحفظة",
+      "profile": "الملف الشخصي",
+      "network": "الشبكة",
+      "appearance": "المظهر",
+      "language": "اللغة",
+      "about": "حول"
+    },
+    "walletNumber": "رقم المحفظة",
+    "fingerprint": "البصمة",
+    "algorithm": "الخوارزمية",
+    "temetroNetwork": "شبكة Temetro",
+    "darkMode": "الوضع الداكن",
+    "language": "اللغة",
+    "phone": "رقم الهاتف",
+    "phoneNotSet": "غير محدد",
+    "version": "الإصدار",
+    "help": "المساعدة والتوثيق",
+    "blog": "المدونة",
+    "logout": "تسجيل الخروج",
+    "resetWallet": "إعادة تعيين المحفظة",
+    "footer": "لا تغادر مفاتيحك وسجلّك هذا الجهاز أبدًا.",
+    "reset": {
+      "title": "إعادة تعيين المحفظة؟",
+      "body": "سيؤدي هذا إلى حذف مفاتيحك وسجلّك على الجهاز نهائيًا. ستحتاج إلى التسجيل من جديد. لا يمكن التراجع عن هذا.",
+      "cancel": "إلغاء",
+      "confirm": "إعادة تعيين"
+    },
+    "phoneDialog": {
+      "title": "رقم الهاتف",
+      "description": "يُحفظ فقط على هذا الجهاز، كجزء من سجلّك.",
+      "placeholder": "مثال: ‎+966 5 1234 5678",
+      "save": "حفظ",
+      "cancel": "إلغاء"
+    },
+    "languageSheet": {
+      "title": "اللغة",
+      "subtitle": "اختر لغة التطبيق",
+      "restartTitle": "يلزم إعادة التشغيل",
+      "restartBody": "يرجى إغلاق temetro وإعادة فتحه لإتمام تغيير اتجاه العرض."
+    },
+    "status": {
+      "connecting": "جارٍ الاتصال…",
+      "connected": "متصل",
+      "authenticated": "متصل",
+      "authFailed": "فشل المصادقة",
+      "disconnected": "غير متصل"
+    }
+  },
+  "lock": {
+    "welcomeBack": "مرحبًا بعودتك",
+    "foundWallet": "وجدنا محفظتك المحفوظة على هذا الجهاز.",
+    "enterPin": "أدخل رمز PIN لفتحها.",
+    "enterPassphrase": "أدخل عبارة المرور لفتحها.",
+    "wrongPin": "رمز PIN غير صحيح. أعد المحاولة.",
+    "wrongPassphrase": "عبارة المرور غير صحيحة. أعد المحاولة.",
+    "checking": "جارٍ التحقق…",
+    "unlock": "فتح",
+    "passphrasePlaceholder": "عبارة المرور"
+  },
+  "vaultSetup": {
+    "secure": "أمِّن محفظتك",
+    "confirmHeading": "أكِّدها",
+    "choosePin": "اختر رمز PIN من 4 أرقام لفتح التطبيق.",
+    "confirmPin": "أدخل رمز PIN مرة أخرى للتأكيد.",
+    "choosePassphrase": "اختر عبارة مرور لفتح التطبيق.",
+    "confirmPassphrase": "أدخل عبارة المرور مرة أخرى للتأكيد.",
+    "noMatch": "غير متطابقتين. أعد المحاولة.",
+    "securing": "جارٍ تأمين محفظتك…",
+    "continue": "متابعة",
+    "confirm": "تأكيد",
+    "usePassphrase": "استخدم عبارة مرور بدلاً من ذلك",
+    "usePin": "استخدم رمز PIN من 4 أرقام بدلاً من ذلك",
+    "passphrasePlaceholder": "عبارة المرور"
+  },
+  "camera": {
+    "accessNeeded": "يلزم الوصول إلى الكاميرا",
+    "accessBody": "يستخدم temetro الكاميرا لمسح رمز QR الخاص بالعيادة حتى تتمكن من مشاركة سجلّك.",
+    "allow": "السماح بالكاميرا",
+    "scanTitle": "امسح رمز العيادة",
+    "scanHint": "وجّه الكاميرا نحو رمز QR المعروض على شاشة العيادة.",
+    "shared": "تمت مشاركة السجل",
+    "sharedBody": "استلمت العيادة سجلّك المشفَّر.",
+    "failedTitle": "تعذّرت المشاركة",
+    "failedBody": "تعذّر الوصول إلى مُرحّل العيادة. تحقق من اتصالك وأعد المحاولة.",
+    "shareTitle": "مشاركة سجلّك؟",
+    "shareBody": "تطلب عيادة {{name}}. سجلّك مشفَّر إليها وموقَّع بمحفظتك — لا يُشارك شيء حتى توافق.",
+    "recordFallback": "سجلّك",
+    "accessSuffix": "وصول",
+    "modePermanent": "دائم",
+    "modeTemporary": "مؤقت",
+    "modeTemporaryHours": "مؤقت · {{hours}} س",
+    "whatShared": "ما الذي ستتم مشاركته",
+    "approve": "الموافقة والمشاركة",
+    "sharing": "جارٍ المشاركة…",
+    "cancel": "إلغاء",
+    "lineVisits": "{{count}} زيارة سريرية",
+    "lineMedications": "{{count}} دواء",
+    "lineProblems": "{{count}} مشكلة",
+    "lineAllergies": "{{count}} حساسية"
+  },
+  "portal": {
+    "invalidLink": "رابط البوابة غير صالح.",
+    "titleMenu": "بوابة المريض",
+    "titleLink": "اربط محفظتك",
+    "titleBook": "احجز موعدًا",
+    "titleResults": "نتائجك",
+    "menu": {
+      "linkTitle": "اربط محفظتك",
+      "linkDesc": "اربط هذه المحفظة بملفك لدى العيادة.",
+      "bookTitle": "احجز موعدًا",
+      "bookDesc": "اختر طبيبًا وموعدًا متاحًا.",
+      "resultsTitle": "عرض النتائج",
+      "resultsDesc": "اطّلع على الزيارات القادمة ونزّل ملفات المختبر."
+    },
+    "checkingLink": "جارٍ التحقق من ربط محفظتك…",
+    "linkedTitle": "تم ربط المحفظة",
+    "linkedNamed": "أنت مرتبط بملف {{name}}. يمكنك الآن حجز المواعيد وعرض نتائجك هنا.",
+    "linkedGeneric": "يمكنك الآن حجز المواعيد وعرض نتائجك هنا.",
+    "back": "رجوع",
+    "notLinkedTitle": "غير مرتبط بعد",
+    "notLinkedBody": "اطلب من العيادة إضافة رقم محفظتك إلى ملفك، ثم أعد المحاولة.",
+    "tryAgain": "أعد المحاولة",
+    "chooseDoctor": "اختر طبيبًا",
+    "noDoctors": "لا يوجد أطباء متاحون حاليًا.",
+    "chooseDay": "اختر يومًا",
+    "chooseTime": "اختر وقتًا",
+    "booking": "جارٍ الحجز…",
+    "bookTime": "احجز {{time}}",
+    "selectTime": "اختر وقتًا",
+    "bookedTitle": "تم حجز الموعد",
+    "upcomingVisits": "الزيارات القادمة",
+    "noUpcoming": "لا توجد زيارات قادمة.",
+    "labFiles": "ملفات المختبر",
+    "noFiles": "لا توجد ملفات في السجل.",
+    "downloadedTitle": "تم التنزيل",
+    "downloadedBody": "تم حفظ «{{name}}» على جهازك.",
+    "downloadFailed": "فشل التنزيل"
+  },
+  "updates": {
+    "title": "تحديث السجل",
+    "subtitle": "تريد {{clinic}} تحديث السجل على هذا الجهاز.",
+    "whatChanged": "ما الذي تغيّر",
+    "keyChangedWarning": "تغيّر مفتاح التوقيع لهذه العيادة منذ آخر مرة وثقت بها. لا توافق إلا إذا كنت تتوقع مفتاحًا جديدًا.",
+    "replaceNote": "الموافقة تستبدل سجلّك على الجهاز بهذه النسخة.",
+    "approve": "الموافقة على التحديث",
+    "decline": "رفض",
+    "later": "لاحقًا"
+  },
+  "documentsScreen": {
+    "empty": "لا توجد مستندات بعد.",
+    "type": "النوع",
+    "size": "الحجم",
+    "added": "أُضيف"
+  },
+  "visitsScreen": {
+    "empty": "لا توجد زيارات مسجَّلة بعد.",
+    "date": "التاريخ",
+    "type": "النوع",
+    "provider": "مقدّم الرعاية"
+  },
+  "prescriptionsScreen": {
+    "empty": "لا توجد وصفات نشطة.",
+    "dose": "الجرعة",
+    "frequency": "التكرار"
+  },
+  "notificationsScreen": {
+    "empty": "لا توجد إشعارات بعد.",
+    "emptyBody": "ستظهر هنا تحديثات العيادات وطلبات المشاركة.",
+    "justNow": "الآن",
+    "minutesAgo": "قبل {{count}} د",
+    "hoursAgo": "قبل {{count}} س",
+    "daysAgo": "قبل {{count}} ي"
+  },
+  "appointmentsScreen": {
+    "empty": "لا توجد مواعيد قادمة.",
+    "fallback": "موعد",
+    "with": "مع {{provider}}",
+    "status": "الحالة: {{status}}"
+  },
+  "invoicesScreen": {
+    "empty": "لا توجد فواتير بعد.",
+    "fallbackNumber": "فاتورة",
+    "issued": "صدرت في {{date}}",
+    "due": "الاستحقاق {{date}}",
+    "installmentsPaid": "{{paid}}/{{total}} أقساط مدفوعة",
+    "status": {
+      "paid": "مدفوعة",
+      "sent": "غير مدفوعة",
+      "draft": "مسودة",
+      "void": "ملغاة"
+    }
+  }
+}

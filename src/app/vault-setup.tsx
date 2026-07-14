@@ -11,6 +11,7 @@ import {
 } from 'heroui-native';
 import { LockKeyhole } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,6 +26,7 @@ const PIN_LENGTH = 4;
 export default function VaultSetupScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const { create } = useVault();
   const [accent, danger] = useThemeColor(['accent', 'danger']);
 
@@ -54,7 +56,7 @@ export default function VaultSetupScreen() {
       return;
     }
     if (candidate !== first) {
-      setError("Those didn't match. Try again.");
+      setError(t('vaultSetup.noMatch'));
       setValue('');
       setStage('enter');
       setFirst('');
@@ -79,16 +81,16 @@ export default function VaultSetupScreen() {
           </View>
           <View className="items-center gap-1.5">
             <Typography type="h3" className="font-bold text-foreground">
-              {stage === 'enter' ? 'Secure your wallet' : 'Confirm it'}
+              {stage === 'enter' ? t('vaultSetup.secure') : t('vaultSetup.confirmHeading')}
             </Typography>
             <Typography type="body-sm" color="muted" align="center">
               {method === 'pin'
                 ? stage === 'enter'
-                  ? 'Choose a 4-digit PIN to open the app.'
-                  : 'Enter your PIN again to confirm.'
+                  ? t('vaultSetup.choosePin')
+                  : t('vaultSetup.confirmPin')
                 : stage === 'enter'
-                  ? 'Choose a passphrase to open the app.'
-                  : 'Enter your passphrase again to confirm.'}
+                  ? t('vaultSetup.choosePassphrase')
+                  : t('vaultSetup.confirmPassphrase')}
             </Typography>
           </View>
         </View>
@@ -118,7 +120,7 @@ export default function VaultSetupScreen() {
           <View className="w-full">
             <TextField>
               <Input
-                placeholder="Passphrase"
+                placeholder={t('vaultSetup.passphrasePlaceholder')}
                 secureTextEntry
                 autoFocus
                 value={value}
@@ -136,7 +138,7 @@ export default function VaultSetupScreen() {
           <View className="flex-row items-center gap-2">
             <Spinner />
             <Typography type="body-sm" color="muted">
-              Securing your wallet…
+              {t('vaultSetup.securing')}
             </Typography>
           </View>
         ) : error ? (
@@ -149,14 +151,16 @@ export default function VaultSetupScreen() {
           {method === 'passphrase' ? (
             <Button size="lg" isDisabled={!minOk || busy} onPress={() => submit(value)}>
               {busy ? <Spinner /> : null}
-              <Button.Label>{stage === 'enter' ? 'Continue' : 'Confirm'}</Button.Label>
+              <Button.Label>
+                {stage === 'enter' ? t('vaultSetup.continue') : t('vaultSetup.confirm')}
+              </Button.Label>
             </Button>
           ) : null}
           <Pressable
             onPress={() => reset(method === 'pin' ? 'passphrase' : 'pin')}
             className="active:opacity-70">
             <Typography type="body-sm" align="center" style={{ color: accent }}>
-              {method === 'pin' ? 'Use a passphrase instead' : 'Use a 4-digit PIN instead'}
+              {method === 'pin' ? t('vaultSetup.usePassphrase') : t('vaultSetup.usePin')}
             </Typography>
           </Pressable>
         </View>
