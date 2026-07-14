@@ -2,27 +2,28 @@
   "expo": {
     "name": "temetro-app",
     "slug": "temetro-app",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "temetroapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.khalid-abdi.temetro-app"
+      "bundleIdentifier": "com.khalid.temetro",
+      "buildNumber": "1",
+      "supportsTablet": true
     },
     "android": {
+      "package": "com.khalid.temetro",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "softwareKeyboardLayoutMode": "resize",
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.CAMERA"
       ]
     },
     "web": {
@@ -35,9 +36,11 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 180,
           "android": {
             "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
+            "imageWidth": 140
           }
         }
       ],
@@ -45,7 +48,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow temetro to scan a clinic's QR code to share your record."
+          "cameraPermission": "Allow temetro to scan a clinic's QR code to share your record.",
+          "microphonePermission": false
         }
       ],
       "expo-localization"
