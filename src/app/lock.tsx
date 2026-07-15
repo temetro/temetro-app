@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import {
   Button,
   Input,
@@ -25,7 +24,6 @@ const PIN_LENGTH = 4;
 // passphrase the patient set at vault setup.
 export default function LockScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { t } = useTranslation();
   const { method, unlock } = useVault();
 

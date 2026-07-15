@@ -34,16 +34,11 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
-
-const DOCS_URL = 'https://github.com/temetro/temetro';
-const BLOG_URL = 'https://blog.temetro.com';
-const APP_VERSION = Constants.expoConfig?.version ?? '—';
-
-import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
 import { GlassButton } from '@/components/glass-button';
+import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { SheetInput } from '@/components/sheet/sheet-parts';
 import { shortWallet } from '@/lib/format';
 import i18n from '@/lib/i18n';
@@ -55,6 +50,10 @@ import {
 } from '@/lib/language';
 import { useVault } from '@/lib/vault-context';
 import { useWallet } from '@/lib/wallet-context';
+
+const DOCS_URL = 'https://github.com/temetro/temetro';
+const BLOG_URL = 'https://blog.temetro.com';
+const APP_VERSION = Constants.expoConfig?.version ?? '—';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();

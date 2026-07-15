@@ -1,6 +1,6 @@
 import { BottomSheet, Button, Surface, useThemeColor } from 'heroui-native';
 import { Building2, Check, ShieldCheck, TriangleAlert } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 
@@ -19,8 +19,14 @@ export function UpdatesInbox() {
   const [snoozed, setSnoozed] = useState(false);
 
   // Re-open whenever the queue changes (a new update arrives, or one resolves so
-  // the next should show). "Later" snoozes until the next change.
-  useEffect(() => setSnoozed(false), [pendingUpdates.length]);
+  // the next should show). "Later" snoozes until the next change. Adjusted
+  // during render so the sheet doesn't paint once snoozed before reopening for
+  // the next update.
+  const [prevCount, setPrevCount] = useState(pendingUpdates.length);
+  if (prevCount !== pendingUpdates.length) {
+    setPrevCount(pendingUpdates.length);
+    setSnoozed(false);
+  }
 
   const update: PendingUpdate | undefined = pendingUpdates[0];
   const isOpen = !!update && !snoozed;

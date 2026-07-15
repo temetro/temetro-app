@@ -62,6 +62,10 @@ export default function PortalScreen() {
   useEffect(() => {
     if (!target || !identity) return;
     const s = openPortalSession(target, identity);
+    // The session is a live socket owned by this effect (see the close() in the
+    // cleanup); the state is just a handle to it. There is no render-phase
+    // equivalent — opening a socket during render would leak one per attempt.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSession(s);
     s.request<{ name: string }>('clinic')
       .then((c) => setClinicName(c.name))
@@ -208,7 +212,10 @@ function LinkView({
     }
   }, [session]);
 
+  // Kicks off the linked-patient check against the clinic. The setStates live
+  // inside `attempt`'s promise handlers, but the rule traces the call itself.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void attempt();
   }, [attempt]);
 
@@ -316,7 +323,11 @@ function BookView({
     [session],
   );
 
+  // Re-fetch the day's free slots from the clinic when the doctor or date
+  // changes. The setStates live inside `loadAvailability`'s promise handlers,
+  // but the rule traces the call itself.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (doctor) void loadAvailability(doctor, date);
   }, [doctor, date, loadAvailability]);
 

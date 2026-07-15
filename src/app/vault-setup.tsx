@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import {
   Button,
   Input,
@@ -32,7 +31,6 @@ const PIN_LENGTH = 4;
 // typo can't lock them out. Pairs with the /lock unlock screen.
 export default function VaultSetupScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { t } = useTranslation();
   const { create } = useVault();
   const [accent, danger] = useThemeColor(['accent', 'danger']);

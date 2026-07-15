@@ -1,8 +1,14 @@
 import '@/global.css';
 import '@/lib/i18n';
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider,
+  useRouter,
+  useSegments,
+} from 'expo-router';
 import * as SystemUI from 'expo-system-ui';
 import { HeroUINativeProvider } from 'heroui-native';
 import { useEffect } from 'react';

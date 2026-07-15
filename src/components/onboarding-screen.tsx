@@ -48,7 +48,7 @@ const SLIDES: Slide[] = [
 
 export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
-  const [accent, separator] = useThemeColor(['accent', 'border']);
+  const accent = useThemeColor('accent');
   const [index, setIndex] = useState(0);
   const last = index === SLIDES.length - 1;
   const slide = SLIDES[index];
