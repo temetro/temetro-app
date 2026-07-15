@@ -110,7 +110,9 @@
     "selectDate": "Sélectionner une date",
     "walletNumber": "Votre numéro de portefeuille",
     "create": "Créer le portefeuille",
-    "creating": "Création…"
+    "creating": "Création…",
+    "continue": "Continuer",
+    "dobTitle": "Quand êtes-vous né(e) ?"
   },
   "settings": {
     "title": "Réglages",

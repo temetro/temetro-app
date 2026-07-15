@@ -110,7 +110,9 @@
     "selectDate": "اختر التاريخ",
     "walletNumber": "رقم محفظتك",
     "create": "إنشاء المحفظة",
-    "creating": "جارٍ الإنشاء…"
+    "creating": "جارٍ الإنشاء…",
+    "continue": "متابعة",
+    "dobTitle": "متى وُلدت؟"
   },
   "settings": {
     "title": "الإعدادات",

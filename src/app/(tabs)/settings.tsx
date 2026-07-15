@@ -5,13 +5,10 @@ import {
   BottomSheet,
   Button,
   Dialog,
-  Input,
-  Label,
   ListGroup,
   Separator,
   Surface,
   Switch,
-  TextField,
   Typography,
   useThemeColor,
 } from 'heroui-native';
@@ -47,6 +44,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
 import { GlassButton } from '@/components/glass-button';
+import { SheetInput } from '@/components/sheet/sheet-parts';
 import { shortWallet } from '@/lib/format';
 import i18n from '@/lib/i18n';
 import {
@@ -405,7 +403,9 @@ export default function SettingsScreen() {
       <BottomSheet isOpen={phoneOpen} onOpenChange={setPhoneOpen}>
         <BottomSheet.Portal>
           <BottomSheet.Overlay />
-          <BottomSheet.Content>
+          {/* `keyboardBehavior="extend"` + SheetInput's focus/blur handlers keep
+              the sheet above the keyboard instead of hidden behind it. */}
+          <BottomSheet.Content keyboardBehavior="extend">
             <View className="gap-5 pt-1">
               <View className="gap-1">
                 <BottomSheet.Title>{t('settings.phoneDialog.title')}</BottomSheet.Title>
@@ -413,17 +413,15 @@ export default function SettingsScreen() {
                   {t('settings.phoneDialog.description')}
                 </BottomSheet.Description>
               </View>
-              <TextField>
-                <Label>{t('settings.phone')}</Label>
-                <Input
-                  value={phoneDraft}
-                  onChangeText={setPhoneDraft}
-                  placeholder={t('settings.phoneDialog.placeholder')}
-                  keyboardType="phone-pad"
-                  autoComplete="tel"
-                  autoFocus
-                />
-              </TextField>
+              <SheetInput
+                autoComplete="tel"
+                autoFocus
+                keyboardType="phone-pad"
+                label={t('settings.phone')}
+                onChangeText={setPhoneDraft}
+                placeholder={t('settings.phoneDialog.placeholder')}
+                value={phoneDraft}
+              />
               <View className="flex-row gap-3">
                 <Button variant="secondary" className="flex-1" onPress={() => setPhoneOpen(false)}>
                   <Button.Label>{t('settings.phoneDialog.cancel')}</Button.Label>

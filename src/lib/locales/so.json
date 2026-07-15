@@ -110,7 +110,9 @@
     "selectDate": "Dooro taariikhda",
     "walletNumber": "Lambarka boorsadaada",
     "create": "Samee boorsada",
-    "creating": "Waa la abuurayaa…"
+    "creating": "Waa la abuurayaa…",
+    "continue": "Sii wad",
+    "dobTitle": "Goorma ayaad dhalatay?"
   },
   "settings": {
     "title": "Dejinta",

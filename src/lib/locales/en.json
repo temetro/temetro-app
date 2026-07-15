@@ -110,7 +110,9 @@
     "selectDate": "Select date",
     "walletNumber": "Your wallet number",
     "create": "Create wallet",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "continue": "Continue",
+    "dobTitle": "When were you born?"
   },
   "settings": {
     "title": "Settings",

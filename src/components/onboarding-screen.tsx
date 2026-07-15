@@ -4,14 +4,11 @@ import { Activity, Lock, QrCode, ShieldCheck } from 'lucide-react-native';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-import Animated, {
-  FadeIn,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Logo } from '@/components/logo';
+import { StepDots } from '@/components/step-dots';
 
 const GLOW = require('@/assets/images/logo-glow.png');
 
@@ -81,10 +78,8 @@ export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
         </Animated.View>
       </View>
 
-      <View className="mb-5 flex-row items-center justify-center gap-2">
-        {SLIDES.map((s, i) => (
-          <Dot key={s.key} active={i === index} accent={accent} inactive={separator} />
-        ))}
+      <View className="mb-5">
+        <StepDots count={SLIDES.length} index={index} />
       </View>
 
       <Button
@@ -96,16 +91,6 @@ export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
       </Button>
     </SafeAreaView>
   );
-}
-
-// An animated pagination dot: the active dot smoothly widens and takes the accent
-// color; inactive dots shrink back to the separator color.
-function Dot({ active, accent, inactive }: { active: boolean; accent: string; inactive: string }) {
-  const style = useAnimatedStyle(() => ({
-    width: withTiming(active ? 22 : 8, { duration: 250 }),
-    backgroundColor: withTiming(active ? accent : inactive, { duration: 250 }),
-  }));
-  return <Animated.View style={[{ height: 8, borderRadius: 4 }, style]} />;
 }
 
 // A small stack of mock record cards (echoes the on-device record) for the

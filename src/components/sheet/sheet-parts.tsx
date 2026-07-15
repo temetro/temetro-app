@@ -1,19 +1,44 @@
 import {
   BottomSheet,
   Button,
+  Input,
+  Label,
   Separator,
   Surface,
+  TextField,
   Typography,
+  useBottomSheetAwareHandlers,
   useThemeColor,
 } from 'heroui-native';
 import { X, type LucideIcon } from 'lucide-react-native';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
 // Shared bottom-sheet building blocks so every sheet reads the same. HeroUI's
 // BottomSheet.Content already draws the drag grabber; these style the content
 // below it — a header (optional subject icon + title + round close), grouped
 // section labels, key/value rows, a connected-dot timeline, and an action bar.
+
+// A labelled text field for use inside a BottomSheet.
+//
+// An Input in a sheet needs `useBottomSheetAwareHandlers` wired to focus/blur,
+// or the sheet doesn't know the keyboard is coming and it covers the field the
+// patient is typing into. The hook only works from a component *inside* the
+// sheet's context (outside it the handlers silently no-op), which is why this is
+// its own component rather than props on the call site. Pair it with
+// `keyboardBehavior="extend"` on BottomSheet.Content.
+export function SheetInput({
+  label,
+  ...inputProps
+}: { label: string } & ComponentProps<typeof Input>) {
+  const { onFocus, onBlur } = useBottomSheetAwareHandlers();
+  return (
+    <TextField>
+      <Label>{label}</Label>
+      <Input {...inputProps} onBlur={onBlur} onFocus={onFocus} />
+    </TextField>
+  );
+}
 
 export function SheetHeader({
   title,
