@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { UpdatesInbox } from '@/components/updates-inbox';
-import { useOnboarding } from '@/lib/onboarding';
+import { OnboardingProvider, useOnboarding } from '@/lib/onboarding';
 import { darkPalette, lightPalette } from '@/lib/theme';
 import { useVault, VaultProvider } from '@/lib/vault-context';
 import { useWallet, WalletProvider } from '@/lib/wallet-context';
@@ -93,6 +93,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.bg }}>
       <ThemeProvider value={dark ? navDark : navLight}>
         <HeroUINativeProvider>
+          <OnboardingProvider>
           <VaultProvider>
           <WalletProvider>
             <Stack
@@ -139,6 +140,7 @@ export default function RootLayout() {
             <GateRedirector />
           </WalletProvider>
           </VaultProvider>
+          </OnboardingProvider>
         </HeroUINativeProvider>
       </ThemeProvider>
     </GestureHandlerRootView>

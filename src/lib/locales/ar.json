@@ -189,7 +189,8 @@
     "confirm": "تأكيد",
     "usePassphrase": "استخدم عبارة مرور بدلاً من ذلك",
     "usePin": "استخدم رمز PIN من 4 أرقام بدلاً من ذلك",
-    "passphrasePlaceholder": "عبارة المرور"
+    "passphrasePlaceholder": "عبارة المرور",
+    "failed": "تعذر تأمين محفظتك. يرجى المحاولة مرة أخرى."
   },
   "camera": {
     "accessNeeded": "يلزم الوصول إلى الكاميرا",
@@ -280,7 +281,17 @@
   "prescriptionsScreen": {
     "empty": "لا توجد وصفات نشطة.",
     "dose": "الجرعة",
-    "frequency": "التكرار"
+    "frequency": "التكرار",
+    "prescriber": "الطبيب الواصف",
+    "status": "الحالة",
+    "prescribedAt": "تاريخ الوصف",
+    "duration": "المدة",
+    "endDate": "ينتهي",
+    "statusValue": {
+      "active": "نشط",
+      "completed": "مكتمل",
+      "expired": "منتهي"
+    }
   },
   "notificationsScreen": {
     "empty": "لا توجد إشعارات بعد.",

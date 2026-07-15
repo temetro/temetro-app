@@ -39,6 +39,28 @@ export type WalletDocument = {
   createdAt: string; // ISO timestamp
 };
 
+// A prescription the clinic wrote. Lives in its own clinic table (not on the
+// canonical Patient snapshot), so the clinic pushes it alongside the record —
+// `patient.medications` comes from a different table entirely and does not grow
+// when a prescription is written. Mirrors backend/src/types/prescription.ts.
+// The clinic also ships denormalized `name`/`initials`/`source`/timestamps; we
+// only declare what the wallet renders.
+export type PrescriptionStatus = 'active' | 'completed' | 'expired';
+export type Prescription = {
+  id: string;
+  fileNumber: string;
+  medication: string;
+  dose: string;
+  frequency: string;
+  prescriber: string;
+  prescribedAt: string; // YYYY-MM-DD
+  startDate: string | null;
+  endDate: string | null;
+  status: PrescriptionStatus;
+  duration: string | null;
+  notes: string | null;
+};
+
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'void';
 export type InvoiceLineItem = { description: string; quantity: number; unitPrice: number };
 export type InvoiceInstallment = {
@@ -81,5 +103,6 @@ export type Patient = {
   // Pushed by the clinic alongside the record (optional on older records).
   appointments?: Appointment[];
   invoices?: Invoice[];
+  prescriptions?: Prescription[];
   documents?: WalletDocument[];
 };

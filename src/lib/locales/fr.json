@@ -189,7 +189,8 @@
     "confirm": "Confirmer",
     "usePassphrase": "Utiliser plutôt une phrase secrète",
     "usePin": "Utiliser plutôt un code PIN à 4 chiffres",
-    "passphrasePlaceholder": "Phrase secrète"
+    "passphrasePlaceholder": "Phrase secrète",
+    "failed": "Impossible de sécuriser votre portefeuille. Veuillez réessayer."
   },
   "camera": {
     "accessNeeded": "Accès à la caméra requis",
@@ -280,7 +281,17 @@
   "prescriptionsScreen": {
     "empty": "Aucune ordonnance active.",
     "dose": "Dose",
-    "frequency": "Fréquence"
+    "frequency": "Fréquence",
+    "prescriber": "Prescripteur",
+    "status": "Statut",
+    "prescribedAt": "Prescrit le",
+    "duration": "Durée",
+    "endDate": "Fin",
+    "statusValue": {
+      "active": "En cours",
+      "completed": "Terminé",
+      "expired": "Expiré"
+    }
   },
   "notificationsScreen": {
     "empty": "Aucune notification pour le moment.",

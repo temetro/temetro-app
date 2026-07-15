@@ -12,9 +12,16 @@ import {
 import { LockKeyhole } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { nextPaint } from '@/lib/paint';
 import { useVault } from '@/lib/vault-context';
 
 type Method = 'pin' | 'passphrase';
@@ -62,10 +69,24 @@ export default function VaultSetupScreen() {
       setFirst('');
       return;
     }
+    // The PIN's OTP input is a real (hidden) TextInput that still holds focus.
+    // Drop the keyboard here or it rides along to the home tabs and stays up.
+    Keyboard.dismiss();
     setBusy(true);
-    await create(candidate, method);
-    setBusy(false);
-    router.replace('/');
+    // Let the spinner paint before scrypt seizes the JS thread — see nextPaint.
+    await nextPaint();
+    try {
+      await create(candidate, method);
+      // No navigation here on purpose: `create` sets the vault unlocked and the
+      // gate in the root layout redirects to '/'. Doing it here too raced it.
+    } catch {
+      // Without this the spinner would spin forever on a keychain failure.
+      setBusy(false);
+      setError(t('vaultSetup.failed'));
+      setValue('');
+      setStage('enter');
+      setFirst('');
+    }
   };
 
   return (

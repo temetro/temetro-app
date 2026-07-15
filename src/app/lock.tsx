@@ -11,10 +11,11 @@ import {
 } from 'heroui-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Logo } from '@/components/logo';
+import { nextPaint } from '@/lib/paint';
 import { useVault } from '@/lib/vault-context';
 
 const PIN_LENGTH = 4;
@@ -38,15 +39,21 @@ export default function LockScreen() {
 
   const attempt = async (candidate: string) => {
     if (busy) return;
+    // The OTP input is a real (hidden) TextInput that still holds focus, so drop
+    // the keyboard here or it rides along to the home tabs and stays up.
+    Keyboard.dismiss();
     setBusy(true);
+    // Let the spinner paint before scrypt seizes the JS thread — see nextPaint.
+    await nextPaint();
     const ok = await unlock(candidate);
-    setBusy(false);
     if (ok) {
-      router.replace('/');
-    } else {
-      setError(isPin ? t('lock.wrongPin') : t('lock.wrongPassphrase'));
-      setValue('');
+      // Leave navigation to the gate: `unlock` flips the vault state and the
+      // root layout redirects to '/'. Replacing here as well raced it.
+      return;
     }
+    setBusy(false);
+    setError(isPin ? t('lock.wrongPin') : t('lock.wrongPassphrase'));
+    setValue('');
   };
 
   return (

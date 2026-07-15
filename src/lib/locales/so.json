@@ -189,7 +189,8 @@
     "confirm": "Xaqiiji",
     "usePassphrase": "Halkii isticmaal eray sir ah",
     "usePin": "Halkii isticmaal PIN 4-god ah",
-    "passphrasePlaceholder": "Erayga sirta ah"
+    "passphrasePlaceholder": "Erayga sirta ah",
+    "failed": "Lama sugi karin boorsadaada. Fadlan isku day mar kale."
   },
   "camera": {
     "accessNeeded": "Waxaa loo baahan yahay galitaanka kamarada",
@@ -280,7 +281,17 @@
   "prescriptionsScreen": {
     "empty": "Daawo firfircoon ma jirto.",
     "dose": "Qiyaasta",
-    "frequency": "Inta jeer"
+    "frequency": "Inta jeer",
+    "prescriber": "Dhakhtarka qoray",
+    "status": "Xaaladda",
+    "prescribedAt": "Taariikhda la qoray",
+    "duration": "Muddada",
+    "endDate": "Wuxuu dhammaanayaa",
+    "statusValue": {
+      "active": "Firfircoon",
+      "completed": "La dhammeeyay",
+      "expired": "Dhacay"
+    }
   },
   "notificationsScreen": {
     "empty": "Weli ogeysiis ma jiro.",

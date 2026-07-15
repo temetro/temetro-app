@@ -10,8 +10,10 @@ import type { Socket } from 'socket.io-client';
 
 import { loadRelayOverride, relayUrl as resolveRelayUrl } from './config';
 import { hexToBytes, open, verifySignature, x25519PrivFromSeed } from './crypto';
+import { useOnboarding } from './onboarding';
 import {
   checkAndPinClinicKey,
+  clearClinicPins,
   loadUpdates,
   type PendingUpdate,
   saveUpdates,
@@ -65,6 +67,9 @@ type WalletContextValue = {
 const WalletContext = createContext<WalletContextValue | null>(null);
 
 export function WalletProvider({ children }: { children: ReactNode }) {
+  // WalletProvider sits inside OnboardingProvider, so a reset can put the intro
+  // back *and* have the gate notice, rather than just clearing the stored flag.
+  const { clear: clearOnboarding } = useOnboarding();
   const [ready, setReady] = useState(false);
   const [registered, setRegisteredState] = useState(false);
   const [identity, setIdentity] = useState<WalletIdentity | null>(null);
@@ -146,40 +151,46 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         patient: Patient;
         appointments?: Patient['appointments'];
         invoices?: Patient['invoices'];
+        prescriptions?: Patient['prescriptions'];
         documents?: Patient['documents'];
         changes: string[];
       };
-      // Appointments/invoices/documents arrive next to the patient snapshot —
-      // fold them onto the record so approving the update persists them together.
+      // Appointments/invoices/prescriptions/documents arrive next to the patient
+      // snapshot — fold them onto the record so approving the update persists
+      // them together.
       const mergedPatient: Patient = {
         ...bundle.patient,
         appointments: bundle.appointments ?? bundle.patient.appointments ?? [],
         invoices: bundle.invoices ?? bundle.patient.invoices ?? [],
+        prescriptions:
+          bundle.prescriptions ?? bundle.patient.prescriptions ?? [],
         documents: bundle.documents ?? bundle.patient.documents ?? [],
       };
-      void checkAndPinClinicKey(event.clinicName, event.clinicPublicKey).then(
-        (keyOk) => {
-          const update: PendingUpdate = {
-            requestId: event.requestId,
-            clinicName: event.clinicName,
-            clinicPublicKey: event.clinicPublicKey,
-            fingerprint: event.fingerprint,
-            changes: bundle.changes ?? event.changes ?? [],
-            patient: mergedPatient,
-            createdAt: event.createdAt,
-            keyChanged: !keyOk,
-          };
-          if (updatesRef.current.some((u) => u.requestId === update.requestId)) {
-            return;
-          }
-          persistUpdates([...updatesRef.current, update]);
-          pushNotification(
-            'update',
-            `${event.clinicName} sent a record update`,
-            update.changes.length ? update.changes.join(', ') : undefined,
-          );
-        },
-      );
+      void checkAndPinClinicKey(
+        event.clinicId ?? '',
+        event.clinicPublicKey,
+      ).then((keyOk) => {
+        const update: PendingUpdate = {
+          requestId: event.requestId,
+          clinicId: event.clinicId,
+          clinicName: event.clinicName,
+          clinicPublicKey: event.clinicPublicKey,
+          fingerprint: event.fingerprint,
+          changes: bundle.changes ?? event.changes ?? [],
+          patient: mergedPatient,
+          createdAt: event.createdAt,
+          keyChanged: !keyOk,
+        };
+        if (updatesRef.current.some((u) => u.requestId === update.requestId)) {
+          return;
+        }
+        persistUpdates([...updatesRef.current, update]);
+        pushNotification(
+          'update',
+          `${event.clinicName} sent a record update`,
+          update.changes.length ? update.changes.join(', ') : undefined,
+        );
+      });
     } catch (err) {
       // Undecryptable / malformed bundle — log it instead of dropping silently
       // so a genuine delivery bug (bad seal, key mismatch, JSON error) surfaces.
@@ -325,12 +336,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const reset = async () => {
     socketRef.current?.disconnect();
     socketRef.current = null;
-    // Wipe keys + the on-disk record + the registered flag so the wallet returns
-    // to a clean first-run state (onboarding stays done; registration repeats).
+    // Wipe keys + the on-disk record + the registered/onboarded flags so the
+    // wallet returns to a genuine first-run state, onboarding included.
+    // The clinic key pins have to go too: SecureStore survives app deletion on
+    // iOS, so a pin left behind here outlives a reset and a reinstall, and the
+    // next clinic to mint a fresh key trips a bogus "key changed" warning.
     await resetWallet();
     deleteRecord();
     await removeVault();
     await clearRegistered();
+    await clearOnboarding();
+    await clearClinicPins();
     recordRef.current = null;
     setRecord(null);
     updatesRef.current = [];

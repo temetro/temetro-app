@@ -189,7 +189,8 @@
     "confirm": "Confirm",
     "usePassphrase": "Use a passphrase instead",
     "usePin": "Use a 4-digit PIN instead",
-    "passphrasePlaceholder": "Passphrase"
+    "passphrasePlaceholder": "Passphrase",
+    "failed": "Couldn't secure your wallet. Please try again."
   },
   "camera": {
     "accessNeeded": "Camera access needed",
@@ -280,7 +281,17 @@
   "prescriptionsScreen": {
     "empty": "No active prescriptions.",
     "dose": "Dose",
-    "frequency": "Frequency"
+    "frequency": "Frequency",
+    "prescriber": "Prescriber",
+    "status": "Status",
+    "prescribedAt": "Prescribed",
+    "duration": "Duration",
+    "endDate": "Ends",
+    "statusValue": {
+      "active": "Active",
+      "completed": "Completed",
+      "expired": "Expired"
+    }
   },
   "notificationsScreen": {
     "empty": "No notifications yet.",

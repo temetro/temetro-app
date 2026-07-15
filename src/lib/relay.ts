@@ -30,6 +30,10 @@ export type ShareRequest = {
 // `signature`/`clinicPublicKey` prove the clinic authored it.
 export type RecordUpdateEvent = {
   requestId: string;
+  // The clinic's stable org id: what we pin its signing key against, and the
+  // relay routing id used to fetch document bytes over the portal. Optional
+  // because clinics older than this field don't send it.
+  clinicId?: string;
   clinicName: string;
   sealed: string;
   signature: string;
