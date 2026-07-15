@@ -28,15 +28,28 @@ export type Appointment = {
   status: AppointmentStatus;
 };
 
-// A file/document the clinic attached to the record. The wallet receives the
-// metadata (not the bytes yet) so it can list documents and show a count.
-// Mirrors the trimmed shape pushed from backend/src/services/wallet-updates.ts.
+// A file on the record. Two kinds:
+//
+// - Clinic files: the clinic pushes the metadata only (mirrors the trimmed shape
+//   in backend/src/services/wallet-updates.ts). The bytes stay on the clinic and
+//   are fetched on demand over the portal's `result-file` action, keyed by this
+//   same `id`, then cached encrypted on the device (see doc-store.ts).
+// - Patient files: photos the patient took of their own paperwork. The bytes are
+//   only ever on this device — they are never uploaded to a clinic.
+export type DocumentSource = 'clinic' | 'patient';
+
 export type WalletDocument = {
   id: string;
   filename: string;
   mimeType: string;
   sizeBytes: number;
   createdAt: string; // ISO timestamp
+  // Absent on records written before provenance was tracked; those are all
+  // clinic-pushed, so treat a missing value as 'clinic'.
+  source?: DocumentSource;
+  // Which clinic to fetch the bytes from. Set on clinic files when the pushing
+  // clinic sends its id; never set on patient files.
+  clinicId?: string;
 };
 
 // A prescription the clinic wrote. Lives in its own clinic table (not on the

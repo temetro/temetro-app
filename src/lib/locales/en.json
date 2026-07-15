@@ -272,7 +272,19 @@
     "empty": "No documents yet.",
     "type": "Type",
     "size": "Size",
-    "added": "Added"
+    "added": "Added",
+    "addedBy": "Added by",
+    "addedByYou": "Added by you",
+    "addedByClinic": "From your clinic",
+    "open": "Open",
+    "download": "Download and open",
+    "opening": "Opening…",
+    "errors": {
+      "missing": "This file is no longer on your device.",
+      "unknown-clinic": "Your clinic didn't say where this file lives, so it can't be opened yet.",
+      "failed": "Couldn't get this file. Check your connection and try again.",
+      "no-viewer": "No app on this phone can open this file type."
+    }
   },
   "visitsScreen": {
     "empty": "No visits recorded yet.",
@@ -321,5 +333,22 @@
       "draft": "Draft",
       "void": "Void"
     }
+  },
+  "addDocument": {
+    "title": "Save a document",
+    "none": "Photograph a paper record to keep it here",
+    "count": "{{count}} saved on this phone",
+    "sheetTitle": "Save a document",
+    "sheetDescription": "Photograph paperwork to keep it with your record. It stays on this phone and is never sent to a clinic.",
+    "takePhoto": "Take a photo",
+    "choosePhoto": "Choose from photos",
+    "defaultName": "Document",
+    "permissionTitle": "Permission needed",
+    "permission": {
+      "camera": "Allow camera access to photograph a document.",
+      "library": "Allow photo access to choose an image."
+    },
+    "failedTitle": "Couldn't save",
+    "failedBody": "Something went wrong saving that document. Please try again."
   }
 }

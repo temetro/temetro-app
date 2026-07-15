@@ -272,7 +272,19 @@
     "empty": "Weli dukumenti ma jiro.",
     "type": "Nooca",
     "size": "Cabbirka",
-    "added": "La daray"
+    "added": "La daray",
+    "addedBy": "Waxaa ku daray",
+    "addedByYou": "Adigaa ku daray",
+    "addedByClinic": "Rugtaada caafimaadka",
+    "open": "Fur",
+    "download": "Soo dejiso oo fur",
+    "opening": "Waa la furayaa…",
+    "errors": {
+      "missing": "Faylkan kuma jiro qalabkaaga mar dambe.",
+      "unknown-clinic": "Rugta caafimaadku ma sheegin meesha faylkani ku jiro, sidaas darteed weli lama furi karo.",
+      "failed": "Lama heli karin faylkan. Hubi xiriirkaaga oo isku day mar kale.",
+      "no-viewer": "Ma jiro app taleefankan ku jira oo furi kara nooca faylkan."
+    }
   },
   "visitsScreen": {
     "empty": "Weli booqasho lama diiwaan gelin.",
@@ -321,5 +333,22 @@
       "draft": "Qabyo",
       "void": "La buriyay"
     }
+  },
+  "addDocument": {
+    "title": "Kaydi dukumenti",
+    "none": "Sawir dukumenti warqad ah si aad halkan ugu kaydiso",
+    "count": "{{count}} ayaa lagu kaydiyay taleefankan",
+    "sheetTitle": "Kaydi dukumenti",
+    "sheetDescription": "Sawir warqadahaaga si ay ula joogaan diiwaankaaga. Waxay ku hadhayaan taleefankan, marnabana looma dirayo rug caafimaad.",
+    "takePhoto": "Sawir qaad",
+    "choosePhoto": "Ka dooro sawirrada",
+    "defaultName": "Dukumenti",
+    "permissionTitle": "Ogolaansho ayaa loo baahan yahay",
+    "permission": {
+      "camera": "Ogolow gelitaanka kamaradda si aad dukumenti u sawirto.",
+      "library": "Ogolow gelitaanka sawirrada si aad sawir u doorato."
+    },
+    "failedTitle": "Lama kaydin karin",
+    "failedBody": "Wax baa qaldamay markii la kaydinayay dukumentiga. Fadlan isku day mar kale."
   }
 }

@@ -36,6 +36,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AddDocumentCard } from '@/components/add-document';
 import { HeaderIconButton } from '@/components/header-icon-button';
 import { Logo } from '@/components/logo';
 import { SheetHeader } from '@/components/sheet/sheet-parts';
@@ -262,6 +263,9 @@ export default function HomeScreen() {
             </Pressable>
           );
         })()}
+
+        {/* Save a document — the patient's own photos of their paperwork */}
+        <AddDocumentCard />
 
         {/* Recent activity — latest clinic updates / share requests / info */}
         {notifications.length > 0 ? (

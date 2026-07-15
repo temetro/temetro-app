@@ -24,6 +24,7 @@ import {
   makeNotification,
   saveNotifications,
 } from './notifications';
+import { deleteAllDocs } from './doc-store';
 import { deleteRecord, loadRecord, saveRecord } from './records';
 import { clearRegistered, isRegistered, setRegistered } from './registration';
 import {
@@ -158,13 +159,32 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // Appointments/invoices/prescriptions/documents arrive next to the patient
       // snapshot — fold them onto the record so approving the update persists
       // them together.
+      //
+      // Documents need two extra things. Each clinic file is stamped with the
+      // clinic that sent it, so the viewer knows who to fetch the bytes from.
+      // And the patient's own photos are carried across: approving an update
+      // replaces the record wholesale with the clinic's snapshot, which knows
+      // nothing about them, so without this every clinic push would silently
+      // delete the patient's own documents.
+      const ownDocuments = (recordRef.current?.documents ?? []).filter(
+        (d) => d.source === 'patient',
+      );
+      const clinicDocuments = (
+        bundle.documents ??
+        bundle.patient.documents ??
+        []
+      ).map((d) => ({
+        ...d,
+        source: 'clinic' as const,
+        clinicId: event.clinicId,
+      }));
       const mergedPatient: Patient = {
         ...bundle.patient,
         appointments: bundle.appointments ?? bundle.patient.appointments ?? [],
         invoices: bundle.invoices ?? bundle.patient.invoices ?? [],
         prescriptions:
           bundle.prescriptions ?? bundle.patient.prescriptions ?? [],
-        documents: bundle.documents ?? bundle.patient.documents ?? [],
+        documents: [...clinicDocuments, ...ownDocuments],
       };
       void checkAndPinClinicKey(
         event.clinicId ?? '',
@@ -343,6 +363,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     // next clinic to mint a fresh key trips a bogus "key changed" warning.
     await resetWallet();
     deleteRecord();
+    // Cached clinic files and the patient's own photos are keyed to the local
+    // key we just destroyed; drop them rather than leave orphaned ciphertext.
+    deleteAllDocs();
     await removeVault();
     await clearRegistered();
     await clearOnboarding();

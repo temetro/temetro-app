@@ -272,7 +272,19 @@
     "empty": "Aucun document pour le moment.",
     "type": "Type",
     "size": "Taille",
-    "added": "Ajouté"
+    "added": "Ajouté",
+    "addedBy": "Ajouté par",
+    "addedByYou": "Ajouté par vous",
+    "addedByClinic": "De votre clinique",
+    "open": "Ouvrir",
+    "download": "Télécharger et ouvrir",
+    "opening": "Ouverture…",
+    "errors": {
+      "missing": "Ce fichier n'est plus sur votre appareil.",
+      "unknown-clinic": "Votre clinique n'a pas indiqué où se trouve ce fichier ; impossible de l'ouvrir pour l'instant.",
+      "failed": "Impossible de récupérer ce fichier. Vérifiez votre connexion et réessayez.",
+      "no-viewer": "Aucune application de ce téléphone ne peut ouvrir ce type de fichier."
+    }
   },
   "visitsScreen": {
     "empty": "Aucune consultation enregistrée pour le moment.",
@@ -321,5 +333,22 @@
       "draft": "Brouillon",
       "void": "Annulée"
     }
+  },
+  "addDocument": {
+    "title": "Enregistrer un document",
+    "none": "Photographiez un document papier pour le conserver ici",
+    "count": "{{count}} enregistré(s) sur ce téléphone",
+    "sheetTitle": "Enregistrer un document",
+    "sheetDescription": "Photographiez vos documents pour les conserver avec votre dossier. Ils restent sur ce téléphone et ne sont jamais envoyés à une clinique.",
+    "takePhoto": "Prendre une photo",
+    "choosePhoto": "Choisir dans les photos",
+    "defaultName": "Document",
+    "permissionTitle": "Autorisation requise",
+    "permission": {
+      "camera": "Autorisez l'accès à l'appareil photo pour photographier un document.",
+      "library": "Autorisez l'accès aux photos pour choisir une image."
+    },
+    "failedTitle": "Échec de l'enregistrement",
+    "failedBody": "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer."
   }
 }

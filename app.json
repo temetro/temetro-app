@@ -48,11 +48,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow temetro to scan a clinic's QR code to share your record.",
+          "cameraPermission": "Allow temetro to scan a clinic's QR code and photograph your documents.",
           "microphonePermission": false
         }
       ],
-      "expo-localization"
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow temetro to save a photo of your paperwork to your record. It stays on this device.",
+          "cameraPermission": "Allow temetro to photograph your paperwork so it can be kept with your record."
+        }
+      ],
+      "expo-localization",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
