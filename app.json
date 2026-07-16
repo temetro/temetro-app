@@ -19,9 +19,8 @@
       "package": "com.khalid.temetro",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "softwareKeyboardLayoutMode": "resize",
       "predictiveBackGestureEnabled": false,
@@ -38,10 +37,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#ffffff",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 180,
           "android": {
+            "backgroundColor": "#ffffff",
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 140
           }
@@ -76,6 +76,12 @@
         "projectId": "1488dd74-f423-4a84-9c62-198e28448aed"
       }
     },
-    "owner": "khalid-abdi"
+    "owner": "khalid-abdi",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1488dd74-f423-4a84-9c62-198e28448aed"
+    }
   }
 }

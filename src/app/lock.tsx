@@ -74,8 +74,11 @@ export default function LockScreen() {
           </View>
         </View>
 
-        {isPin ? (
-          <View className="items-center gap-4" style={{ opacity: busy ? 0.5 : 1 }}>
+        {/* Unmount the input while checking: the OTP's hidden TextInput keeps
+            focus, so leaving it mounted lets the keyboard reopen and ride to
+            Home after we navigate. */}
+        {busy ? null : isPin ? (
+          <View className="items-center gap-4">
             <InputOTP
               value={value}
               onChange={(v) => {

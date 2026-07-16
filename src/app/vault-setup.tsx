@@ -114,8 +114,11 @@ export default function VaultSetupScreen() {
           </View>
         </View>
 
-        {method === 'pin' ? (
-          <View className="items-center gap-4" style={{ opacity: busy ? 0.5 : 1 }}>
+        {/* Unmount the input while securing: the OTP's hidden TextInput keeps
+            focus, so leaving it mounted lets the keyboard reopen and ride to
+            Home after we navigate. */}
+        {busy ? null : method === 'pin' ? (
+          <View className="items-center gap-4">
             <InputOTP
               key={stage}
               value={value}

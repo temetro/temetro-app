@@ -5,7 +5,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Logo } from '@/components/logo';
 import { StepDots } from '@/components/step-dots';
@@ -48,13 +48,16 @@ const SLIDES: Slide[] = [
 
 export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const accent = useThemeColor('accent');
   const [index, setIndex] = useState(0);
   const last = index === SLIDES.length - 1;
   const slide = SLIDES[index];
 
   return (
-    <SafeAreaView className="flex-1 bg-background px-7">
+    <View
+      className="flex-1 bg-background px-7"
+      style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }}>
       <View className="h-11 flex-row items-center justify-end">
         {!last ? (
           <Pressable hitSlop={8} onPress={onDone} className="p-2 active:opacity-60">
@@ -72,7 +75,7 @@ export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
           </Animated.View>
         </View>
 
-        <Animated.View key={`copy-${slide.key}`} entering={FadeIn.duration(320)} className="gap-3">
+        <Animated.View key={`copy-${slide.key}`} entering={FadeIn.duration(320)} className="w-full gap-3">
           <Text className="text-center text-3xl font-bold text-foreground">{t(slide.titleKey)}</Text>
           <Text className="px-2 text-center text-base leading-6 text-muted">{t(slide.bodyKey)}</Text>
         </Animated.View>
@@ -85,11 +88,11 @@ export default function OnboardingScreen({ onDone }: { onDone: () => void }) {
       <Button
         variant="primary"
         size="lg"
-        className="mb-3 w-full max-w-md self-center rounded-full"
+        className="w-full max-w-md self-center rounded-full"
         onPress={() => (last ? onDone() : setIndex((i) => i + 1))}>
         <Button.Label>{last ? t('onboarding.getStarted') : t('onboarding.continue')}</Button.Label>
       </Button>
-    </SafeAreaView>
+    </View>
   );
 }
 
