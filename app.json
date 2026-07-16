@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "temetro-app",
+    "name": "Temetro",
     "slug": "temetro-app",
     "version": "1.1.0",
     "orientation": "portrait",
@@ -10,7 +10,10 @@
     "ios": {
       "bundleIdentifier": "com.khalid.temetro",
       "buildNumber": "1",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.khalid.temetro",
@@ -67,7 +70,12 @@
       "reactCompiler": true
     },
     "extra": {
-      "relayUrl": "https://network.temetro.com"
-    }
+      "relayUrl": "https://network.temetro.com",
+      "router": {},
+      "eas": {
+        "projectId": "1488dd74-f423-4a84-9c62-198e28448aed"
+      }
+    },
+    "owner": "khalid-abdi"
   }
 }
