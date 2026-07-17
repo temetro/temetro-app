@@ -436,11 +436,20 @@ export default function SettingsScreen() {
 
       {/* Reset confirmation — native HeroUI dialog with Liquid Glass actions. */}
       <Dialog isOpen={resetOpen} onOpenChange={setResetOpen}>
-        <Dialog.Portal>
+        {/* Explicit absolute-fill + centering styles: the portal/overlay used to rely on
+            heroui-native's internal Uniwind classes alone, and an Expo dependency bump
+            broke their resolution once (dialog pinned to the top, backdrop no longer
+            covering the screen). Inline styles keep the layout dependency-proof. */}
+        <Dialog.Portal style={[StyleSheet.absoluteFill, { justifyContent: 'center', padding: 20 }]}>
           {/* Blurred backdrop behind the dialog (the BlurView lets taps fall
               through to the overlay so tapping outside still dismisses). */}
           <Dialog.Overlay
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
               backgroundColor: theme === 'dark' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.15)',
             }}>
             <BlurView
