@@ -28,7 +28,7 @@ import {
   Stethoscope,
   Wallet,
 } from 'lucide-react-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Keyboard, Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
@@ -42,6 +42,7 @@ import { HeaderIconButton } from '@/components/header-icon-button';
 import { Logo } from '@/components/logo';
 import { SheetHeader } from '@/components/sheet/sheet-parts';
 import { formatDate, shortWallet } from '@/lib/format';
+import { syncAppointmentReminders } from '@/lib/reminders';
 import type { NotificationKind } from '@/lib/notifications';
 import { useWallet } from '@/lib/wallet-context';
 
@@ -93,6 +94,12 @@ export default function HomeScreen() {
       return () => clearTimeout(timer);
     }, []),
   );
+
+  // Keep local appointment reminders in step with the record (a no-op unless the
+  // patient turned reminders on in Settings).
+  useEffect(() => {
+    void syncAppointmentReminders(record?.appointments, t);
+  }, [record?.appointments, t]);
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);

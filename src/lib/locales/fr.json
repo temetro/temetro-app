@@ -116,7 +116,15 @@
     "continue": "Continuer",
     "dobTitle": "Quand êtes-vous né(e) ?"
   },
+  "reminders": {
+    "title": "Rappel de rendez-vous",
+    "body": "{{type}} à {{time}}"
+  },
   "settings": {
+    "reminders": "Rappels de rendez-vous",
+    "remindersHint": "Recevez un rappel local avant chaque rendez-vous",
+    "remindersDeniedTitle": "Notifications désactivées",
+    "remindersDeniedBody": "Activez les notifications pour cette app afin de recevoir des rappels.",
     "title": "Réglages",
     "storedOnDevice": "Conservé uniquement sur cet appareil",
     "patientFallback": "Patient",

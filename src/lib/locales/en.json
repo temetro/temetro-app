@@ -116,7 +116,15 @@
     "continue": "Continue",
     "dobTitle": "When were you born?"
   },
+  "reminders": {
+    "title": "Appointment reminder",
+    "body": "{{type}} at {{time}}"
+  },
   "settings": {
+    "reminders": "Appointment reminders",
+    "remindersHint": "Get a local reminder before each appointment",
+    "remindersDeniedTitle": "Notifications off",
+    "remindersDeniedBody": "Enable notifications for this app to get reminders.",
     "title": "Settings",
     "storedOnDevice": "Stored only on this device",
     "patientFallback": "Patient",

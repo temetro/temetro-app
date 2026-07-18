@@ -14,6 +14,7 @@ import {
 } from 'heroui-native';
 import { useRouter } from 'expo-router';
 import {
+  Bell,
   BookOpen,
   Check,
   Copy,
@@ -42,6 +43,12 @@ import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { SheetInput } from '@/components/sheet/sheet-parts';
 import { shortWallet } from '@/lib/format';
 import i18n from '@/lib/i18n';
+import {
+  remindersEnabled,
+  requestReminderPermission,
+  setRemindersPref,
+  syncAppointmentReminders,
+} from '@/lib/reminders';
 import {
   applyDirectionForLanguage,
   LANGUAGES,
@@ -72,6 +79,22 @@ export default function SettingsScreen() {
   const [langOpen, setLangOpen] = useState(false);
   const [phoneOpen, setPhoneOpen] = useState(false);
   const [phoneDraft, setPhoneDraft] = useState('');
+  const [reminders, setReminders] = useState(remindersEnabled());
+
+  // Toggle local appointment reminders. Enabling asks for notification
+  // permission first; either change re-syncs the schedule from the record.
+  const toggleReminders = async (on: boolean) => {
+    if (on && !(await requestReminderPermission())) {
+      Alert.alert(
+        t('settings.remindersDeniedTitle'),
+        t('settings.remindersDeniedBody'),
+      );
+      return;
+    }
+    setRemindersPref(on);
+    setReminders(on);
+    await syncAppointmentReminders(record?.appointments, t);
+  };
 
   const openPhone = () => {
     setPhoneDraft(record?.phone ?? '');
@@ -283,6 +306,21 @@ export default function SettingsScreen() {
                   isSelected={theme === 'dark'}
                   onSelectedChange={(on) => Uniwind.setTheme(on ? 'dark' : 'light')}
                 />
+              </ListGroup.ItemSuffix>
+            </ListGroup.Item>
+            <Separator className="mx-4" />
+            <ListGroup.Item>
+              <ListGroup.ItemPrefix>
+                <Bell size={20} color={accent} />
+              </ListGroup.ItemPrefix>
+              <ListGroup.ItemContent>
+                <ListGroup.ItemTitle>{t('settings.reminders')}</ListGroup.ItemTitle>
+                <ListGroup.ItemDescription>
+                  {t('settings.remindersHint')}
+                </ListGroup.ItemDescription>
+              </ListGroup.ItemContent>
+              <ListGroup.ItemSuffix>
+                <Switch isSelected={reminders} onSelectedChange={toggleReminders} />
               </ListGroup.ItemSuffix>
             </ListGroup.Item>
             <Separator className="mx-4" />

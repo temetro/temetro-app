@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { UpdatesInbox } from '@/components/updates-inbox';
 import { OnboardingProvider, useOnboarding } from '@/lib/onboarding';
+import { configureReminders } from '@/lib/reminders';
 import { darkPalette, lightPalette } from '@/lib/theme';
 import { useVault, VaultProvider } from '@/lib/vault-context';
 import { useWallet, WalletProvider } from '@/lib/wallet-context';
@@ -35,6 +36,10 @@ const navLight = {
   ...DefaultTheme,
   colors: { ...DefaultTheme.colors, background: lightPalette.bg, card: lightPalette.bg },
 };
+
+// Register the notification handler once so appointment reminders show even
+// while the app is foregrounded.
+configureReminders();
 
 // Auth-style gate: once the onboarding flag + wallet state are loaded, redirect
 // into the right flow. The animated splash overlay covers the first frame so the

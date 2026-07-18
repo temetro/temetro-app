@@ -116,7 +116,15 @@
     "continue": "Sii wad",
     "dobTitle": "Goorma ayaad dhalatay?"
   },
+  "reminders": {
+    "title": "Xusuusin ballan",
+    "body": "{{type}} {{time}}"
+  },
   "settings": {
+    "reminders": "Xusuusinta ballamaha",
+    "remindersHint": "Hel xusuusin gudaha ah ballan kasta ka hor",
+    "remindersDeniedTitle": "Ogeysiisyada waa la damiyay",
+    "remindersDeniedBody": "Daar ogeysiisyada abkan si aad u hesho xusuusino.",
     "title": "Dejinta",
     "storedOnDevice": "Waxaa lagu kaydiyaa qalabkan oo keliya",
     "patientFallback": "Bukaan",

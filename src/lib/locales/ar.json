@@ -116,7 +116,15 @@
     "continue": "متابعة",
     "dobTitle": "متى وُلدت؟"
   },
+  "reminders": {
+    "title": "تذكير بالموعد",
+    "body": "{{type}} في {{time}}"
+  },
   "settings": {
+    "reminders": "تذكيرات المواعيد",
+    "remindersHint": "احصل على تذكير محلي قبل كل موعد",
+    "remindersDeniedTitle": "الإشعارات متوقفة",
+    "remindersDeniedBody": "فعّل إشعارات هذا التطبيق لتصلك التذكيرات.",
     "title": "الإعدادات",
     "storedOnDevice": "محفوظ فقط على هذا الجهاز",
     "patientFallback": "المريض",

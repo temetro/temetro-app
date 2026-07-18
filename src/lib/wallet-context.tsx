@@ -263,6 +263,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       socketRef.current?.disconnect();
       socketRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- connect is stable and this must run once on mount
   }, []);
 
   // Mint the patient's first record from their profile and mark them registered.

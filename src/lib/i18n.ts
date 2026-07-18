@@ -15,6 +15,7 @@ import so from './locales/so.json';
 const initialLanguage = resolveInitialLanguage();
 applyDirectionForLanguage(initialLanguage);
 
+// eslint-disable-next-line import/no-named-as-default-member -- chaining on the i18next default instance is the documented setup API
 void i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
