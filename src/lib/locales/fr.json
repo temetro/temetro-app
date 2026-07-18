@@ -52,6 +52,8 @@
     },
     "recentActivity": "Activité récente",
     "share": {
+      "qr": "QR code",
+      "barcode": "Code-barres",
       "title": "Partager votre dossier",
       "subtitle": "Laissez une clinique scanner ceci pour demander votre dossier",
       "hint": "La clinique finalise la demande de son côté après le scan.",

@@ -52,6 +52,8 @@
     },
     "recentActivity": "Recent activity",
     "share": {
+      "qr": "QR code",
+      "barcode": "Barcode",
       "title": "Share your record",
       "subtitle": "Let a clinic scan this to request your record",
       "hint": "The clinic completes the request on their side after scanning.",

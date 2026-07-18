@@ -95,8 +95,12 @@ export default function SettingsScreen() {
     disconnected: t('settings.status.disconnected'),
   };
 
+  // Match on the base code so a region-suffixed active language (e.g. "en-US"
+  // from device detection) still resolves to a LANGUAGES entry and shows its
+  // name below "Language" instead of falling back to English.
   const currentLanguage =
-    LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
+    LANGUAGES.find((l) => l.code === i18n.language?.split('-')[0]) ??
+    LANGUAGES[0];
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
@@ -402,9 +406,15 @@ export default function SettingsScreen() {
       <BottomSheet isOpen={phoneOpen} onOpenChange={setPhoneOpen}>
         <BottomSheet.Portal>
           <BottomSheet.Overlay />
-          {/* `keyboardBehavior="extend"` + SheetInput's focus/blur handlers keep
-              the sheet above the keyboard instead of hidden behind it. */}
-          <BottomSheet.Content keyboardBehavior="extend">
+          {/* `keyboardBehavior="interactive"` pans the sheet up with the
+              keyboard so the field stays visible (a small dynamic-height sheet
+              has no taller snap point for "extend" to grow into);
+              `android_keyboardInputMode="adjustResize"` makes Android react to
+              the keyboard too. Pairs with SheetInput's focus/blur handlers. */}
+          <BottomSheet.Content
+            android_keyboardInputMode="adjustResize"
+            keyboardBehavior="interactive"
+          >
             <View className="gap-5 pt-1">
               <View className="gap-1">
                 <BottomSheet.Title>{t('settings.phoneDialog.title')}</BottomSheet.Title>

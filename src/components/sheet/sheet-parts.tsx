@@ -35,7 +35,10 @@ export function SheetInput({
   return (
     <TextField>
       <Label>{label}</Label>
-      <Input {...inputProps} onBlur={onBlur} onFocus={onFocus} />
+      {/* `secondary` (bg-default) so the field stands out from the sheet: the
+          default `bg-field` resolves to the same colour as `bg-overlay` (the
+          sheet surface) in both themes, making the input invisible. */}
+      <Input variant="secondary" {...inputProps} onBlur={onBlur} onFocus={onFocus} />
     </TextField>
   );
 }

@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
   BottomSheet,
   Card,
@@ -28,15 +28,16 @@ import {
   Stethoscope,
   Wallet,
 } from 'lucide-react-native';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, View } from 'react-native';
+import { Alert, Keyboard, Pressable, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { RefreshableScrollView } from '@/components/refreshable-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddDocumentCard } from '@/components/add-document';
+import { DataMatrix } from '@/components/data-matrix';
 import { HeaderIconButton } from '@/components/header-icon-button';
 import { Logo } from '@/components/logo';
 import { SheetHeader } from '@/components/sheet/sheet-parts';
@@ -79,7 +80,19 @@ export default function HomeScreen() {
     useWallet();
   const [fg, muted, accent] = useThemeColor(['foreground', 'muted', 'accent']);
   const [shareOpen, setShareOpen] = useState(false);
+  const [shareFormat, setShareFormat] = useState<'qr' | 'barcode'>('qr');
   const [walletOpen, setWalletOpen] = useState(false);
+
+  // Unlock uses a PIN OTP backed by a hidden TextInput; when the gate navigates
+  // here the keyboard can ride along and stay up. Dismiss it whenever Home gains
+  // focus (the delayed pass catches a keyboard that reopens mid-transition).
+  useFocusEffect(
+    useCallback(() => {
+      Keyboard.dismiss();
+      const timer = setTimeout(() => Keyboard.dismiss(), 150);
+      return () => clearTimeout(timer);
+    }, []),
+  );
 
   const copy = async (value: string, label: string) => {
     await Clipboard.setStringAsync(value);
@@ -197,11 +210,17 @@ export default function HomeScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={qa.label}
                 className="flex-1 active:opacity-80">
-                <Card className="items-center gap-2 py-4">
+                <Card className="min-h-[104px] items-center gap-2 py-4">
                   <View className="size-11 items-center justify-center rounded-2xl bg-accent/12">
                     <Icon size={22} color={accent} />
                   </View>
-                  <Typography className="text-xs font-medium text-foreground">{qa.label}</Typography>
+                  {/* Clamp + min-height so longer translations (e.g. Somali)
+                      keep every quick-action card the same size. */}
+                  <Typography
+                    numberOfLines={2}
+                    className="text-center text-xs font-medium text-foreground">
+                    {qa.label}
+                  </Typography>
                 </Card>
               </Pressable>
             );
@@ -217,7 +236,7 @@ export default function HomeScreen() {
                 key={tile.key}
                 onPress={() => router.push(tile.route)}
                 className="w-[48%] active:opacity-80">
-                <Card className="gap-4">
+                <Card className="min-h-[156px] gap-4">
                   <View className="flex-row items-start justify-between">
                     <View
                       className={`size-11 items-center justify-center rounded-2xl ${tile.tintClass}`}>
@@ -225,10 +244,19 @@ export default function HomeScreen() {
                     </View>
                     <ChevronRight size={18} color={muted} />
                   </View>
+                  {/* Clamp title/caption + a shared min-height so a longer
+                      locale (Somali) can't stretch one tile taller than its
+                      row-mates. */}
                   <View className="gap-0.5">
                     <Typography className="text-3xl font-bold text-foreground">{tile.count}</Typography>
-                    <Typography className="text-sm font-medium text-foreground">{tile.title}</Typography>
-                    <Typography className="text-xs text-muted">{tile.caption}</Typography>
+                    <Typography
+                      numberOfLines={2}
+                      className="text-sm font-medium text-foreground">
+                      {tile.title}
+                    </Typography>
+                    <Typography numberOfLines={2} className="text-xs text-muted">
+                      {tile.caption}
+                    </Typography>
                   </View>
                 </Card>
               </Pressable>
@@ -331,8 +359,29 @@ export default function HomeScreen() {
               />
               {identity ? (
                 <View className="items-center gap-4 pb-2">
+                  {/* QR or a compact 2D barcode (DataMatrix) — the clinic can
+                      scan either from the Patients page. */}
+                  <View className="flex-row self-center rounded-full bg-surface p-1">
+                    {(['qr', 'barcode'] as const).map((fmt) => (
+                      <Pressable
+                        accessibilityRole="button"
+                        className={`rounded-full px-4 py-1.5 ${shareFormat === fmt ? 'bg-accent' : ''}`}
+                        key={fmt}
+                        onPress={() => setShareFormat(fmt)}>
+                        <Typography
+                          className="text-xs font-medium"
+                          style={{ color: shareFormat === fmt ? '#fff' : muted }}>
+                          {t(`home.share.${fmt}`)}
+                        </Typography>
+                      </Pressable>
+                    ))}
+                  </View>
                   <View className="rounded-3xl bg-white p-5">
-                    <QRCode value={identity.walletNumber} size={200} />
+                    {shareFormat === 'qr' ? (
+                      <QRCode value={identity.walletNumber} size={200} />
+                    ) : (
+                      <DataMatrix size={200} value={identity.walletNumber} />
+                    )}
                   </View>
                   <Pressable
                     onPress={() =>

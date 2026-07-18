@@ -101,7 +101,7 @@ export default function CameraScreen() {
       {focused && !pairing ? (
         <CameraView
           style={StyleSheet.absoluteFill}
-          barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+          barcodeScannerSettings={{ barcodeTypes: ['qr', 'datamatrix', 'pdf417'] }}
           onBarcodeScanned={({ data }) => onBarcodeScanned(data)}
         />
       ) : null}
