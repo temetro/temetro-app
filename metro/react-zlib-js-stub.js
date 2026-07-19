@@ -1,15 +1,10 @@
-// Stub for `react-zlib-js`.
+// Stub for `react-zlib-js` (the PNG_ZLIB default import in bwip-js's RN build).
 //
-// bwip-js's React Native build (dist/bwip-js-rn.mjs) statically imports
-// `react-zlib-js` (as PNG_ZLIB) and `react-zlib-js/buffer.js` (as Buffer), but
-// only ever uses them inside its PNG encoder and image-input paths. Our
-// DataMatrix component only calls `toSVG`, which never touches either, so the
-// real package is dead weight — and the published `react-zlib-js` crashes
-// during its own module evaluation under React Native ("Cannot read property
-// 'slice' of null"), which took the whole bundle down.
-//
-// Metro aliases both `react-zlib-js` and `react-zlib-js/buffer.js` to this empty
-// module (see metro.config.js), satisfying the static imports without pulling in
-// the broken package. An empty object is safe: the only code that would read
-// from it lives in the unused PNG/Buffer paths.
+// The published `react-zlib-js` crashes during its own module evaluation under
+// React Native ("Cannot read property 'slice' of null"), so we alias it here
+// instead of installing it (see metro.config.js). bwip-js only touches this
+// zlib object inside its PNG encoder (toDataURL); DataMatrix only calls toSVG,
+// which never runs that path, so an empty object is safe. (The separate Buffer
+// import IS used at module eval to decode the built-in font — that one is
+// aliased to the real `buffer` polyfill, see react-zlib-js-buffer-shim.js.)
 module.exports = {};
